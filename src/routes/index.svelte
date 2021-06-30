@@ -1,5 +1,31 @@
 <script lang="ts">
+  import { onMount } from 'svelte'
+  import {
+    getProviderAndContract,
+    initializeEventListeners,
+    metaMaskChecks,
+  } from '../web3/tools'
   import { getBytes32FromMultiash, getMultihashFromBytes32 } from '../utils/cid'
+  import { abi } from '../ABI/Dqanda.json'
+  import { ethers } from 'ethers'
+  import { provider, contract } from '../web3/store'
+
+  onMount(async () => {
+    let contractAddress = import.meta.env.VITE_DQANDA_HARDHAT_ADDRESS
+    let NETWORK_ID = import.meta.env.VITE_LOCALHOST_NETWORK_ID
+
+    if (typeof contractAddress == 'string' && typeof NETWORK_ID == 'string') {
+      const { provider: web3Provider, contract: dQandA } =
+        getProviderAndContract(contractAddress, abi)
+
+      provider.set(web3Provider)
+      contract.set(dQandA)
+
+      metaMaskChecks()
+      initializeEventListeners(NETWORK_ID, $provider, $contract)
+    }
+  })
+
   let cid = ''
   function handlesubmit() {
     let bytes32
@@ -19,5 +45,17 @@
       placeholder="CID"
     />
   </form>
-  <p>QmagCD7i57KJHQV7APbX1WPpBNFUqwV9TYSAVPwqps5W49</p>
+  <button
+    on:click={async () =>
+      console.log(
+        await $contract.ask(
+          'jeff',
+          ethers.BigNumber.from(18),
+          ethers.BigNumber.from(32),
+          {
+            value: ethers.utils.parseEther('1.0'),
+          }
+        )
+      )}>ASK</button
+  >
 </main>
