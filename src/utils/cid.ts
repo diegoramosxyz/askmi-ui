@@ -1,5 +1,11 @@
-import { utils } from 'ethers'
+import { ethers, utils } from 'ethers'
 import { Buffer } from 'buffer'
+
+export type multihash = {
+  digest: string
+  hashFunction: ethers.BigNumber
+  size: ethers.BigNumber
+}
 
 /**
  * @typedef {Object} Multihash
@@ -19,8 +25,8 @@ export function getBytes32FromMultiash(multihash: string) {
 
   return {
     digest: utils.hexlify(decoded.slice(2)),
-    hashFunction: decoded[0],
-    size: decoded[1],
+    hashFunction: ethers.BigNumber.from(decoded[0]),
+    size: ethers.BigNumber.from(decoded[1]),
   }
 }
 
@@ -30,13 +36,9 @@ export function getBytes32FromMultiash(multihash: string) {
  * @param {Multihash} multihash
  * @returns {(string|null)} base58 encoded multihash string
  */
-export function getMultihashFromBytes32(multihash: {
-  digest: string
-  hashFunction: number
-  size: number
-}) {
+export function getMultihashFromBytes32(multihash: multihash) {
   const { digest, hashFunction, size } = multihash
-  if (size === 0) return null
+  if (size.toNumber() === 0) return null
 
   // cut off leading "0x"
   const hashBytes = Buffer.from(digest.slice(2), 'hex')
@@ -63,8 +65,8 @@ export function parseContractResponse(
   const [digest, hashFunction, size] = response
   return {
     digest,
-    hashFunction: Number(hashFunction),
-    size: Number(size),
+    hashFunction: ethers.BigNumber.from(hashFunction),
+    size: ethers.BigNumber.from(size),
   }
 }
 
