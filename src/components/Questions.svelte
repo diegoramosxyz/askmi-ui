@@ -1,7 +1,8 @@
 <script lang="ts">
-  import type { ethers } from 'ethers'
-  import { getBytes32FromMultiash } from '../utils/cid'
+  import { ethers } from 'ethers'
+  import { getBytes32FromMultiash, getMultihashFromBytes32 } from '../utils/cid'
   import { questions, signer, owner, contract } from '../web3/store'
+  import Link from './Link.svelte'
 
   let cid2 = ''
   function respond(questioner: string, qIndex: ethers.BigNumber) {
@@ -16,10 +17,21 @@
   {#each $questions as { questioner, questions }}
     <p>{questioner}</p>
     <div class="grid gap-3 mb-5">
-      {#each [...questions].reverse() as { question, answer, qIndex }}
+      {#each [...questions].reverse() as { question, answer, qIndex, balance }}
         <article class="px-3 py-2 ring-1 ring-trueGray-700 rounded">
-          <p>Question: {question.digest}</p>
-          <p>Answer: {answer.digest}</p>
+          <section class="grid gap-2 mb-4">
+            <Link
+              href={`https://ipfs.io/ipfs/${getMultihashFromBytes32(question)}`}
+              >Question</Link
+            >
+            {#if answer.digest !== ''}
+              <Link
+                href={`https://ipfs.io/ipfs/${getMultihashFromBytes32(answer)}`}
+                >Answer</Link
+              >
+            {/if}
+            <p>Price: {ethers.utils.formatEther(balance)} ETH</p>
+          </section>
           {#if answer.digest === '' && questioner === $signer.address}
             <button
               on:click={() => $contract.removeQuestion(qIndex)}

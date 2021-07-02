@@ -1,7 +1,16 @@
 import { ethers, Contract } from 'ethers'
-import type { dQandA, Question } from './contract'
-import { InitializeContractEventListeners } from './eventListeners'
+import type { dQandA } from './contract'
 import { signer } from './store'
+import { abi } from '../ABI/Dqanda.json'
+import {
+  provider,
+  contract,
+  owner,
+  price,
+  questioners,
+  questions,
+} from '../web3/store'
+import { InitializeContractEventListeners } from './eventListeners'
 
 // Get the ETH balance for any account in human-readable form
 export async function getRoundedEthBalance(
@@ -13,42 +22,24 @@ export async function getRoundedEthBalance(
   return Math.floor(Number(ETH) * 100) / 100
 }
 
-// Convert Big Number types to human readable types
-export function formatQuestion(q: Question) {
-  return {
-    question: {
-      digest: q.question.digest,
-      hashFunction: q.question.hashFunction.toNumber(),
-      size: q.question.size.toNumber(),
-    },
-    answer: {
-      digest: q.answer.digest,
-      hashFunction: q.answer.hashFunction.toNumber(),
-      size: q.answer.size.toNumber(),
-    },
-    qIndex: q.qIndex.toNumber(),
-    balance: ethers.utils.formatEther(q.balance),
-  }
-}
-
-export function getProviderAndContract(
+function getProviderAndContract(
   contractAddress: string,
   contractABI: ethers.ContractInterface
 ) {
   // Get the provider from the browser
-  const provider = new ethers.providers.Web3Provider(window.ethereum)
+  const _provider = new ethers.providers.Web3Provider(window.ethereum)
 
   // Create a new Contract instance for the Multi Sig Wallet
-  let contract = new Contract(
+  let _contract = new Contract(
     contractAddress || '',
     contractABI,
-    provider.getSigner()
+    _provider.getSigner()
   ) as dQandA
 
-  return { provider, contract }
+  return { _provider, _contract }
 }
 
-export function metaMaskChecks(provider: ethers.providers.Web3Provider) {
+function setMetaMaskChecks(provider: ethers.providers.Web3Provider) {
   if (window.ethereum) {
     // Detect the account on MetaMask upon page reload
     window.ethereum
@@ -75,10 +66,9 @@ export function metaMaskChecks(provider: ethers.providers.Web3Provider) {
   }
 }
 
-export async function initializeEventListeners(
+async function setChainChecks(
   chainId: string,
-  provider: ethers.providers.Web3Provider,
-  contract: dQandA
+  provider: ethers.providers.Web3Provider
 ) {
   // Listen for chain id changes
   provider.on('network', (newNetwork, oldNetwork) => {
@@ -91,7 +81,32 @@ export async function initializeEventListeners(
     // oldNetwork exists, it represents a changing network
     oldNetwork && window.location.reload()
   })
+}
 
-  // Create event listeners
-  InitializeContractEventListeners(contract, provider)
+// Set up event listeners and load store with initial data
+export async function setUpWeb3(
+  contractAddress: string | boolean | undefined,
+  chainId: string | boolean | undefined
+) {
+  // Check that the environment variables are loaded
+  if (typeof contractAddress == 'string' && typeof chainId == 'string') {
+    // Get the web3 provider (MetaMask) and the contract object
+    const { _provider, _contract } = getProviderAndContract(
+      contractAddress,
+      abi
+    )
+
+    // Set check to update data on events
+    setMetaMaskChecks(_provider)
+    setChainChecks(chainId, _provider)
+    InitializeContractEventListeners(_contract, questioners, questions)
+
+    // Load stores
+    provider.set(_provider)
+    contract.set(_contract)
+    owner.set((await _contract.owner()).toLocaleLowerCase())
+    price.set(ethers.utils.formatEther(await _contract.price()))
+  } else {
+    console.log('Enviroment variables not loaded.')
+  }
 }

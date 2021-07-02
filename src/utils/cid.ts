@@ -1,11 +1,6 @@
 import { ethers, utils } from 'ethers'
 import { Buffer } from 'buffer'
-
-export type multihash = {
-  digest: string
-  hashFunction: ethers.BigNumber
-  size: ethers.BigNumber
-}
+import type { Cid } from 'src/web3/contract'
 
 /**
  * @typedef {Object} Multihash
@@ -36,7 +31,7 @@ export function getBytes32FromMultiash(multihash: string) {
  * @param {Multihash} multihash
  * @returns {(string|null)} base58 encoded multihash string
  */
-export function getMultihashFromBytes32(multihash: multihash) {
+export function getMultihashFromBytes32(multihash: Cid) {
   const { digest, hashFunction, size } = multihash
   if (size.toNumber() === 0) return null
 
@@ -51,33 +46,4 @@ export function getMultihashFromBytes32(multihash: multihash) {
   multihashBytes.set(hashBytes, 2)
 
   return utils.base58.encode(multihashBytes)
-}
-
-/**
- * Parse Solidity response in array to a Multihash object
- *
- * @param {array} response Response array from Solidity
- * @returns {Multihash} multihash object
- */
-export function parseContractResponse(
-  response: [digest: string, hashFunction: string, size: string]
-) {
-  const [digest, hashFunction, size] = response
-  return {
-    digest,
-    hashFunction: ethers.BigNumber.from(hashFunction),
-    size: ethers.BigNumber.from(size),
-  }
-}
-
-/**
- * Parse Solidity response in array to a base58 encoded multihash string
- *
- * @param {array} response Response array from Solidity
- * @returns {string} base58 encoded multihash string
- */
-export function getMultihashFromContractResponse(
-  response: [digest: string, hashFunction: string, size: string]
-) {
-  return getMultihashFromBytes32(parseContractResponse(response))
 }
