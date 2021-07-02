@@ -424,6 +424,13 @@
   resolved "https://registry.yarnpkg.com/@trysound/sax/-/sax-0.1.1.tgz#3348564048e7a2d7398c935d466c0414ebb6a669"
   integrity sha512-Z6DoceYb/1xSg5+e+ZlPZ9v0N16ZvZ+wYMraFue4HYrE4ttONKtsvruIRf6t9TBR0YvSOfi1hUU0fJfBLCDYow==
 
+"@types/btoa@^1.2.3":
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/@types/btoa/-/btoa-1.2.3.tgz#2c8e7093f902bf8f0e10992a731a4996aa1a5732"
+  integrity sha512-ANNCZICS/ofxhzUl8V1DniBJs+sFQ+Yg5am1ZwVEf/sxoKY/J2+h5Fuw3xUErlZ7eJLdgzukBjZwnsV6+/2Rmg==
+  dependencies:
+    "@types/node" "*"
+
 "@types/node@*":
   version "15.14.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-15.14.0.tgz#74dbf254fb375551a9d2a71faf6b9dbc2178dc53"
@@ -588,6 +595,11 @@ bs58@^4.0.1:
   integrity sha1-vhYedsNU9veIrkBx9j806MTwpCo=
   dependencies:
     base-x "^3.0.2"
+
+btoa@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/btoa/-/btoa-1.2.1.tgz#01a9909f8b2c93f6bf680ba26131eb30f7fa3d73"
+  integrity sha512-SB4/MIGlsiVkMcHmT+pSmIPoNDoHg+7cMzmt3Uxt628MTz2487DKSqK/fuhFBrkuqrYv5UCEnACpF4dTFNKc/g==
 
 buffer@^6.0.3:
   version "6.0.3"

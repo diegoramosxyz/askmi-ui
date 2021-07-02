@@ -1,7 +1,7 @@
 import { ethers, Contract } from 'ethers'
 import type { dQandA } from './contract'
 import { signer } from './store'
-import { abi } from '../ABI/Dqanda.json'
+import { abi } from '../abi/Dqanda.json'
 import {
   provider,
   contract,
