@@ -3,8 +3,10 @@
   import { setUpWeb3 } from '../web3/tools'
   import { getBytes32FromMultiash } from '../utils/cid'
   import { ethers } from 'ethers'
-  import { contract, signer, owner, price } from '../web3/store'
+  import { contract, signer, owner } from '../web3/store'
   import Questions from '../components/Questions.svelte'
+  import Navbar from '../components/Navbar.svelte'
+  import SubmitFile from '../components/SubmitFile.svelte'
 
   onMount(async () => {
     let { VITE_CONTRACT_ADDRESS, VITE_CHAIN_ID } = import.meta.env
@@ -13,7 +15,6 @@
     await setUpWeb3(VITE_CONTRACT_ADDRESS, VITE_CHAIN_ID)
   })
 
-  let cid = ''
   function ask(cid: string) {
     // Conver CID into a multihash object
     let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
@@ -23,17 +24,13 @@
     })
   }
 
-  let files: FileList
-  // let image: any = null
+  let questionInputValue: string
+
+  // Take the string from the textarea and
+  // generate a FormData object to make the fetch request
   async function upload() {
-    // var response = await files[0].arrayBuffer()
-    // let buffer = new Uint8Array(response)
-
-    // Generate a link to render an image from a buffer
-    // image = URL.createObjectURL(new Blob([buffer], { type: 'image/png' }))
-
     const formData = new FormData()
-    formData.append('document', files[0])
+    formData.append('question', questionInputValue)
 
     let res = await fetch('https://ipfs.infura.io:5001/api/v0/add', {
       method: 'POST',
@@ -44,45 +41,29 @@
   }
 </script>
 
-<main class="max-w-prose mx-auto my-3">
-  {#if $owner && $signer}
-    <article class="grid gap-1 my-2">
-      <p>Account: {$signer.address}</p>
-    </article>
-    {#if $owner !== $signer.address}
-      <form
-        class="flex gap-3 justify-center"
-        on:submit|preventDefault={() => ask(cid)}
-      >
-        <input
-          bind:value={cid}
-          class="px-3 py-1 ring-1 rounded ring-gray-800"
-          placeholder="CID"
-        />
+<main class="max-w-screen-md mx-auto">
+  <Navbar />
+  {#if $owner && $signer && $owner !== $signer.address}
+    <form
+      class="mb-5 grid gap-3 justify-center"
+      on:submit|preventDefault={async () => {
+        let hash = await upload()
+        ask(hash)
+      }}
+    >
+      <textarea
+        bind:value={questionInputValue}
+        cols="40"
+        rows="8"
+        class="px-3 py-2 bg-transparent ring-1 ring-trueGray-700 rounded resize-y"
+        placeholder="Ask a question here."
+      />
+      <div>
         <button class="px-4 py-1 font-medium bg-blue-800 text-white rounded"
           >ASK</button
         >
-      </form>
-      <p>Price {$price} ETH</p>
-      <form
-        class="my-4"
-        on:submit|preventDefault={async () => {
-          let hash = await upload()
-          ask(hash)
-        }}
-      >
-        <input bind:files type="file" />
-
-        <button class="px-4 py-1 font-medium bg-blue-800 text-white rounded"
-          >ASK</button
-        >
-      </form>
-      <!-- Render an image submitted by the user -->
-      <!-- {#if image}
-        <img src={image} alt="Svelte logo" />
-      {/if} -->
-    {/if}
+      </div>
+    </form>
   {/if}
-
   <Questions />
 </main>

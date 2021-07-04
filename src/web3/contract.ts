@@ -11,6 +11,8 @@ export type Question = {
   answer: Cid
   qIndex: ethers.BigNumber
   balance: ethers.BigNumber
+  resolvedQuestion: string | null
+  resolvedAnswer: string | null
 }
 
 export interface dQandA extends ethers.Contract {

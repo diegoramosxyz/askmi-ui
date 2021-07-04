@@ -8,6 +8,7 @@ const config = {
     extend: {
       colors: {
         trueGray: colors.trueGray,
+        amber: colors.amber,
       },
     },
   },
