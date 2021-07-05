@@ -40,7 +40,9 @@
   </header>
   {#if $questions}
     {#each $questions as { questioner, questions }}
-      <p class="pl-2 mb-2 font-mono">{shrinkAddress(questioner)}</p>
+      <a href={`/questioner/${questioner}`}>
+        <p class="pl-2 mb-2 font-mono">{shrinkAddress(questioner)}</p>
+      </a>
       <div class="grid gap-3 mb-6">
         {#each [...questions].reverse() as { answer, qIndex, balance, resolvedQuestion, resolvedAnswer }}
           <article class="p-3 mb-2 ring-1 ring-trueGray-700 rounded">

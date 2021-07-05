@@ -2,60 +2,60 @@ import type { ethers } from 'ethers'
 import type { dQandA } from './contract'
 import type { questionsByQuestioner } from './store'
 import type { Writable } from 'svelte/store'
-import { getMultihashFromBytes32 } from '../utils/cid'
+import { getMultihashFromBytes32 as getCid } from '../utils/cid'
+import { get } from 'svelte/store'
 
 // Ethers docs
 // https://docs.ethers.io/v5/api/utils/bignumber/#BigNumber
 
 // https://docs.ethers.io/v5/api/contract/contract/#Contract-on
 
-export async function updateQuestions(
+async function resolveIpfs(cid: string | null) {
+  if (cid !== null) {
+    let res = await fetch(`https://ipfs.io/ipfs/${cid}`)
+    return await res.text()
+  }
+  return null
+}
+
+export async function getQuestionsSubset(
   contract: dQandA,
   questioners: Writable<string[]>,
   questions: Writable<questionsByQuestioner>
 ) {
-  // Get questioners and remove the first element of the array
-  // The first element is the 0 address
-  let qrs = (await contract.getQuestioners()).slice(1)
-  questioners.set(qrs)
-  let _questioners: string[] = []
-  questioners.subscribe((value) => (_questioners = value))
+  // 1- Get questioners
+  // 2- remove the first element of the array (which is the 0 address)
+  // 3- Remove all other questioners, but the last 5
+  // This is done to limit the FETCH resquest made to IPFS
+  questioners.set((await contract.getQuestioners()).slice(1).slice(-5))
+  // Initialize the questions array
+  questions.set([])
 
-  let qs: questionsByQuestioner = []
-  // WARNING TODO: Limit the amount of questioners queried
-  // Create a Questions object for each questioner
-  _questioners.map(async (questioner) => {
-    let _questions = await contract.getQuestions(questioner)
-    // Call the ipfs endpoint for each cid stored in the contract
-    // Todo: Limit the amount of call made at once
-    let _questionsWithText = await Promise.all(
+  // Fetch data from IPFS
+  get(questioners).map(async (questioner) => {
+    // Get only the last 3 questions asked by the questioner
+    // This is done to limit the amount request made by the browser to IPFS
+    let _questions = (await contract.getQuestions(questioner)).slice(-3)
+
+    // Get the data from IPFS using the CID for questions and answers
+    let _fetchedContent = await Promise.all(
       _questions.map(async (qAndA) => {
-        let q = getMultihashFromBytes32(qAndA.question)
-        let a = getMultihashFromBytes32(qAndA.answer)
-        let resolvedQuestion = null
-        let resolvedAnswer = null
-        if (q !== null) {
-          let res = await fetch(`https://ipfs.io/ipfs/${q}`)
-          resolvedQuestion = await res.text()
-        }
-        if (a !== null) {
-          let res = await fetch(`https://ipfs.io/ipfs/${a}`)
-          resolvedAnswer = await res.text()
-        }
         return {
           ...qAndA,
-          resolvedQuestion,
-          resolvedAnswer,
+          resolvedQuestion: await resolveIpfs(getCid(qAndA.question)),
+          resolvedAnswer: await resolveIpfs(getCid(qAndA.answer)),
         }
       })
     )
 
-    qs.push({
-      questioner: questioner.toLocaleLowerCase(),
-      questions: _questionsWithText,
-    })
-    // Research why this is the only way to make this work
-    questions.set(qs)
+    // Push the new elements into the questions array
+    questions.set([
+      ...get(questions),
+      {
+        questioner: questioner.toLocaleLowerCase(),
+        questions: _fetchedContent,
+      },
+    ])
   })
 }
 
@@ -63,25 +63,29 @@ export async function updateQuestions(
 export async function InitializeContractEventListeners(
   contract: dQandA,
   questioners: Writable<string[]>,
-  questions: Writable<questionsByQuestioner>
+  questions: Writable<questionsByQuestioner>,
+  path: string
 ) {
-  // Update data on page load
-  await updateQuestions(contract, questioners, questions)
-
-  // Update data on events
-  contract.on(
-    'QuestionAsked',
-    async (_questioner: string, _qIndex: ethers.BigNumber) =>
-      await updateQuestions(contract, questioners, questions)
-  )
-  contract.on(
-    'QuestionAnswered',
-    async (_questioner: string, _qIndex: ethers.BigNumber) =>
-      await updateQuestions(contract, questioners, questions)
-  )
-  contract.on(
-    'QuestionRemoved',
-    async (_questioner: string, _qIndex: ethers.BigNumber) =>
-      await updateQuestions(contract, questioners, questions)
-  )
+  if (path === '/') {
+    // Run once on page load
+    await getQuestionsSubset(contract, questioners, questions)
+    // Update data on events
+    contract.on(
+      'QuestionAsked',
+      async (_questioner: string, _qIndex: ethers.BigNumber) =>
+        await getQuestionsSubset(contract, questioners, questions)
+    )
+    contract.on(
+      'QuestionAnswered',
+      async (_questioner: string, _qIndex: ethers.BigNumber) =>
+        await getQuestionsSubset(contract, questioners, questions)
+    )
+    contract.on(
+      'QuestionRemoved',
+      async (_questioner: string, _qIndex: ethers.BigNumber) =>
+        await getQuestionsSubset(contract, questioners, questions)
+    )
+  } else if (path === '/questioner') {
+    questioners.set((await contract.getQuestioners()).slice(1))
+  }
 }

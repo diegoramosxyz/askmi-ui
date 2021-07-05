@@ -86,7 +86,8 @@ async function setChainChecks(
 // Set up event listeners and load store with initial data
 export async function setUpWeb3(
   contractAddress: string | boolean | undefined,
-  chainId: string | boolean | undefined
+  chainId: string | boolean | undefined,
+  path: string
 ) {
   // Check that the environment variables are loaded
   if (typeof contractAddress == 'string' && typeof chainId == 'string') {
@@ -99,7 +100,7 @@ export async function setUpWeb3(
     // Set check to update data on events
     setMetaMaskChecks(_provider)
     setChainChecks(chainId, _provider)
-    InitializeContractEventListeners(_contract, questioners, questions)
+    InitializeContractEventListeners(_contract, questioners, questions, path)
 
     // Load stores
     provider.set(_provider)

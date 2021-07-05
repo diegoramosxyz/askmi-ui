@@ -1,17 +1,31 @@
+<script context="module" lang="ts">
+  import type { LoadInput } from '@sveltejs/kit'
+
+  export function load({ page: { path } }: LoadInput) {
+    return {
+      props: {
+        path,
+      },
+    }
+  }
+</script>
+
 <script lang="ts">
   import { onMount } from 'svelte'
   import { setUpWeb3 } from '../web3/tools'
   import { getBytes32FromMultiash } from '../utils/cid'
   import { ethers } from 'ethers'
   import { contract, signer, owner } from '../web3/store'
-  import Questions from '../components/Questions.svelte'
-  import Navbar from '../components/Navbar.svelte'
+  import Questions from '$lib/Questions.svelte'
+  import Navbar from '$lib/Navbar.svelte'
+
+  export let path: string
 
   onMount(async () => {
     let { VITE_CONTRACT_ADDRESS, VITE_CHAIN_ID } = import.meta.env
 
     // Set up event listeners and load stores with initial data
-    await setUpWeb3(VITE_CONTRACT_ADDRESS, VITE_CHAIN_ID)
+    await setUpWeb3(VITE_CONTRACT_ADDRESS, VITE_CHAIN_ID, path)
   })
 
   function ask(cid: string) {
