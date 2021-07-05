@@ -6,7 +6,6 @@
   import { contract, signer, owner } from '../web3/store'
   import Questions from '../components/Questions.svelte'
   import Navbar from '../components/Navbar.svelte'
-  import SubmitFile from '../components/SubmitFile.svelte'
 
   onMount(async () => {
     let { VITE_CONTRACT_ADDRESS, VITE_CHAIN_ID } = import.meta.env
@@ -54,7 +53,7 @@
       <textarea
         bind:value={questionInputValue}
         cols="40"
-        rows="8"
+        rows="7"
         class="px-3 py-2 bg-transparent ring-1 ring-trueGray-700 rounded resize-y"
         placeholder="Ask a question here."
       />

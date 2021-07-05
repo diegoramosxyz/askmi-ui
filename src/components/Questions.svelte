@@ -1,5 +1,6 @@
 <script lang="ts">
   import { ethers } from 'ethers'
+  import { shrinkAddress } from '../utils/ui'
   import { getBytes32FromMultiash } from '../utils/cid'
   import { questions, signer, owner, contract } from '../web3/store'
 
@@ -33,23 +34,25 @@
   }
 </script>
 
-<section class="mb-3">
+<section class="mb-3 max-w-prose mx-auto">
   <header class="mb-3">
     <h1 class="text-xl font-medium">Questions</h1>
   </header>
   {#if $questions}
     {#each $questions as { questioner, questions }}
-      <p class="pl-2 mb-3 font-mono">{questioner}</p>
-      <div class="grid gap-3 mb-5">
+      <p class="pl-2 mb-2 font-mono">{shrinkAddress(questioner)}</p>
+      <div class="grid gap-3 mb-6">
         {#each [...questions].reverse() as { answer, qIndex, balance, resolvedQuestion, resolvedAnswer }}
-          <article class="p-3 ring-1 ring-trueGray-700 rounded">
+          <article class="p-3 mb-2 ring-1 ring-trueGray-700 rounded">
             <section class="grid gap-2 mb-4">
-              <p>{resolvedQuestion}</p>
+              <p class="font-semibold text-lg">{resolvedQuestion}</p>
               <!-- If the answer exists -->
               {#if answer.digest !== ''}
                 <p>{resolvedAnswer}</p>
               {/if}
-              <p>Price: {ethers.utils.formatEther(balance)} ETH</p>
+              {#if balance > ethers.BigNumber.from(0)}
+                <p>Deposit: {ethers.utils.formatEther(balance)} ETH</p>
+              {/if}
             </section>
             {#if answer.digest === '' && questioner === $signer.address}
               <button
