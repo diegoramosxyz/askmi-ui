@@ -15,7 +15,7 @@ export type Question = {
   resolvedAnswer: string | null
 }
 
-export interface dQandA extends ethers.Contract {
+export interface AskMi extends ethers.Contract {
   /**
    * Variables
    */

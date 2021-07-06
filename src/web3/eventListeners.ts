@@ -1,5 +1,5 @@
 import type { ethers } from 'ethers'
-import type { dQandA } from './contract'
+import type { AskMi } from './contract'
 import type { questionsByQuestioner } from './store'
 import type { Writable } from 'svelte/store'
 import { getMultihashFromBytes32 as getCid } from '../utils/cid'
@@ -19,7 +19,7 @@ async function resolveIpfs(cid: string | null) {
 }
 
 export async function getQuestionsSubset(
-  contract: dQandA,
+  contract: AskMi,
   questioners: Writable<string[]>,
   questions: Writable<questionsByQuestioner>
 ) {
@@ -61,7 +61,7 @@ export async function getQuestionsSubset(
 
 // This function will only run once on page load
 export async function InitializeContractEventListeners(
-  contract: dQandA,
+  contract: AskMi,
   questioners: Writable<string[]>,
   questions: Writable<questionsByQuestioner>,
   path: string

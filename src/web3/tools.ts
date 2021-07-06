@@ -1,7 +1,7 @@
 import { ethers, Contract } from 'ethers'
-import type { dQandA } from './contract'
+import type { AskMi } from './contract'
 import { signer } from './store'
-import { abi } from '../abi/Dqanda.json'
+import { abi } from '../abi/AskMi.json'
 import {
   provider,
   contract,
@@ -34,7 +34,7 @@ function getProviderAndContract(
     contractAddress || '',
     contractABI,
     _provider.getSigner()
-  ) as dQandA
+  ) as AskMi
 
   return { _provider, _contract }
 }

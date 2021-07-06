@@ -1,18 +1,18 @@
-# dqanda
+# AskMi
 
-dqanda (Decentralized Q&A) is dapp used to offer a pay-per-response service in which anyone can ask questions by paying a price set by the responder in exchange for a answer.
+AskMi is dapp used to offer a pay-per-response service in which anyone can ask questions by paying a price set by the responder in exchange for a answer.
 
 The responder will add Priority Tiers, which inform the questioner of how fast he should expect a response.
 
 ### PROBLEM BEING ADRESSED
 
-As seen in websites such as Quora and Yahoo Answers, people are willing to answer questions, even when there is no economic incentive for doing so. dqanda aims to provide an economic incentive for anyone to provide the best answer the any question in a decentralized and non-custodial fashion.
+As seen in websites such as Quora and Yahoo Answers, people are willing to answer questions, even when there is no economic incentive for doing so. AskMi aims to provide an economic incentive for anyone to provide the best answer the any question in a decentralized and non-custodial fashion.
 
 Thanks to IPFS the answer will not be limited to strings. If feasiable, any type of file could be use to answer the questions.
 
 ### THE SERVICE AND THE PROTOCOL
 
-dqanda as a service will be the best and easiest to use graphical user interface to interact with dqanda, the protocol. It will show stats for the responder and allow viewers to tip answers, signaling a cosign. Such tips will be distributed between the responder and questioner.
+AskMi as a service will be the best and easiest to use graphical user interface to interact with AskMi, the protocol. It will show stats for the responder and allow viewers to tip answers, signaling a cosign. Such tips will be distributed between the responder and questioner.
 
 ### STATEMENTS
 
