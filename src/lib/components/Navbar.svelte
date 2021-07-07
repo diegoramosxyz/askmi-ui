@@ -1,6 +1,6 @@
 <script>
-  import { shrinkAddress } from '../utils/ui'
-  import { signer } from '../web3/store'
+  import { shrinkAddress } from '$lib/utils/ui'
+  import { signer } from '$lib/web3/store'
 </script>
 
 <nav class="flex justify-between items-center py-3">

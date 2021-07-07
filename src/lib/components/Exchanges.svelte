@@ -1,15 +1,15 @@
 <script lang="ts">
   import { ethers } from 'ethers'
-  import { shrinkAddress } from '../utils/ui'
-  import { getBytes32FromMultiash } from '../utils/cid'
-  import { questions, signer, owner, contract } from '../web3/store'
+  import { shrinkAddress } from '$lib/utils/ui'
+  import { getBytes32FromMultiash } from '$lib/utils/cid'
+  import { questions, signer, owner, askMi, questioners } from '$lib/web3/store'
 
   let cid2 = ''
   function respond(questioner: string, qIndex: ethers.BigNumber) {
     // Conver CID into a multihash object
     let { digest, hashFunction, size } = getBytes32FromMultiash(cid2)
     // Call the ask function
-    $contract.respond(questioner, digest, hashFunction, size, qIndex)
+    $askMi.respond(questioner, digest, hashFunction, size, qIndex)
   }
 
   let questionInputValue: string
@@ -44,7 +44,7 @@
         <p class="pl-2 mb-2 font-mono">{shrinkAddress(questioner)}</p>
       </a>
       <div class="grid gap-3 mb-6">
-        {#each [...questions].reverse() as { answer, qIndex, balance, resolvedQuestion, resolvedAnswer }}
+        {#each [...questions].reverse() as { answer, exchangeIndex, balance, resolvedQuestion, resolvedAnswer }}
           <article class="p-3 mb-2 ring-1 ring-trueGray-700 rounded">
             <section class="grid gap-2 mb-4">
               <p class="font-semibold text-lg">{resolvedQuestion}</p>
@@ -56,18 +56,12 @@
                 <p>Deposit: {ethers.utils.formatEther(balance)} ETH</p>
               {/if}
             </section>
-            {#if answer.digest === '' && questioner === $signer.address}
-              <button
-                on:click={() => $contract.removeQuestion(qIndex)}
-                class="px-3 py-2 bg-red-700 text-white rounded">Remove</button
-              >
-            {/if}
             {#if answer.digest === '' && $owner === $signer.address}
               <form
                 class="mb-5 grid gap-3 justify-center"
                 on:submit|preventDefault={async () => {
                   let hash = await upload()
-                  respond(questioner, qIndex)
+                  respond(questioner, exchangeIndex)
                 }}
               >
                 <textarea
@@ -77,13 +71,26 @@
                   class="px-3 py-2 bg-transparent ring-1 ring-trueGray-700 rounded resize-y"
                   placeholder="Ask a question here."
                 />
-                <div>
+                <div class="flex gap-4">
                   <button
                     class="px-4 py-1 font-medium bg-blue-800 text-white rounded"
                     >Answer</button
                   >
+                  <button
+                    on:click={() =>
+                      $askMi.removeQuestion(questioner, exchangeIndex)}
+                    class="px-3 py-1 font-medium bg-red-800 text-white rounded"
+                    >Remove</button
+                  >
                 </div>
               </form>
+            {/if}
+            {#if answer.digest === '' && questioner === $signer.address}
+              <button
+                on:click={() =>
+                  $askMi.removeQuestion(questioner, exchangeIndex)}
+                class="px-3 py-1 bg-red-700 text-white rounded">Remove</button
+              >
             {/if}
           </article>
         {/each}

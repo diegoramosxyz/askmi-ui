@@ -2,7 +2,7 @@ import type { ethers } from 'ethers'
 import type { AskMi } from './askmi'
 import type { questionsByQuestioner } from './store'
 import type { Writable } from 'svelte/store'
-import { getMultihashFromBytes32 as getCid } from '../utils/cid'
+import { getMultihashFromBytes32 as getCid } from '$lib/utils/cid'
 import { get } from 'svelte/store'
 
 // Ethers docs
@@ -66,7 +66,7 @@ export async function InitializeContractEventListeners(
   questions: Writable<questionsByQuestioner>,
   path: string
 ) {
-  if (path === '/') {
+  if (path.startsWith('/instance/')) {
     // Run once on page load
     await getQuestionsSubset(contract, questioners, questions)
     // Update data on events

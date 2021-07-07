@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores'
-  import { questioners } from '../../web3/store'
-  import { setUpWeb3 } from '../../web3/tools'
+  import { questioners } from '$lib/web3/store'
+  import { setUpWeb3 } from '$lib/web3/tools'
   import { onMount } from 'svelte'
 
   onMount(async () => {

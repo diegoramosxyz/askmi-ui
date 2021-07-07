@@ -1,12 +1,8 @@
 <script lang="ts">
   import { page } from '$app/stores'
   import { onMount } from 'svelte'
-  import { setUpWeb3 } from '../web3/tools'
-  import { getBytes32FromMultiash } from '../utils/cid'
-  import { BigNumber, utils } from 'ethers'
-  import { contract, signer, owner } from '../web3/store'
-  import Questions from '$lib/Questions.svelte'
-  import Navbar from '$lib/Navbar.svelte'
+  import { setUpWeb3 } from '$lib/web3/tools'
+  import Navbar from '$lib/components/Navbar.svelte'
 
   onMount(async () => {
     let { VITE_CONTRACT_ADDRESS, VITE_CHAIN_ID } = import.meta.env
@@ -15,55 +11,52 @@
     await setUpWeb3(VITE_CONTRACT_ADDRESS, VITE_CHAIN_ID, $page.path)
   })
 
-  function ask(cid: string, _tierIndex: BigNumber) {
-    // Conver CID into a multihash object
-    let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
-    // Call the ask function
-    $contract.ask(digest, hashFunction, size, _tierIndex, {
-      value: utils.parseEther('1.0'),
-    })
-  }
-
-  let questionInputValue: string
-
-  // Take the string from the textarea and
-  // generate a FormData object to make the fetch request
-  async function upload() {
-    const formData = new FormData()
-    formData.append('question', questionInputValue)
-
-    let res = await fetch('https://ipfs.infura.io:5001/api/v0/add', {
-      method: 'POST',
-      body: formData,
-    })
-    let { Hash } = await res.json()
-    return Hash
-  }
+  let basicTier: string
+  let mediumTier: string
+  let premiumTier: string
+  let tipPrice: string
 </script>
 
 <main class="max-w-screen-md mx-auto">
   <Navbar />
-  {#if $owner && $signer && $owner !== $signer.address}
-    <form
-      class="mb-5 grid gap-3 justify-center"
-      on:submit|preventDefault={async () => {
-        let hash = await upload()
-        ask(hash, BigNumber.from(0))
-      }}
-    >
-      <textarea
-        bind:value={questionInputValue}
-        cols="40"
-        rows="7"
-        class="px-3 py-2 bg-transparent ring-1 ring-trueGray-700 rounded resize-y"
-        placeholder="Ask a question here."
-      />
-      <div>
-        <button class="px-4 py-1 font-medium bg-blue-800 text-white rounded"
-          >ASK</button
-        >
-      </div>
-    </form>
-  {/if}
-  <Questions />
+  <h1 class="mb-3">Deploy an AskMi instance</h1>
+  <h2>Tiers in ETH</h2>
+  <section class="grid gap-2">
+    <label for="basic">Basic</label>
+    <input
+      class="px-2 py-1 bg-black text-white rounded"
+      type="number"
+      name="basic"
+      bind:value={basicTier}
+    />
+    <label for="medium">Medium</label>
+    <input
+      class="px-2 py-1 bg-black text-white rounded"
+      type="number"
+      name="medium"
+      bind:value={mediumTier}
+    />
+    <label for="premium">Premium</label>
+    <input
+      class="px-2 py-1 bg-black text-white rounded"
+      type="number"
+      name="premium"
+      bind:value={premiumTier}
+    />
+  </section>
+  <h2>Tip price in ETH</h2>
+  <section class="grid gap-2">
+    <label for="basic">Tip price</label>
+    <input
+      class="px-2 py-1 bg-black text-white rounded"
+      type="number"
+      name="tip"
+      bind:value={tipPrice}
+    />
+  </section>
+  <button
+    class="px-2 py-1.5 bg-green-700 text-white rounded"
+    on:click={() => console.log('Implement contract deploy')}
+    >Deploy AskMi contract</button
+  >
 </main>

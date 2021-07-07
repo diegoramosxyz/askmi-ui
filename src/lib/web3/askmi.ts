@@ -18,20 +18,9 @@ export type Exchange = {
 
 export interface AskMi extends Contract {
   /**
-   * Variables
+   * PAYABLE FUNCTIONS
    */
-  owner(): Promise<string>
-  tip(): Promise<BigNumber>
-  fee(): Promise<BigNumber>
 
-  /**
-   * Functions
-   */
-  updateTip(_newTipPrice: BigNumber): Promise<Transaction>
-  updateTiers(_newTiers: BigNumber[]): Promise<Transaction>
-  getTiers(): Promise<BigNumber[]>
-  getQuestioners(): Promise<string[]>
-  getQuestions(_questioner: string): Promise<Exchange[]>
   ask(
     _digest: string,
     _hashFunction: BigNumber,
@@ -39,7 +28,20 @@ export interface AskMi extends Contract {
     _tierIndex: BigNumber,
     overrides: CallOverrides
   ): Promise<Transaction>
-  removeQuestion(_exchangeIndex: BigNumber): Promise<Transaction>
+  issueTip(
+    _questioner: string,
+    _exchangeIndex: BigNumber,
+    overrides: CallOverrides
+  ): Promise<Transaction>
+
+  /**
+   * STATE MODIFIER FUNCTIONS
+   */
+
+  removeQuestion(
+    _questioner: string,
+    _exchangeIndex: BigNumber
+  ): Promise<Transaction>
   respond(
     _questioner: string,
     _digest: string,
@@ -47,5 +49,22 @@ export interface AskMi extends Contract {
     _size: BigNumber,
     _exchangeIndex: BigNumber
   ): Promise<Transaction>
-  issueTip(_questioner: string, _exchangeIndex: BigNumber): Promise<Transaction>
+  updateTiers(_newTiers: BigNumber[]): Promise<Transaction>
+  updateTip(_newTipPrice: BigNumber): Promise<Transaction>
+
+  /**
+   * GETTER FUNCTIONS
+   */
+
+  getTiers(): Promise<BigNumber[]>
+  getQuestioners(): Promise<string[]>
+  getQuestions(_questioner: string): Promise<Exchange[]>
+
+  /**
+   * VARIABLES
+   */
+
+  tip(): Promise<BigNumber>
+  fee(): Promise<BigNumber>
+  owner(): Promise<string>
 }

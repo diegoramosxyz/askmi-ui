@@ -1,15 +1,8 @@
 import { ethers, Contract } from 'ethers'
 import type { AskMi } from './askmi'
 import { signer } from './store'
-import { abi } from '../abi/AskMi.json'
-import {
-  provider,
-  contract,
-  owner,
-  price,
-  questioners,
-  questions,
-} from '../web3/store'
+import { abi } from '$lib/abi/AskMi.json'
+import { provider, askMi, owner, tiers, questioners, questions } from './store'
 import { InitializeContractEventListeners } from './eventListeners'
 
 // Get the ETH balance for any account in human-readable form
@@ -102,11 +95,14 @@ export async function setUpWeb3(
     setChainChecks(chainId, _provider)
     InitializeContractEventListeners(_contract, questioners, questions, path)
 
+    let _tiers = await _contract.getTiers()
+    let formattedTiers = _tiers.map((tier) => ethers.utils.formatEther(tier))
+
     // Load stores
     provider.set(_provider)
-    contract.set(_contract)
+    askMi.set(_contract)
     owner.set((await _contract.owner()).toLocaleLowerCase())
-    price.set(ethers.utils.formatEther(await _contract.price()))
+    tiers.set(formattedTiers)
   } else {
     console.log('Enviroment variables not loaded.')
   }
