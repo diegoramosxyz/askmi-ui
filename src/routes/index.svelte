@@ -3,7 +3,7 @@
   import { onMount } from 'svelte'
   import { setUpWeb3 } from '../web3/tools'
   import { getBytes32FromMultiash } from '../utils/cid'
-  import { ethers } from 'ethers'
+  import { BigNumber, utils } from 'ethers'
   import { contract, signer, owner } from '../web3/store'
   import Questions from '$lib/Questions.svelte'
   import Navbar from '$lib/Navbar.svelte'
@@ -15,12 +15,12 @@
     await setUpWeb3(VITE_CONTRACT_ADDRESS, VITE_CHAIN_ID, $page.path)
   })
 
-  function ask(cid: string) {
+  function ask(cid: string, _tierIndex: BigNumber) {
     // Conver CID into a multihash object
     let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
     // Call the ask function
-    $contract.ask(digest, hashFunction, size, {
-      value: ethers.utils.parseEther('1.0'),
+    $contract.ask(digest, hashFunction, size, _tierIndex, {
+      value: utils.parseEther('1.0'),
     })
   }
 
@@ -48,7 +48,7 @@
       class="mb-5 grid gap-3 justify-center"
       on:submit|preventDefault={async () => {
         let hash = await upload()
-        ask(hash)
+        ask(hash, BigNumber.from(0))
       }}
     >
       <textarea

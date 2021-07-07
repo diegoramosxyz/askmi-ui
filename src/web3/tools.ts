@@ -1,5 +1,5 @@
 import { ethers, Contract } from 'ethers'
-import type { AskMi } from './contract'
+import type { AskMi } from './askmi'
 import { signer } from './store'
 import { abi } from '../abi/AskMi.json'
 import {

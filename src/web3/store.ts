@@ -1,6 +1,6 @@
 import type { ethers } from 'ethers'
 import { Writable, writable } from 'svelte/store'
-import type { AskMi, Question } from './contract'
+import type { AskMi, Exchange } from './askmi'
 
 interface MetaMaskSigner {
   address: string
@@ -9,7 +9,7 @@ interface MetaMaskSigner {
 
 export type questionsByQuestioner = {
   questioner: string
-  questions: Question[]
+  questions: Exchange[]
 }[]
 
 export const contract: Writable<AskMi> = writable()

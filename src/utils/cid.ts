@@ -1,6 +1,6 @@
 import { ethers, utils } from 'ethers'
 import { Buffer } from 'buffer'
-import type { Cid } from 'src/web3/contract'
+import type { Cid } from 'src/web3/askmi'
 
 /**
  * @typedef {Object} Multihash

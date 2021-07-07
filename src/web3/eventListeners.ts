@@ -1,5 +1,5 @@
 import type { ethers } from 'ethers'
-import type { AskMi } from './contract'
+import type { AskMi } from './askmi'
 import type { questionsByQuestioner } from './store'
 import type { Writable } from 'svelte/store'
 import { getMultihashFromBytes32 as getCid } from '../utils/cid'
