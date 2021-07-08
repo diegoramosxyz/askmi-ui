@@ -1,4 +1,3 @@
-import type { ethers } from 'ethers'
 import type { AskMi } from './askmi'
 import type { questionsByQuestioner } from './store'
 import type { Writable } from 'svelte/store'
@@ -57,35 +56,4 @@ export async function getQuestionsSubset(
       },
     ])
   })
-}
-
-// This function will only run once on page load
-export async function InitializeContractEventListeners(
-  contract: AskMi,
-  questioners: Writable<string[]>,
-  questions: Writable<questionsByQuestioner>,
-  path: string
-) {
-  if (path.startsWith('/instance/')) {
-    // Run once on page load
-    await getQuestionsSubset(contract, questioners, questions)
-    // Update data on events
-    contract.on(
-      'QuestionAsked',
-      async (_questioner: string, _qIndex: ethers.BigNumber) =>
-        await getQuestionsSubset(contract, questioners, questions)
-    )
-    contract.on(
-      'QuestionAnswered',
-      async (_questioner: string, _qIndex: ethers.BigNumber) =>
-        await getQuestionsSubset(contract, questioners, questions)
-    )
-    contract.on(
-      'QuestionRemoved',
-      async (_questioner: string, _qIndex: ethers.BigNumber) =>
-        await getQuestionsSubset(contract, questioners, questions)
-    )
-  } else if (path === '/questioner') {
-    questioners.set((await contract.getQuestioners()).slice(1))
-  }
 }

@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { ethers } from 'ethers'
+  import { BigNumber, ethers } from 'ethers'
   import { shrinkAddress } from '$lib/utils/ui'
   import { getBytes32FromMultiash } from '$lib/utils/cid'
   import { questions, signer, owner, askMi, questioners } from '$lib/web3/store'
+  import { getQuestionsSubset } from '$lib/web3/eventListeners'
 
   let cid2 = ''
   function respond(questioner: string, qIndex: ethers.BigNumber) {
@@ -10,6 +11,22 @@
     let { digest, hashFunction, size } = getBytes32FromMultiash(cid2)
     // Call the ask function
     $askMi.respond(questioner, digest, hashFunction, size, qIndex)
+
+    $askMi.once(
+      'QuestionAnswered',
+      async (_questioner: string, _exchangeIndex: BigNumber) =>
+        await getQuestionsSubset($askMi, questioners, questions)
+    )
+  }
+
+  function removeQuestion(questioner: string, exchangeIndex: BigNumber) {
+    $askMi.removeQuestion(questioner, exchangeIndex)
+
+    $askMi.once(
+      'QuestionRemoved',
+      async (_questioner: string, _exchangeIndex: BigNumber) =>
+        await getQuestionsSubset($askMi, questioners, questions)
+    )
   }
 
   let questionInputValue: string
@@ -60,7 +77,7 @@
               <form
                 class="mb-5 grid gap-3 justify-center"
                 on:submit|preventDefault={async () => {
-                  let hash = await upload()
+                  await upload()
                   respond(questioner, exchangeIndex)
                 }}
               >
@@ -77,8 +94,7 @@
                     >Answer</button
                   >
                   <button
-                    on:click={() =>
-                      $askMi.removeQuestion(questioner, exchangeIndex)}
+                    on:click={() => removeQuestion(questioner, exchangeIndex)}
                     class="px-3 py-1 font-medium bg-red-800 text-white rounded"
                     >Remove</button
                   >
@@ -87,8 +103,7 @@
             {/if}
             {#if answer.digest === '' && questioner === $signer.address}
               <button
-                on:click={() =>
-                  $askMi.removeQuestion(questioner, exchangeIndex)}
+                on:click={() => removeQuestion(questioner, exchangeIndex)}
                 class="px-3 py-1 bg-red-700 text-white rounded">Remove</button
               >
             {/if}

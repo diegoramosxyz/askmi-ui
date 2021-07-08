@@ -1,6 +1,6 @@
 import type { BigNumber, Contract } from 'ethers'
 
-export interface AskMi extends Contract {
+export interface AskMiFactory extends Contract {
   /**
    * FUNCTIONS
    */

@@ -1,19 +1,27 @@
 <script lang="ts">
   import { page } from '$app/stores'
   import { onMount } from 'svelte'
-  import { setUpWeb3 } from '$lib/web3/tools'
+  import { setUpAskMi } from '$lib/web3/tools'
   import { getBytes32FromMultiash } from '$lib/utils/cid'
   import { BigNumber, utils } from 'ethers'
-  import { askMi, signer, owner, tiers } from '$lib/web3/store'
+  import {
+    askMi,
+    signer,
+    owner,
+    tiers,
+    questioners,
+    questions,
+  } from '$lib/web3/store'
   import Exchanges from '$lib/components/Exchanges.svelte'
   import Navbar from '$lib/components/Navbar.svelte'
+  import { getQuestionsSubset } from '$lib/web3/eventListeners'
 
   // TODO: Create function to check valid Ethereum addresses
   onMount(async () => {
     let { VITE_CHAIN_ID } = import.meta.env
 
     // Set up event listeners and load stores with initial data
-    await setUpWeb3($page.params.address, VITE_CHAIN_ID, $page.path)
+    await setUpAskMi($page.params.address, VITE_CHAIN_ID, $page.path)
   })
 
   function ask(cid: string, _tierIndex: number) {
@@ -23,6 +31,11 @@
     $askMi.ask(digest, hashFunction, size, BigNumber.from(_tierIndex), {
       value: utils.parseEther($tiers[_tierIndex]),
     })
+    $askMi.once(
+      'QuestionAsked',
+      async (_questioner: string, _exchangeIndex: BigNumber) =>
+        await getQuestionsSubset($askMi, questioners, questions)
+    )
   }
 
   let questionInputValue: string

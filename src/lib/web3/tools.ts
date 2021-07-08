@@ -1,9 +1,11 @@
 import { ethers, Contract } from 'ethers'
 import type { AskMi } from './askmi'
-import { signer } from './store'
-import { abi } from '$lib/abi/AskMi.json'
+import { askMiFactory, myAskMi, signer } from './store'
+import { abi as askMiAbi } from '$lib/abi/AskMi.json'
+import { abi as askMiFactoryAbi } from '$lib/abi/AskMiFactory.json'
 import { provider, askMi, owner, tiers, questioners, questions } from './store'
-import { InitializeContractEventListeners } from './eventListeners'
+import { getQuestionsSubset } from './eventListeners'
+import type { AskMiFactory } from './askmi-factory'
 
 // Get the ETH balance for any account in human-readable form
 export async function getRoundedEthBalance(
@@ -15,21 +17,9 @@ export async function getRoundedEthBalance(
   return Math.floor(Number(ETH) * 100) / 100
 }
 
-function getProviderAndContract(
-  contractAddress: string,
-  contractABI: ethers.ContractInterface
-) {
+function getProvider() {
   // Get the provider from the browser
-  const _provider = new ethers.providers.Web3Provider(window.ethereum)
-
-  // Create a new Contract instance for the Multi Sig Wallet
-  let _contract = new Contract(
-    contractAddress || '',
-    contractABI,
-    _provider.getSigner()
-  ) as AskMi
-
-  return { _provider, _contract }
+  return new ethers.providers.Web3Provider(window.ethereum)
 }
 
 function setMetaMaskChecks(provider: ethers.providers.Web3Provider) {
@@ -77,24 +67,28 @@ async function setChainChecks(
 }
 
 // Set up event listeners and load store with initial data
-export async function setUpWeb3(
-  contractAddress: string | boolean | undefined,
-  chainId: string | boolean | undefined,
+export async function setUpAskMi(
+  address: ImportMetaEnv[''],
+  chainId: ImportMetaEnv[''],
   path: string
 ) {
   // Check that the environment variables are loaded
-  if (typeof contractAddress == 'string' && typeof chainId == 'string') {
+  if (typeof address == 'string' && typeof chainId == 'string') {
     // Get the web3 provider (MetaMask) and the contract object
-    const { _provider, _contract } = getProviderAndContract(
-      contractAddress,
-      abi
-    )
+    const _provider = getProvider()
+    const _contract = new Contract(
+      address,
+      askMiAbi,
+      _provider.getSigner()
+    ) as AskMi
 
     // Set check to update data on events
     setMetaMaskChecks(_provider)
     setChainChecks(chainId, _provider)
-    InitializeContractEventListeners(_contract, questioners, questions, path)
-
+    if (path.startsWith('/instance/')) {
+      // Run once on page load
+      await getQuestionsSubset(_contract, questioners, questions)
+    }
     let _tiers = await _contract.getTiers()
     let formattedTiers = _tiers.map((tier) => ethers.utils.formatEther(tier))
 
@@ -103,6 +97,38 @@ export async function setUpWeb3(
     askMi.set(_contract)
     owner.set((await _contract.owner()).toLocaleLowerCase())
     tiers.set(formattedTiers)
+  } else {
+    console.log('Enviroment variables not loaded.')
+  }
+}
+
+// Set up event listeners and load store with initial data
+export async function setUpAskMiFactory(
+  address: ImportMetaEnv[''],
+  chainId: ImportMetaEnv['']
+) {
+  // Check that the environment variables are loaded
+  if (typeof address == 'string' && typeof chainId == 'string') {
+    // Get the web3 provider (MetaMask) and the contract object
+    const _provider = getProvider()
+    const _contract = new Contract(
+      address,
+      askMiFactoryAbi,
+      _provider.getSigner()
+    ) as AskMiFactory
+
+    // Set check to update data on events
+    setMetaMaskChecks(_provider)
+    setChainChecks(chainId, _provider)
+
+    // Load stores
+    provider.set(_provider)
+    askMiFactory.set(_contract)
+
+    // _provider.getBalance()
+
+    let _accounts = await _provider.listAccounts()
+    myAskMi.set(await _contract.getMyAskMi(_accounts[0]))
   } else {
     console.log('Enviroment variables not loaded.')
   }

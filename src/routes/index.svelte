@@ -1,62 +1,53 @@
 <script lang="ts">
-  import { page } from '$app/stores'
   import { onMount } from 'svelte'
-  import { setUpWeb3 } from '$lib/web3/tools'
+  import { setUpAskMiFactory } from '$lib/web3/tools'
   import Navbar from '$lib/components/Navbar.svelte'
+  import TierCards from '$lib/components/TierCards.svelte'
+  import TipCard from '$lib/components/TipCard.svelte'
+  import {
+    askMiFactory,
+    factoryTiers,
+    factoryTip,
+    myAskMi,
+  } from '$lib/web3/store'
+  import { utils } from 'ethers'
 
   onMount(async () => {
-    let { VITE_CONTRACT_ADDRESS, VITE_CHAIN_ID } = import.meta.env
+    let { VITE_ASKMI_FACTORY, VITE_CHAIN_ID } = import.meta.env
 
     // Set up event listeners and load stores with initial data
-    await setUpWeb3(VITE_CONTRACT_ADDRESS, VITE_CHAIN_ID, $page.path)
+    await setUpAskMiFactory(VITE_ASKMI_FACTORY, VITE_CHAIN_ID)
   })
 
-  let basicTier: string
-  let mediumTier: string
-  let premiumTier: string
-  let tipPrice: string
+  function instantiateAskMi() {
+    let _tiers = $factoryTiers
+      .filter(({ value }) => value > 0)
+      .map(({ value }) => utils.parseEther(value.toString()))
+    let _tip = utils.parseEther($factoryTip.toString())
+    // Deploy an AskMi instance
+    $askMiFactory.instantiateAskMi(_tiers, _tip)
+    // Listen to the AskMiInstantiated event
+    $askMiFactory.once('AskMiInstantiated', (_askMiAddress: string) => {
+      console.log('AskMi instantiated at: ', _askMiAddress)
+    })
+  }
 </script>
 
-<main class="max-w-screen-md mx-auto">
+<main class="px-3 lg:px-0 max-w-screen-md mx-auto font-mono">
   <Navbar />
-  <h1 class="mb-3">Deploy an AskMi instance</h1>
-  <h2>Tiers in ETH</h2>
-  <section class="grid gap-2">
-    <label for="basic">Basic</label>
-    <input
-      class="px-2 py-1 bg-black text-white rounded"
-      type="number"
-      name="basic"
-      bind:value={basicTier}
-    />
-    <label for="medium">Medium</label>
-    <input
-      class="px-2 py-1 bg-black text-white rounded"
-      type="number"
-      name="medium"
-      bind:value={mediumTier}
-    />
-    <label for="premium">Premium</label>
-    <input
-      class="px-2 py-1 bg-black text-white rounded"
-      type="number"
-      name="premium"
-      bind:value={premiumTier}
-    />
-  </section>
-  <h2>Tip price in ETH</h2>
-  <section class="grid gap-2">
-    <label for="basic">Tip price</label>
-    <input
-      class="px-2 py-1 bg-black text-white rounded"
-      type="number"
-      name="tip"
-      bind:value={tipPrice}
-    />
-  </section>
-  <button
-    class="px-2 py-1.5 bg-green-700 text-white rounded"
-    on:click={() => console.log('Implement contract deploy')}
-    >Deploy AskMi contract</button
-  >
+  <header>
+    <h1 class="mb-3">Deploy an AskMi instance</h1>
+  </header>
+  {#if $myAskMi !== undefined}
+    <a class="hover:underline" href={`/instance/${$myAskMi}`}
+      >Go to your AskMi instance</a
+    >
+  {/if}
+  <form on:submit|preventDefault={() => instantiateAskMi()}>
+    <TierCards />
+    <TipCard />
+    <button class="px-2 py-1.5 bg-green-700 text-white rounded"
+      >Deploy AskMi contract</button
+    >
+  </form>
 </main>
