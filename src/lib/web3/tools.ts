@@ -1,6 +1,6 @@
 import { ethers, Contract } from 'ethers'
 import type { AskMi } from './askmi'
-import { askMiFactory, myAskMi, signer } from './store'
+import { askMiFactory, loading, myAskMi, signer } from './store'
 import { abi as askMiAbi } from '$lib/abi/AskMi.json'
 import { abi as askMiFactoryAbi } from '$lib/abi/AskMiFactory.json'
 import { provider, askMi, owner, tiers, questioners, questions } from './store'
@@ -22,33 +22,6 @@ function getProvider() {
   return new ethers.providers.Web3Provider(window.ethereum)
 }
 
-function setMetaMaskChecks(provider: ethers.providers.Web3Provider) {
-  if (window.ethereum) {
-    // Detect the account on MetaMask upon page reload
-    window.ethereum
-      .request({ method: 'eth_accounts' })
-      .then(async (accounts: string[]) =>
-        signer.set({
-          address: accounts[0],
-          balance: await getRoundedEthBalance(provider, accounts[0]),
-        })
-      )
-      .catch((err: Error) => console.error(err))
-
-    // Detect when accounts are changed in MetaMask
-    window.ethereum.on('accountsChanged', async (accounts: string[]) =>
-      signer.set({
-        address: accounts[0],
-        balance: await getRoundedEthBalance(provider, accounts[0]),
-      })
-    )
-  } else {
-    // Prompt user to install MetaMask
-    // Todo: Show pop up error message
-    console.log('INSTALL METAMASK TO USE THIS DAPP!')
-  }
-}
-
 async function setChainChecks(
   chainId: string,
   provider: ethers.providers.Web3Provider
@@ -67,35 +40,46 @@ async function setChainChecks(
 }
 
 // Set up event listeners and load store with initial data
-export async function setUpAskMi(
-  address: ImportMetaEnv[''],
-  chainId: ImportMetaEnv[''],
-  path: string
-) {
+export async function setUpAskMi(address: string, chainId: ImportMetaEnv['']) {
   // Check that the environment variables are loaded
-  if (typeof address == 'string' && typeof chainId == 'string') {
+  if (typeof chainId == 'string') {
     // Get the web3 provider (MetaMask) and the contract object
     const _provider = getProvider()
-    const _contract = new Contract(
+    const _askMi = new Contract(
       address,
       askMiAbi,
       _provider.getSigner()
     ) as AskMi
 
-    // Set check to update data on events
-    setMetaMaskChecks(_provider)
-    setChainChecks(chainId, _provider)
-    if (path.startsWith('/instance/')) {
-      // Run once on page load
-      await getQuestionsSubset(_contract, questioners, questions)
+    if (window.ethereum) {
+      let _accounts = await _provider.listAccounts()
+      signer.set({
+        address: _accounts[0],
+        balance: await getRoundedEthBalance(_provider, _accounts[0]),
+      })
+      // Detect when accounts are changed in MetaMask
+      window.ethereum.on('accountsChanged', async (accounts: string[]) => {
+        signer.set({
+          address: accounts[0],
+          balance: await getRoundedEthBalance(_provider, accounts[0]),
+        })
+      })
+    } else {
+      // Prompt user to install MetaMask
+      // Todo: Show pop up error message
+      console.log('INSTALL METAMASK TO USE THIS DAPP!')
     }
-    let _tiers = await _contract.getTiers()
+    setChainChecks(chainId, _provider)
+    // Run once on page load
+    await getQuestionsSubset(_askMi, questioners, questions)
+
+    let _tiers = await _askMi.getTiers()
     let formattedTiers = _tiers.map((tier) => ethers.utils.formatEther(tier))
 
     // Load stores
     provider.set(_provider)
-    askMi.set(_contract)
-    owner.set((await _contract.owner()).toLocaleLowerCase())
+    askMi.set(_askMi)
+    owner.set(await _askMi.owner())
     tiers.set(formattedTiers)
   } else {
     console.log('Enviroment variables not loaded.')
@@ -109,26 +93,49 @@ export async function setUpAskMiFactory(
 ) {
   // Check that the environment variables are loaded
   if (typeof address == 'string' && typeof chainId == 'string') {
+    loading.set(true)
     // Get the web3 provider (MetaMask) and the contract object
     const _provider = getProvider()
-    const _contract = new Contract(
+    const _askMiFactory = new Contract(
       address,
       askMiFactoryAbi,
       _provider.getSigner()
     ) as AskMiFactory
 
     // Set check to update data on events
-    setMetaMaskChecks(_provider)
+    if (window.ethereum) {
+      let _accounts = await _provider.listAccounts()
+      signer.set({
+        address: _accounts[0],
+        balance: await getRoundedEthBalance(_provider, _accounts[0]),
+      })
+      // Detect when accounts are changed in MetaMask
+      window.ethereum.on('accountsChanged', async (accounts: string[]) => {
+        signer.set({
+          address: accounts[0],
+          balance: await getRoundedEthBalance(_provider, accounts[0]),
+        })
+        try {
+          myAskMi.set(await _askMiFactory.getMyAskMi(accounts[0]))
+        } catch (error) {
+          myAskMi.set(null)
+        }
+      })
+    } else {
+      // Prompt user to install MetaMask
+      // Todo: Show pop up error message
+      console.log('INSTALL METAMASK TO USE THIS DAPP!')
+    }
     setChainChecks(chainId, _provider)
 
     // Load stores
     provider.set(_provider)
-    askMiFactory.set(_contract)
-
-    // _provider.getBalance()
+    askMiFactory.set(_askMiFactory)
 
     let _accounts = await _provider.listAccounts()
-    myAskMi.set(await _contract.getMyAskMi(_accounts[0]))
+    myAskMi.set(await _askMiFactory.getMyAskMi(_accounts[0]))
+
+    loading.set(false)
   } else {
     console.log('Enviroment variables not loaded.')
   }

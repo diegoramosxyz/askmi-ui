@@ -21,7 +21,7 @@
     let { VITE_CHAIN_ID } = import.meta.env
 
     // Set up event listeners and load stores with initial data
-    await setUpAskMi($page.params.address, VITE_CHAIN_ID, $page.path)
+    await setUpAskMi($page.params.address, VITE_CHAIN_ID)
   })
 
   function ask(cid: string, _tierIndex: number) {

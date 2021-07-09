@@ -8,9 +8,11 @@
     askMiFactory,
     factoryTiers,
     factoryTip,
+    loading,
     myAskMi,
   } from '$lib/web3/store'
   import { utils } from 'ethers'
+  import { goto } from '$app/navigation'
 
   onMount(async () => {
     let { VITE_ASKMI_FACTORY, VITE_CHAIN_ID } = import.meta.env
@@ -28,26 +30,32 @@
     $askMiFactory.instantiateAskMi(_tiers, _tip)
     // Listen to the AskMiInstantiated event
     $askMiFactory.once('AskMiInstantiated', (_askMiAddress: string) => {
-      console.log('AskMi instantiated at: ', _askMiAddress)
+      // Redirect user to the newly create AskMi instance
+      goto(`/instance/${_askMiAddress}`)
     })
   }
 </script>
 
 <main class="px-3 lg:px-0 max-w-screen-md mx-auto font-mono">
   <Navbar />
-  <header>
-    <h1 class="mb-3">Deploy an AskMi instance</h1>
-  </header>
-  {#if $myAskMi !== undefined}
-    <a class="hover:underline" href={`/instance/${$myAskMi}`}
-      >Go to your AskMi instance</a
-    >
+  {#if !$loading}
+    {#if $myAskMi !== null}
+      <a class="hover:underline" href={`/instance/${$myAskMi}`}
+        >Go to your AskMi instance</a
+      >
+    {:else}
+      <header>
+        <h1 class="mb-3">Deploy an AskMi instance</h1>
+      </header>
+      <form on:submit|preventDefault={() => instantiateAskMi()}>
+        <TierCards />
+        <TipCard />
+        <button class="px-2 py-1.5 bg-green-700 text-white rounded"
+          >Deploy AskMi contract</button
+        >
+      </form>
+    {/if}
+  {:else}
+    <p>Loading...</p>
   {/if}
-  <form on:submit|preventDefault={() => instantiateAskMi()}>
-    <TierCards />
-    <TipCard />
-    <button class="px-2 py-1.5 bg-green-700 text-white rounded"
-      >Deploy AskMi contract</button
-    >
-  </form>
 </main>

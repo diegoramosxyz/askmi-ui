@@ -14,7 +14,7 @@ export type questionsByQuestioner = {
 }[]
 
 export const askMi: Writable<AskMi> = writable()
-export const myAskMi: Writable<string> = writable()
+export const myAskMi: Writable<string | null> = writable()
 export const askMiFactory: Writable<AskMiFactory> = writable()
 export const provider: Writable<ethers.providers.Web3Provider> = writable()
 export const signer: Writable<MetaMaskSigner> = writable()
@@ -24,6 +24,7 @@ export const tip: Writable<string> = writable()
 export const fee: Writable<string> = writable()
 export const questioners: Writable<string[]> = writable()
 export const questions: Writable<questionsByQuestioner> = writable()
+export const loading: Writable<boolean> = writable()
 
 export const factoryTiers: Writable<{ name: string; value: number }[]> =
   writable()
