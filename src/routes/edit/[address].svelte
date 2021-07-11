@@ -2,8 +2,15 @@
   import { page } from '$app/stores'
   import { onMount } from 'svelte'
   import { setUpAskMi } from '$lib/web3/tools'
-  import { utils } from 'ethers'
-  import { askMi, loading, factoryTiers, factoryTip } from '$lib/web3/store'
+  import { ethers, utils } from 'ethers'
+  import {
+    askMi,
+    loading,
+    factoryTiers,
+    factoryTip,
+    tiers,
+    tip,
+  } from '$lib/web3/store'
   import Navbar from '$lib/components/Navbar.svelte'
   import TierCards from '$lib/components/TierCards.svelte'
   import TipCard from '$lib/components/TipCard.svelte'
@@ -23,6 +30,7 @@
     $askMi.updateTiers(_tiers)
     $askMi.once('TiersUpdated', (_askMiAddress: string) => {
       console.log('Tiers Updated.')
+      location.reload()
     })
   }
 
@@ -31,6 +39,7 @@
     $askMi.updateTip(_tip)
     $askMi.once('TipUpdated', (_askMiAddress: string) => {
       console.log('Tip Updated.')
+      location.reload()
     })
   }
 </script>
@@ -44,6 +53,12 @@
     <header>
       <h1 class="mb-3">Edit your AskMi instance</h1>
     </header>
+    {#each $tiers as tier, i}
+      <article class="flex gap-2 items-center">
+        <p>tier {i + 1}: {tier} ETH</p>
+      </article>
+    {/each}
+    <p>Tip: {ethers.utils.formatEther($tip)} ETH</p>
     <form on:submit|preventDefault={() => updateTiers()}>
       <TierCards />
       <button class="px-2 py-1.5 bg-green-700 text-white rounded"

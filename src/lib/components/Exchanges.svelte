@@ -85,7 +85,7 @@
                 <p>Deposit: {ethers.utils.formatEther(balance)} ETH</p>
               {/if}
             </section>
-            {#if answer.digest === '' && $owner.toLowerCase() === $signer.toLowerCase()}
+            {#if answer.digest === '' && $owner && $signer && $owner.toLowerCase() === $signer.toLowerCase()}
               <form
                 class="mb-5 grid gap-3 justify-center"
                 on:submit|preventDefault={async () => {
