@@ -3,11 +3,6 @@ import { Writable, writable } from 'svelte/store'
 import type { AskMi, Exchange } from './askmi'
 import type { AskMiFactory } from './askmi-factory'
 
-interface MetaMaskSigner {
-  address: string
-  balance: number
-}
-
 export type questionsByQuestioner = {
   questioner: string
   questions: Exchange[]
@@ -17,7 +12,8 @@ export const askMi: Writable<AskMi> = writable()
 export const myAskMi: Writable<string | null> = writable()
 export const askMiFactory: Writable<AskMiFactory> = writable()
 export const provider: Writable<ethers.providers.Web3Provider> = writable()
-export const signer: Writable<MetaMaskSigner> = writable()
+export const signer: Writable<string> = writable()
+export const chainId: Writable<string | null> = writable()
 export const owner: Writable<string> = writable()
 export const tiers: Writable<string[]> = writable()
 export const tip: Writable<string> = writable()
