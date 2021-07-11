@@ -5,7 +5,7 @@
   import { connectToMetaMask } from '$lib/web3/MetaMask'
 </script>
 
-<nav class="flex justify-between items-center py-3">
+<nav class="mb-3 flex justify-between items-center py-3">
   <section>
     <a href="/">AskMi</a>
   </section>

@@ -1,8 +1,15 @@
 <script lang="ts">
-  import { BigNumber, ethers } from 'ethers'
+  import { BigNumber, ethers, utils } from 'ethers'
   import { shrinkAddress } from '$lib/utils/ui'
   import { getBytes32FromMultiash } from '$lib/utils/cid'
-  import { questions, signer, owner, askMi, questioners } from '$lib/web3/store'
+  import {
+    questions,
+    signer,
+    owner,
+    askMi,
+    questioners,
+    tip,
+  } from '$lib/web3/store'
   import { getQuestionsSubset } from '$lib/web3/eventListeners'
 
   let cid2 = ''
@@ -26,6 +33,18 @@
       'QuestionRemoved',
       async (_questioner: string, _exchangeIndex: BigNumber) =>
         await getQuestionsSubset($askMi, questioners, questions)
+    )
+  }
+
+  async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
+    $askMi.issueTip(questioner, exchangeIndex, {
+      value: await $askMi.tip(),
+    })
+
+    $askMi.once(
+      'TipIssued',
+      async (_tipper: string, _questioner: string, _exchangeIndex: BigNumber) =>
+        console.log('Tip issued!')
     )
   }
 
@@ -55,7 +74,7 @@
   <header class="mb-3">
     <h1 class="text-xl font-medium">Questions</h1>
   </header>
-  {#if $questions}
+  {#if $questions && $questions.length !== 0}
     {#each $questions as { questioner, questions }}
       <a href={`/questioner/${questioner}`}>
         <p class="pl-2 mb-2 font-mono">{shrinkAddress(questioner)}</p>
@@ -73,7 +92,7 @@
                 <p>Deposit: {ethers.utils.formatEther(balance)} ETH</p>
               {/if}
             </section>
-            {#if answer.digest === '' && $owner === $signer.address}
+            {#if answer.digest === '' && $owner === $signer}
               <form
                 class="mb-5 grid gap-3 justify-center"
                 on:submit|preventDefault={async () => {
@@ -101,10 +120,17 @@
                 </div>
               </form>
             {/if}
-            {#if answer.digest === '' && questioner === $signer.address}
+            {#if answer.digest === '' && questioner === $signer}
               <button
                 on:click={() => removeQuestion(questioner, exchangeIndex)}
                 class="px-3 py-1 bg-red-700 text-white rounded">Remove</button
+              >
+            {/if}
+            {#if answer.digest !== ''}
+              <button
+                on:click={async () =>
+                  await tipAsnwer(questioner, exchangeIndex)}
+                class="px-3 py-1 bg-green-700 text-white rounded">Tip</button
               >
             {/if}
           </article>

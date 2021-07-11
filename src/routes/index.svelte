@@ -36,7 +36,7 @@
   }
 </script>
 
-<main class="px-3 lg:px-0 max-w-screen-md mx-auto font-mono">
+<main class="px-3 lg:px-0 max-w-screen-md mx-auto">
   <Navbar />
   {#if !$loading}
     {#if $myAskMi !== null}
@@ -45,12 +45,17 @@
       >
     {:else}
       <header>
-        <h1 class="mb-3">Deploy an AskMi instance</h1>
+        <h1 class="mb-4 text-xl font-bold text-center">
+          Deploy an AskMi instance
+        </h1>
       </header>
-      <form on:submit|preventDefault={() => instantiateAskMi()}>
+      <form
+        class="mb-5 gap-6 grid justify-center"
+        on:submit|preventDefault={() => instantiateAskMi()}
+      >
         <TierCards />
         <TipCard />
-        <button class="px-2 py-1.5 bg-green-700 text-white rounded"
+        <button class="px-2 py-1.5 mx-auto bg-green-700 text-white rounded"
           >Deploy AskMi contract</button
         >
       </form>

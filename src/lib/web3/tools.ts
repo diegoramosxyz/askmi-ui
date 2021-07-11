@@ -1,6 +1,6 @@
 import { ethers, Contract } from 'ethers'
 import type { AskMi } from './askmi'
-import { askMiFactory, loading, myAskMi, signer } from './store'
+import { askMiFactory, loading, myAskMi, signer, tip } from './store'
 import { get } from 'svelte/store'
 import { abi as askMiAbi } from '$lib/abi/AskMi.json'
 import { abi as askMiFactoryAbi } from '$lib/abi/AskMiFactory.json'
@@ -69,6 +69,7 @@ export async function setUpAskMi(address: string, _chainId: ImportMetaEnv['']) {
     askMi.set(_askMi)
     owner.set(await _askMi.owner())
     tiers.set(formattedTiers)
+    tip.set((await _askMi.tip()).toString())
   } else {
     console.log('Enviroment variables not loaded.')
   }
@@ -86,10 +87,9 @@ export async function setUpAskMiFactory(
     provider.set(getProvider())
     // Set the signer on page load
     signer.set((await get(provider).listAccounts())[0])
-    // Detect account changes
-    detectAccountsChanged(signer)
     // Get the chain and check for updates
     await detectChain(chainId)
+
     // Instantiate an AskMiFactory contract object
     askMiFactory.set(
       new Contract(
@@ -99,11 +99,19 @@ export async function setUpAskMiFactory(
       ) as AskMiFactory
     )
 
-    try {
-      myAskMi.set(await get(askMiFactory).getMyAskMi(get(signer)))
-    } catch (error) {
-      console.log('This address does not have an AskMi instance.')
+    async function checkContract() {
+      try {
+        myAskMi.set(await get(askMiFactory).getMyAskMi(get(signer)))
+      } catch (error) {
+        myAskMi.set(null)
+        console.log('This address does not have an AskMi instance.')
+      }
     }
+
+    await checkContract()
+
+    // Detect account changes
+    detectAccountsChanged(signer, checkContract)
 
     loading.set(false)
   } else {

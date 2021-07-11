@@ -5,6 +5,7 @@
 import detectEthereumProvider from '@metamask/detect-provider'
 import { get } from 'svelte/store'
 import type { Writable } from 'svelte/store'
+import { askMiFactory, myAskMi } from './store'
 
 export async function detectProvider() {
   // this returns the provider, or null if it wasn't detected
@@ -43,20 +44,25 @@ export async function detectChain(chainId: Writable<string | null>) {
 /* Handle user accounts and accountsChanged (per EIP-1193) */
 /***********************************************************/
 
-export function detectAccountsChanged(signer: Writable<string>) {
+export function detectAccountsChanged(
+  signer: Writable<string>,
+  customCallback: () => Promise<void>
+) {
   // Note that this event is emitted on page load.
   // If the array of accounts is non-empty, you're already
   // connected.
   window.ethereum.on('accountsChanged', () =>
     window.ethereum
       .request({ method: 'eth_accounts' })
-      .then((accounts: string[]) => {
+      .then(async (accounts: string[]) => {
         if (accounts.length === 0) {
           // MetaMask is locked or the user has not connected any accounts
           signer.set('')
           console.log('Please connect to MetaMask.')
         } else if (accounts[0] !== get(signer)) {
           signer.set(accounts[0])
+          // Add any custom logic to update UI
+          await customCallback()
         }
       })
       .catch((err: Error) => {

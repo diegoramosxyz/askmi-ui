@@ -57,7 +57,7 @@
 
 <main class="max-w-screen-md mx-auto">
   <Navbar />
-  {#if $owner && $signer && $owner !== $signer.address}
+  {#if $owner && $signer && $owner.toLowerCase() !== $signer.toLowerCase()}
     <form
       class="mb-5 grid justify-center"
       on:submit|preventDefault={async () => {
