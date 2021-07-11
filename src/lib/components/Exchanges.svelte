@@ -1,15 +1,8 @@
 <script lang="ts">
-  import { BigNumber, ethers, utils } from 'ethers'
+  import { BigNumber, ethers } from 'ethers'
   import { shrinkAddress } from '$lib/utils/ui'
   import { getBytes32FromMultiash } from '$lib/utils/cid'
-  import {
-    questions,
-    signer,
-    owner,
-    askMi,
-    questioners,
-    tip,
-  } from '$lib/web3/store'
+  import { questions, signer, owner, askMi, questioners } from '$lib/web3/store'
   import { getQuestionsSubset } from '$lib/web3/eventListeners'
 
   let cid2 = ''
@@ -92,7 +85,7 @@
                 <p>Deposit: {ethers.utils.formatEther(balance)} ETH</p>
               {/if}
             </section>
-            {#if answer.digest === '' && $owner === $signer}
+            {#if answer.digest === '' && $owner.toLowerCase() === $signer.toLowerCase()}
               <form
                 class="mb-5 grid gap-3 justify-center"
                 on:submit|preventDefault={async () => {

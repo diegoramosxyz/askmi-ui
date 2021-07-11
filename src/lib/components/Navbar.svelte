@@ -10,7 +10,7 @@
     <a href="/">AskMi</a>
   </section>
   <section>
-    {#if $owner && $signer && $owner === $signer && !$page.path.startsWith('/edit/')}
+    {#if $owner && $signer && $owner.toLowerCase() === $signer.toLowerCase() && !$page.path.startsWith('/edit/')}
       <a
         href={`/edit/${$page.params.address}`}
         class="px-3 py-2 ring-1 font-mono ring-amber-600 rounded"

@@ -53,6 +53,8 @@
     let { Hash } = await res.json()
     return Hash
   }
+
+  let index: number
 </script>
 
 <main class="max-w-screen-md mx-auto">
@@ -62,7 +64,7 @@
       class="mb-5 grid justify-center"
       on:submit|preventDefault={async () => {
         let hash = await upload()
-        ask(hash, 0)
+        ask(hash, index)
       }}
     >
       <textarea
@@ -74,9 +76,15 @@
       />
       <section class="flex gap-4 mb-2 items-center">
         <h1 class="font-bold text-lg">Tier</h1>
-        {#each $tiers as tier, index}
+        {#each $tiers as tier, i}
           <article class="flex gap-2 items-center">
-            <input type="radio" id={tier} name="tier" value={index} />
+            <input
+              type="radio"
+              id={tier}
+              name="tier"
+              bind:group={index}
+              value={i}
+            />
             <label for={tier}>{tier} ETH</label>
           </article>
         {/each}

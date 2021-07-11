@@ -46,7 +46,7 @@ export async function detectChain(chainId: Writable<string | null>) {
 
 export function detectAccountsChanged(
   signer: Writable<string>,
-  customCallback: () => Promise<void>
+  customCallback?: () => Promise<void>
 ) {
   // Note that this event is emitted on page load.
   // If the array of accounts is non-empty, you're already
@@ -62,7 +62,9 @@ export function detectAccountsChanged(
         } else if (accounts[0] !== get(signer)) {
           signer.set(accounts[0])
           // Add any custom logic to update UI
-          await customCallback()
+          if (customCallback) {
+            await customCallback()
+          }
         }
       })
       .catch((err: Error) => {

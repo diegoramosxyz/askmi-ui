@@ -44,18 +44,8 @@ export async function setUpAskMi(address: string, _chainId: ImportMetaEnv['']) {
       _provider.getSigner()
     ) as AskMi
 
-    if (window.ethereum) {
-      let _accounts = await _provider.listAccounts()
-      signer.set(_accounts[0])
-      // Detect when accounts are changed in MetaMask
-      window.ethereum.on('accountsChanged', async (accounts: string[]) => {
-        signer.set(_accounts[0])
-      })
-    } else {
-      // Prompt user to install MetaMask
-      // Todo: Show pop up error message
-      console.log('INSTALL METAMASK TO USE THIS DAPP!')
-    }
+    // Detect account changes
+    detectAccountsChanged(signer)
     await detectChain(chainId)
 
     // Run once on page load
