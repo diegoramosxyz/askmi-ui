@@ -187,6 +187,18 @@ export async function removeQuestion(
   )
 }
 
+export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
+  get(askMi).issueTip(questioner, exchangeIndex, {
+    value: await get(askMi).tip(),
+  })
+
+  get(askMi).once(
+    'TipIssued',
+    async (_tipper: string, _questioner: string, _exchangeIndex: BigNumber) =>
+      console.log('Tip issued!')
+  )
+}
+
 // Get the ETH balance for any account in human-readable form
 // export async function getRoundedEthBalance(
 //   provider: ethers.providers.Web3Provider,

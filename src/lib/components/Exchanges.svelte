@@ -1,21 +1,9 @@
 <script lang="ts">
-  import { BigNumber, ethers } from 'ethers'
+  import { ethers } from 'ethers'
   import { shrinkAddress } from '$lib/utils/ui'
-  import { questions, signer, askMi } from '$lib/web3/store'
-  import { removeQuestion } from '$lib/web3/tools'
+  import { questions } from '$lib/web3/store'
   import AnswerForm from './AnswerForm.svelte'
-
-  async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
-    $askMi.issueTip(questioner, exchangeIndex, {
-      value: await $askMi.tip(),
-    })
-
-    $askMi.once(
-      'TipIssued',
-      async (_tipper: string, _questioner: string, _exchangeIndex: BigNumber) =>
-        console.log('Tip issued!')
-    )
-  }
+  import ExchangeInteraction from './ExchangeInteraction.svelte'
 </script>
 
 <section class="mb-3 max-w-prose mx-auto">
@@ -41,19 +29,7 @@
               {/if}
             </section>
             <AnswerForm {digest} {exchangeIndex} {questioner} />
-            {#if digest === '' && questioner === $signer}
-              <button
-                on:click={() => removeQuestion(questioner, exchangeIndex)}
-                class="px-3 py-1 bg-red-700 text-white rounded">Remove</button
-              >
-            {/if}
-            {#if digest !== ''}
-              <button
-                on:click={async () =>
-                  await tipAsnwer(questioner, exchangeIndex)}
-                class="px-3 py-1 bg-green-700 text-white rounded">Tip</button
-              >
-            {/if}
+            <ExchangeInteraction {digest} {exchangeIndex} {questioner} />
           </article>
         {/each}
       </div>
