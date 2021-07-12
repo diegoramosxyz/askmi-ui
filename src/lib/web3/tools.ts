@@ -67,23 +67,23 @@ export async function setUpAskMi(address: string, chainId: ImportMetaEnv['']) {
     // Get the web3 provider (MetaMask) and the contract object
     setProvider()
     // Set the signer on page load
-    setSigner()
+    await setSigner()
     // Detect account changes
     detectAccountsChanged()
     // Set the Chain ID
-    setChainId()
+    await setChainId()
     // Detect chain id changes
-    detectChainChanged()
+    await detectChainChanged()
 
     askMi.set(
       new Contract(address, askMiAbi, get(provider).getSigner()) as AskMi
     )
 
-    setOwner()
-    setTiers()
-    setTip()
+    await setOwner()
+    await setTiers()
+    await setTip()
 
-    getQuestionsSubset()
+    await getQuestionsSubset()
 
     loading.set(false)
   } else {
@@ -102,13 +102,13 @@ export async function setUpAskMiFactory(
     // Get the web3 provider (MetaMask) and the contract object
     setProvider()
     // Set the signer on page load
-    setSigner()
+    await setSigner()
     // Detect account changes
     detectAccountsChanged(setAskMiAddress)
     // Set the Chain ID
-    setChainId()
+    await setChainId()
     // Detect chain id changes
-    detectChainChanged()
+    await detectChainChanged()
 
     // Instantiate an AskMiFactory contract object
     askMiFactory.set(
@@ -120,7 +120,7 @@ export async function setUpAskMiFactory(
     )
 
     // Check if the current signer has created an AskMi contract
-    setAskMiAddress()
+    await setAskMiAddress()
 
     loading.set(false)
   } else {
