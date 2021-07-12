@@ -5,6 +5,7 @@
 import detectEthereumProvider from '@metamask/detect-provider'
 import { get } from 'svelte/store'
 import type { Writable } from 'svelte/store'
+import { signer } from './store'
 
 export async function detectProvider() {
   // this returns the provider, or null if it wasn't detected
@@ -30,9 +31,7 @@ export async function detectProvider() {
 /* Handle chain (network) and chainChanged (per EIP-1193) */
 /**********************************************************/
 
-export async function detectChain(chainId: Writable<string | null>) {
-  chainId.set(await window.ethereum.request({ method: 'eth_chainId' }))
-
+export async function detectChainChanged() {
   window.ethereum.on('chainChanged', (chainId: string) => {
     // window.location.reload()
     console.log(`Network changed to: ${chainId}`)
@@ -43,10 +42,7 @@ export async function detectChain(chainId: Writable<string | null>) {
 /* Handle user accounts and accountsChanged (per EIP-1193) */
 /***********************************************************/
 
-export function detectAccountsChanged(
-  signer: Writable<string>,
-  customCallback?: () => Promise<any>
-) {
+export function detectAccountsChanged(customCallback?: () => any) {
   // Note that this event is emitted on page load.
   // If the array of accounts is non-empty, you're already
   // connected.
@@ -56,7 +52,6 @@ export function detectAccountsChanged(
       .then(async (accounts: string[]) => {
         if (accounts.length === 0) {
           // MetaMask is locked or the user has not connected any accounts
-          signer.set('')
           console.log('Please connect to MetaMask.')
         } else if (accounts[0] !== get(signer)) {
           signer.set(accounts[0])
@@ -96,7 +91,6 @@ export function connectToMetaMask(signer: Writable<string>) {
     .then((accounts: string[]) => {
       if (accounts.length === 0) {
         // MetaMask is locked or the user has not connected any accounts
-        signer.set('')
         console.log('Please connect to MetaMask.')
       } else {
         signer.set(accounts[0])

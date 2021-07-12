@@ -25,3 +25,5 @@ export const loading: Writable<boolean> = writable()
 export const factoryTiers: Writable<{ name: string; value: number }[]> =
   writable()
 export const factoryTip: Writable<number> = writable()
+
+export const textAreaContent: Writable<string> = writable()

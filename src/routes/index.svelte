@@ -18,6 +18,7 @@
 <main class="px-3 lg:px-0 max-w-screen-md mx-auto">
   <Navbar />
   <Loading>
+    <!-- Check if the current signer alreadt has an AskMi contract -->
     {#if $askMiAddress !== null}
       <a
         transition:fade

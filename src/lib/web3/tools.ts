@@ -1,65 +1,91 @@
-import { ethers, Contract } from 'ethers'
+import { ethers, Contract, BigNumber, utils } from 'ethers'
 import type { AskMi } from './askmi'
-import { askMiAddress, askMiFactory, loading, signer, tip } from './store'
+import {
+  askMiAddress,
+  askMiFactory,
+  loading,
+  signer,
+  textAreaContent,
+  tip,
+} from './store'
 import { get } from 'svelte/store'
 import { abi as askMiAbi } from '$lib/abi/AskMi.json'
 import { abi as askMiFactoryAbi } from '$lib/abi/AskMiFactory.json'
-import {
-  provider,
-  askMi,
-  owner,
-  tiers,
-  questioners,
-  questions,
-  chainId,
-} from './store'
+import { provider, askMi, owner, tiers, chainId } from './store'
 import { getQuestionsSubset } from './eventListeners'
 import type { AskMiFactory } from './askmi-factory'
-import { detectAccountsChanged, detectChain } from './MetaMask'
+import { detectAccountsChanged, detectChainChanged } from './MetaMask'
+import { getBytes32FromMultiash } from '$lib/utils/cid'
 
-// Get the ETH balance for any account in human-readable form
-export async function getRoundedEthBalance(
-  provider: ethers.providers.Web3Provider,
-  address: string
-) {
-  // return the balance formated to ETH
-  let ETH = ethers.utils.formatEther(await provider?.getBalance(address))
-  return Math.floor(Number(ETH) * 100) / 100
+function setProvider() {
+  // Get the provider from the browser
+  provider.set(new ethers.providers.Web3Provider(window.ethereum))
 }
 
-function getProvider() {
-  // Get the provider from the browser
-  return new ethers.providers.Web3Provider(window.ethereum)
+async function setChainId() {
+  const _chainId = await window.ethereum.request({ method: 'eth_chainId' })
+  chainId.set(_chainId)
+}
+
+async function setSigner() {
+  const accounts = await get(provider).listAccounts()
+  signer.set(accounts[0])
+}
+
+async function setOwner() {
+  const _owner = await get(askMi).owner()
+  owner.set(_owner)
+}
+
+async function setTiers() {
+  let _tiers = await get(askMi).getTiers()
+  let formattedTiers = _tiers.map((tier) => ethers.utils.formatEther(tier))
+
+  // Load stores
+  tiers.set(formattedTiers)
+}
+
+async function setTip() {
+  const _tip = await get(askMi).tip()
+  tip.set(_tip.toString())
+}
+
+async function setAskMiAddress() {
+  try {
+    askMiAddress.set(await get(askMiFactory).getMyAskMi(get(signer)))
+  } catch (error) {
+    askMiAddress.set(null)
+    console.log('This address does not have an AskMi instance.')
+  }
 }
 
 // Set up event listeners and load store with initial data
-export async function setUpAskMi(address: string, _chainId: ImportMetaEnv['']) {
+export async function setUpAskMi(address: string, chainId: ImportMetaEnv['']) {
   // Check that the environment variables are loaded
-  if (typeof _chainId == 'string') {
+  if (typeof chainId == 'string') {
+    loading.set(true)
     // Get the web3 provider (MetaMask) and the contract object
-    const _provider = getProvider()
-    const _askMi = new Contract(
-      address,
-      askMiAbi,
-      _provider.getSigner()
-    ) as AskMi
-
+    setProvider()
+    // Set the signer on page load
+    setSigner()
     // Detect account changes
-    detectAccountsChanged(signer)
-    await detectChain(chainId)
+    detectAccountsChanged()
+    // Set the Chain ID
+    setChainId()
+    // Detect chain id changes
+    detectChainChanged()
 
-    // Run once on page load
-    await getQuestionsSubset(_askMi, questioners, questions)
+    askMi.set(
+      new Contract(address, askMiAbi, get(provider).getSigner()) as AskMi
+    )
 
-    let _tiers = await _askMi.getTiers()
-    let formattedTiers = _tiers.map((tier) => ethers.utils.formatEther(tier))
+    setOwner()
+    setTiers()
+    setTip()
 
-    // Load stores
-    provider.set(_provider)
-    askMi.set(_askMi)
-    owner.set(await _askMi.owner())
-    tiers.set(formattedTiers)
-    tip.set((await _askMi.tip()).toString())
+    getQuestionsSubset()
+
+    loading.set(false)
   } else {
     console.log('Enviroment variables not loaded.')
   }
@@ -68,17 +94,21 @@ export async function setUpAskMi(address: string, _chainId: ImportMetaEnv['']) {
 // Set up event listeners and load store with initial data
 export async function setUpAskMiFactory(
   address: ImportMetaEnv[''],
-  _chainId: ImportMetaEnv['']
+  chainId: ImportMetaEnv['']
 ) {
   // Check that the environment variables are loaded
-  if (typeof address == 'string' && typeof _chainId == 'string') {
+  if (typeof address == 'string' && typeof chainId == 'string') {
     loading.set(true)
     // Get the web3 provider (MetaMask) and the contract object
-    provider.set(getProvider())
+    setProvider()
     // Set the signer on page load
-    signer.set((await get(provider).listAccounts())[0])
-    // Get the chain and check for updates
-    await detectChain(chainId)
+    setSigner()
+    // Detect account changes
+    detectAccountsChanged(setAskMiAddress)
+    // Set the Chain ID
+    setChainId()
+    // Detect chain id changes
+    detectChainChanged()
 
     // Instantiate an AskMiFactory contract object
     askMiFactory.set(
@@ -89,22 +119,80 @@ export async function setUpAskMiFactory(
       ) as AskMiFactory
     )
 
-    async function checkContract() {
-      try {
-        askMiAddress.set(await get(askMiFactory).getMyAskMi(get(signer)))
-      } catch (error) {
-        askMiAddress.set(null)
-        console.log('This address does not have an AskMi instance.')
-      }
-    }
-
-    await checkContract()
-
-    // Detect account changes
-    detectAccountsChanged(signer, checkContract)
+    // Check if the current signer has created an AskMi contract
+    setAskMiAddress()
 
     loading.set(false)
   } else {
     console.log('Enviroment variables not loaded.')
   }
 }
+
+async function fetchTextToIPFS() {
+  const formData = new FormData()
+  formData.append('question', get(textAreaContent))
+
+  const res = await fetch('https://ipfs.infura.io:5001/api/v0/add', {
+    method: 'POST',
+    body: formData,
+  })
+  const { Hash } = await res.json()
+  return Hash
+}
+
+export async function ask(_tierIndex: number) {
+  const cid = await fetchTextToIPFS()
+  // Conver CID into a multihash object
+  let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
+  // Call the ask function
+  get(askMi).ask(digest, hashFunction, size, BigNumber.from(_tierIndex), {
+    value: utils.parseEther(get(tiers)[_tierIndex]),
+  })
+  // Update questions when event has been emitted
+  get(askMi).once(
+    'QuestionAsked',
+    async (_questioner: string, _exchangeIndex: BigNumber) => {
+      textAreaContent.set('')
+      await getQuestionsSubset()
+    }
+  )
+}
+
+export async function respond(questioner: string, qIndex: ethers.BigNumber) {
+  const cid = await fetchTextToIPFS()
+  // Conver CID into a multihash object
+  let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
+  // Call the ask function
+  get(askMi).respond(questioner, digest, hashFunction, size, qIndex)
+
+  get(askMi).once(
+    'QuestionAnswered',
+    async (_questioner: string, _exchangeIndex: BigNumber) => {
+      textAreaContent.set('')
+      await getQuestionsSubset()
+    }
+  )
+}
+
+export async function removeQuestion(
+  questioner: string,
+  exchangeIndex: BigNumber
+) {
+  get(askMi).removeQuestion(questioner, exchangeIndex)
+
+  get(askMi).once(
+    'QuestionRemoved',
+    async (_questioner: string, _exchangeIndex: BigNumber) =>
+      await getQuestionsSubset()
+  )
+}
+
+// Get the ETH balance for any account in human-readable form
+// export async function getRoundedEthBalance(
+//   provider: ethers.providers.Web3Provider,
+//   address: string
+// ) {
+//   // return the balance formated to ETH
+//   let ETH = ethers.utils.formatEther(await provider?.getBalance(address))
+//   return Math.floor(Number(ETH) * 100) / 100
+// }
