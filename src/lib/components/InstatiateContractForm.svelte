@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition'
   import TierCards from '$lib/components/TierCards.svelte'
   import TipCard from '$lib/components/TipCard.svelte'
   import { askMiFactory, factoryTiers, factoryTip } from '$lib/web3/store'
@@ -23,7 +22,6 @@
 </script>
 
 <form
-  transition:fade
   class="col-start-1 row-start-1 mb-5 gap-6 grid justify-center"
   on:submit|preventDefault={() => instantiateAskMi()}
 >
@@ -32,5 +30,5 @@
   </header>
   <TierCards />
   <TipCard />
-  <Button>Deploy AskMi contract</Button>
+  <Button color={'green'}>Deploy AskMi contract</Button>
 </form>

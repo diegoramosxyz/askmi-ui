@@ -2,6 +2,7 @@
   import { signer } from '$lib/web3/store'
   import { removeQuestion, tipAsnwer } from '$lib/web3/tools'
   import type { BigNumber } from '@ethersproject/bignumber'
+  import Button from './Button.svelte'
 
   export let digest: string
   export let questioner: string
@@ -9,14 +10,14 @@
 </script>
 
 {#if digest === '' && questioner === $signer}
-  <button
-    on:click={() => removeQuestion(questioner, exchangeIndex)}
-    class="px-3 py-1 bg-red-700 text-white rounded">Remove</button
+  <Button color="red" on:click={() => removeQuestion(questioner, exchangeIndex)}
+    >Remove</Button
   >
 {/if}
 {#if digest !== ''}
-  <button
+  <Button
+    color="green"
     on:click={async () => await tipAsnwer(questioner, exchangeIndex)}
-    class="px-3 py-1 bg-green-700 text-white rounded">Tip</button
+    >Tip</Button
   >
 {/if}

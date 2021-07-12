@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition'
   import { onMount } from 'svelte'
   import { setUpAskMiFactory } from '$lib/web3/tools'
   import { askMiAddress } from '$lib/web3/store'
   import Navbar from '$lib/components/Navbar.svelte'
   import InstatiateContractForm from '$lib/components/InstatiateContractForm.svelte'
   import Loading from '$lib/components/Loading.svelte'
+  import Link from '$lib/svg/Link.svelte'
 
   onMount(async () => {
     let { VITE_ASKMI_FACTORY, VITE_CHAIN_ID } = import.meta.env
@@ -23,10 +23,11 @@
       <InstatiateContractForm />
     {:else}
       <a
-        transition:fade
-        class="col-start-1 row-start-1 hover:underline"
-        href={`/instance/${$askMiAddress}`}>Go to your AskMi instance</a
-      >
+        class="flex items-center gap-2 col-start-1 row-start-1 hover:underline"
+        href={`/instance/${$askMiAddress}`}
+        ><Link />
+        <p>Go to your AskMi instance</p>
+      </a>
     {/if}
   </Loading>
 </main>

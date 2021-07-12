@@ -2,6 +2,7 @@
   import { owner, signer, textAreaContent } from '$lib/web3/store'
   import { removeQuestion, respond } from '$lib/web3/tools'
   import type { BigNumber } from '@ethersproject/bignumber'
+  import Button from './Button.svelte'
 
   export let digest: string
   export let questioner: string
@@ -24,10 +25,10 @@
       <button class="px-4 py-1 font-medium bg-blue-800 text-white rounded"
         >Answer</button
       >
-      <button
+      <Button
+        color="red"
         on:click={() => removeQuestion(questioner, exchangeIndex)}
-        class="px-3 py-1 font-medium bg-red-800 text-white rounded"
-        >Remove</button
+        >Remove</Button
       >
     </div>
   </form>

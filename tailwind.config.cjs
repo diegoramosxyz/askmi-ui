@@ -9,6 +9,7 @@ const config = {
       colors: {
         trueGray: colors.trueGray,
         amber: colors.amber,
+        lightBlue: colors.lightBlue,
       },
     },
   },
