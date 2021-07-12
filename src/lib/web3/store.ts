@@ -9,7 +9,7 @@ export type questionsByQuestioner = {
 }[]
 
 export const askMi: Writable<AskMi> = writable()
-export const myAskMi: Writable<string | null> = writable()
+export const askMiAddress: Writable<string | null> = writable()
 export const askMiFactory: Writable<AskMiFactory> = writable()
 export const provider: Writable<ethers.providers.Web3Provider> = writable()
 export const signer: Writable<string> = writable()

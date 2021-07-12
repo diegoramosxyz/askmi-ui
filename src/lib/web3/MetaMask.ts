@@ -5,7 +5,6 @@
 import detectEthereumProvider from '@metamask/detect-provider'
 import { get } from 'svelte/store'
 import type { Writable } from 'svelte/store'
-import { askMiFactory, myAskMi } from './store'
 
 export async function detectProvider() {
   // this returns the provider, or null if it wasn't detected
@@ -46,7 +45,7 @@ export async function detectChain(chainId: Writable<string | null>) {
 
 export function detectAccountsChanged(
   signer: Writable<string>,
-  customCallback?: () => Promise<void>
+  customCallback?: () => Promise<any>
 ) {
   // Note that this event is emitted on page load.
   // If the array of accounts is non-empty, you're already

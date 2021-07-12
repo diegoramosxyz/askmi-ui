@@ -1,6 +1,6 @@
 import { ethers, Contract } from 'ethers'
 import type { AskMi } from './askmi'
-import { askMiFactory, loading, myAskMi, signer, tip } from './store'
+import { askMiAddress, askMiFactory, loading, signer, tip } from './store'
 import { get } from 'svelte/store'
 import { abi as askMiAbi } from '$lib/abi/AskMi.json'
 import { abi as askMiFactoryAbi } from '$lib/abi/AskMiFactory.json'
@@ -91,9 +91,9 @@ export async function setUpAskMiFactory(
 
     async function checkContract() {
       try {
-        myAskMi.set(await get(askMiFactory).getMyAskMi(get(signer)))
+        askMiAddress.set(await get(askMiFactory).getMyAskMi(get(signer)))
       } catch (error) {
-        myAskMi.set(null)
+        askMiAddress.set(null)
         console.log('This address does not have an AskMi instance.')
       }
     }

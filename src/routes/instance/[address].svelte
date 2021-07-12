@@ -31,6 +31,7 @@
     $askMi.ask(digest, hashFunction, size, BigNumber.from(_tierIndex), {
       value: utils.parseEther($tiers[_tierIndex]),
     })
+    // Update questions when event has been emitted
     $askMi.once(
       'QuestionAsked',
       async (_questioner: string, _exchangeIndex: BigNumber) =>
@@ -38,23 +39,22 @@
     )
   }
 
-  let questionInputValue: string
+  let textAreaContent: string
+  let index: number
 
   // Take the string from the textarea and
   // generate a FormData object to make the fetch request
   async function upload() {
     const formData = new FormData()
-    formData.append('question', questionInputValue)
+    formData.append('question', textAreaContent)
 
-    let res = await fetch('https://ipfs.infura.io:5001/api/v0/add', {
+    const res = await fetch('https://ipfs.infura.io:5001/api/v0/add', {
       method: 'POST',
       body: formData,
     })
-    let { Hash } = await res.json()
-    return Hash
+    const { Hash } = await res.json()
+    ask(Hash, index)
   }
-
-  let index: number
 </script>
 
 <main class="max-w-screen-md mx-auto">
@@ -62,13 +62,10 @@
   {#if $owner && $signer && $owner.toLowerCase() !== $signer.toLowerCase()}
     <form
       class="mb-5 grid justify-center"
-      on:submit|preventDefault={async () => {
-        let hash = await upload()
-        ask(hash, index)
-      }}
+      on:submit|preventDefault={async () => await upload()}
     >
       <textarea
-        bind:value={questionInputValue}
+        bind:value={textAreaContent}
         cols="40"
         rows="7"
         class="mb-3 px-3 py-2 bg-transparent ring-1 ring-trueGray-700 rounded resize-y"
