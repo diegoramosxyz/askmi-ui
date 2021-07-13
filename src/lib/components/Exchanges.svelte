@@ -16,13 +16,16 @@
         <p class="pl-2 mb-2 font-mono">{shrinkAddress(questioner)}</p>
       </a>
       <div class="grid gap-3 mb-6">
-        {#each [...questions].reverse() as { answer: { digest }, exchangeIndex, balance, resolvedQuestion, resolvedAnswer }}
+        {#each [...questions].reverse() as { answer: { digest }, exchangeIndex, balance, resolvedQuestion, resolvedAnswer, tips }}
           <article class="p-3 mb-2 ring-1 ring-trueGray-700 rounded">
             <section class="grid gap-2 mb-4">
               <p class="font-semibold text-lg">{resolvedQuestion}</p>
               <!-- If the answer exists -->
               {#if digest !== ''}
                 <p>{resolvedAnswer}</p>
+                <p>
+                  Tips: {tips.toNumber()}
+                </p>
               {/if}
               {#if balance > ethers.BigNumber.from(0)}
                 <p>Deposit: {ethers.utils.formatEther(balance)} ETH</p>

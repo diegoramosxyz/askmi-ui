@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { signer } from '$lib/web3/store'
+  import { owner, signer } from '$lib/web3/store'
   import { removeQuestion, tipAsnwer } from '$lib/web3/tools'
   import type { BigNumber } from '@ethersproject/bignumber'
   import Button from './Button.svelte'
@@ -9,15 +9,14 @@
   export let exchangeIndex: BigNumber
 </script>
 
-{#if digest === '' && questioner === $signer}
-  <Button color="red" on:click={() => removeQuestion(questioner, exchangeIndex)}
+{#if digest === '' && questioner.toLowerCase() === $signer.toLowerCase()}
+  <Button color="red" click={() => removeQuestion(questioner, exchangeIndex)}
     >Remove</Button
   >
 {/if}
-{#if digest !== ''}
+{#if digest !== '' && $owner.toLowerCase() !== $signer.toLowerCase()}
   <Button
     color="green"
-    on:click={async () => await tipAsnwer(questioner, exchangeIndex)}
-    >Tip</Button
+    click={async () => await tipAsnwer(questioner, exchangeIndex)}>Tip</Button
   >
 {/if}

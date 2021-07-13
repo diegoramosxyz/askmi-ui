@@ -13,6 +13,7 @@
 
 <div class="mx-auto">
   <button
+    on:click={$$props.click}
     class={`select-none transition focus:outline-none font-medium px-3 py-1.5 rounded focus:ring ${colors[color]}`}
     ><slot /></button
   >

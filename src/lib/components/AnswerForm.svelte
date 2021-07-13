@@ -27,8 +27,7 @@
       >
       <Button
         color="red"
-        on:click={() => removeQuestion(questioner, exchangeIndex)}
-        >Remove</Button
+        click={() => removeQuestion(questioner, exchangeIndex)}>Remove</Button
       >
     </div>
   </form>

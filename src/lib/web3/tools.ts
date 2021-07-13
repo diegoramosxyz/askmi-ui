@@ -195,7 +195,7 @@ export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
   get(askMi).once(
     'TipIssued',
     async (_tipper: string, _questioner: string, _exchangeIndex: BigNumber) =>
-      console.log('Tip issued!')
+      await getQuestionsSubset()
   )
 }
 
