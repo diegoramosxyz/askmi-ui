@@ -9,7 +9,7 @@
   export let exchangeIndex: BigNumber
 </script>
 
-{#if digest === '' && $owner && $signer && $owner.toLowerCase() === $signer.toLowerCase()}
+{#if digest === '' && !!$owner && !!$signer && $owner.toLowerCase() === $signer.toLowerCase()}
   <form
     class="mb-5 grid gap-3 justify-center"
     on:submit|preventDefault={async () => respond(questioner, exchangeIndex)}

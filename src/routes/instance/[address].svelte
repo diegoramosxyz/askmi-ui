@@ -3,14 +3,16 @@
   import { onMount } from 'svelte'
   import { ask, setUpAskMi } from '$lib/web3/tools'
   import {
-    signer,
     owner,
     tiers,
     loading,
     textAreaContent,
+    signer,
   } from '$lib/web3/store'
   import Exchanges from '$lib/components/Exchanges.svelte'
   import Navbar from '$lib/components/Navbar.svelte'
+  import makeBlockie from 'ethereum-blockies-base64'
+  import { shrinkAddress } from '$lib/utils/ui'
 
   // TODO: Create function to check valid Ethereum addresses
   onMount(async () => {
@@ -26,17 +28,29 @@
 <main class="max-w-screen-md mx-auto">
   {#if $loading === false}
     <Navbar />
-    {#if $owner && $signer && $owner.toLowerCase() !== $signer.toLowerCase()}
+    {#if !!$owner && !!$signer && $owner.toLowerCase() !== $signer.toLowerCase()}
       <form
         class="mb-5 grid justify-center"
         on:submit|preventDefault={async () => await ask(index)}
       >
+        <p class="mb-2 p-1.5 flex gap-2 items-center">
+          Ask
+          <img
+            class="rounded h-6"
+            src={makeBlockie($owner)}
+            alt="Blockie from questioner's address"
+          />
+          <span class="font-mono px-2 py-1 rounded ring-1 ring-trueGray-700"
+            >{shrinkAddress($owner)}</span
+          >
+          a question:
+        </p>
         <textarea
           bind:value={$textAreaContent}
           cols="40"
           rows="7"
           class="mb-3 px-3 py-2 bg-transparent ring-1 ring-trueGray-700 rounded resize-y"
-          placeholder="Ask a question here."
+          placeholder="Type here..."
         />
         <section class="flex gap-4 mb-2 items-center">
           <h1 class="font-bold text-lg">Tier</h1>

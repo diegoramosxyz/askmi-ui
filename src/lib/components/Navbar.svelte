@@ -4,8 +4,8 @@
   import { owner, signer } from '$lib/web3/store'
   import { connectToMetaMask } from '$lib/web3/MetaMask'
   import Adjustments from '$lib/svg/Adjustments.svelte'
-  import Identification from '$lib/svg/Identification.svelte'
   import Library from '$lib/svg/Library.svelte'
+  import makeBlockie from 'ethereum-blockies-base64'
 </script>
 
 <nav class="mb-3 flex justify-between items-center py-3">
@@ -16,7 +16,7 @@
     </a>
   </section>
   <section class="flex items-center gap-4">
-    {#if $owner && $signer && $owner.toLowerCase() === $signer.toLowerCase() && !$page.path.startsWith('/edit/')}
+    {#if !!$owner && !!$signer && $owner.toLowerCase() === $signer.toLowerCase() && !$page.path.startsWith('/edit/')}
       <a
         class="flex items-center gap-2 px-3 py-2 ring-1 ring-amber-600 rounded"
         href={`/edit/${$page.params.address}`}
@@ -29,7 +29,11 @@
       <button
         class="flex items-center gap-2 px-3 py-2 ring-1 ring-amber-600 rounded"
       >
-        <Identification />
+        <img
+          class="rounded h-6"
+          src={makeBlockie($signer)}
+          alt="Blockie from questioner's address"
+        />
         {shrinkAddress($signer)}</button
       >
     {:else}
@@ -37,7 +41,11 @@
         on:click={() => connectToMetaMask(signer)}
         class="flex items-center gap-2 px-3 py-2 ring-1 ring-trueGray-600 rounded"
       >
-        <Identification />
+        <img
+          class="rounded h-6"
+          src={makeBlockie($signer)}
+          alt="Blockie from questioner's address"
+        />
         <p>MetaMask</p>
       </button>
     {/if}

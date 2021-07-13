@@ -17,6 +17,7 @@
     "btoa": "^1.2.1",
     "buffer": "^6.0.3",
     "cssnano": "^5.0.6",
+    "ethereum-blockies-base64": "^1.0.2",
     "ethers": "^5.4.0",
     "postcss": "^8.3.5",
     "postcss-load-config": "^3.1.0",
