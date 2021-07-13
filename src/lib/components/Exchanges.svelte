@@ -22,7 +22,7 @@
               <p class="font-semibold text-lg">{resolvedQuestion}</p>
               <!-- If the answer exists -->
               {#if digest !== ''}
-                <p>{resolvedAnswer}</p>
+                <pre class="font-sans">{resolvedAnswer}</pre>
                 <p>
                   Tips: {tips.toNumber()}
                 </p>
