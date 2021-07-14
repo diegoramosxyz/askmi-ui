@@ -31,5 +31,6 @@
   </header>
   <TierCards />
   <TipCard />
+  <p>Developer fee: <span class="font-mono">0.5%</span> of rewards.</p>
   <Button color={'lime'}><Terminal />Deploy AskMi contract</Button>
 </form>
