@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PaperAirplane from '$lib/svg/PaperAirplane.svelte'
+  import Trash from '$lib/svg/Trash.svelte'
   import { owner, signer, textAreaContent } from '$lib/web3/store'
   import { removeQuestion, respond } from '$lib/web3/tools'
   import type { BigNumber } from '@ethersproject/bignumber'
@@ -19,15 +21,14 @@
       cols="40"
       rows="5"
       class="px-3 py-2 bg-transparent ring-1 ring-trueGray-700 rounded resize-y"
-      placeholder="Ask a question here."
+      placeholder="Answer here..."
     />
     <div class="flex gap-4">
-      <button class="px-4 py-1 font-medium bg-blue-800 text-white rounded"
-        >Answer</button
-      >
+      <Button color="lightBlue"><PaperAirplane /> Answer</Button>
       <Button
         color="red"
-        click={() => removeQuestion(questioner, exchangeIndex)}>Remove</Button
+        click={() => removeQuestion(questioner, exchangeIndex)}
+        ><Trash /> Remove</Button
       >
     </div>
   </form>

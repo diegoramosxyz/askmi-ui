@@ -6,6 +6,7 @@
   import { removeQuestion, tipAsnwer } from '$lib/web3/tools'
   import type { BigNumber } from '@ethersproject/bignumber'
   import Button from './Button.svelte'
+  import Trash from '$lib/svg/Trash.svelte'
 
   export let digest: string
   export let questioner: string
@@ -16,12 +17,12 @@
 <section class="flex gap-2 justify-end">
   {#if digest === '' && questioner.toLowerCase() === $signer.toLowerCase()}
     <Button color="red" click={() => removeQuestion(questioner, exchangeIndex)}
-      >Remove</Button
+      ><Trash/> Remove</Button
     >
   {/if}
   {#if digest !== '' && !!$owner && !!$signer && $owner.toLowerCase() !== $signer.toLowerCase()}
     <Button
-      color="green"
+      color="lime"
       click={async () => await tipAsnwer(questioner, exchangeIndex)}
       ><DollarSign /> Tips: {tips.toNumber()}</Button
     >

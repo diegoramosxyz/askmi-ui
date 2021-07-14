@@ -2,48 +2,44 @@
   import { factoryTiers } from '$lib/web3/store'
   factoryTiers.set([
     {
-      name: 'First',
+      name: 'Slow',
       value: 0,
     },
     {
-      name: 'Second',
+      name: 'Medium',
       value: 0,
     },
     {
-      name: 'Third',
+      name: 'Fast',
       value: 0,
     },
   ])
 </script>
 
 <section>
-  <header>
-    <h2 class="mb-1 text-lg">
-      Select your tiers <span class="text-sm">(Min. 1 tier)</span>
-    </h2>
+  <header class="mb-3">
+    <h1 class="text-center text-lg font-bold">
+      Select the contract's tiers <span class="text-sm">(Min. 1 tier)</span>
+    </h1>
   </header>
-  <div class="grid md:flex gap-5">
+  <div class="grid gap-4">
     {#each $factoryTiers as { name, value }, i}
-      <article class="bg-black px-4 py-3 rounded-md">
-        <section class="grid gap-2 justify-between items-end">
-          <label class="mr-2 flex-1 font-medium block uppercase" for={name}
-            >{name}</label
-          >
-          <div class="flex gap-3 items-end">
-            <input
-              {name}
-              id={name}
-              bind:value
-              required={i === 0}
-              type="number"
-              step="0.001"
-              min="0"
-              class="text-2xl font-bold text-right bg-transparent w-28 focus:outline-none rounded ring-1 ring-trueGray-700 transition focus:ring-trueGray-400"
-              placeholder="0"
-            />
-            <p class="font-medium">ETH</p>
-          </div>
-        </section>
+      <article class="flex gap-2 items-end">
+        <label class="flex-1" for={name}>{name}</label>
+        <div class="flex gap-3 items-end">
+          <input
+            {name}
+            id={name}
+            bind:value
+            required={i === 0}
+            type="number"
+            step="0.001"
+            min="0"
+            class="flex-none text-xl font-bold text-right w-28 bg-transparent focus:outline-none rounded ring-1 ring-trueGray-700 transition focus:ring-trueGray-400"
+            placeholder="0"
+          />
+          <span class="text-sm font-semibold">ETH</span>
+        </div>
       </article>
     {/each}
   </div>

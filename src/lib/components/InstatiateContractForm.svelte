@@ -5,6 +5,7 @@
   import { utils } from 'ethers'
   import { goto } from '$app/navigation'
   import Button from '$lib/components/Button.svelte'
+  import Terminal from '$lib/svg/Terminal.svelte'
 
   function instantiateAskMi() {
     let _tiers = $factoryTiers
@@ -22,13 +23,13 @@
 </script>
 
 <form
-  class="col-start-1 row-start-1 mb-5 gap-6 grid justify-center"
+  class="col-start-1 row-start-1 grid gap-6 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
   on:submit|preventDefault={() => instantiateAskMi()}
 >
   <header>
-    <h1 class="mb-4 text-xl font-bold text-center">Deploy an AskMi instance</h1>
+    <h1 class="text-xl font-bold text-center">Deploy an AskMi instance</h1>
   </header>
   <TierCards />
   <TipCard />
-  <Button color={'green'}>Deploy AskMi contract</Button>
+  <Button color={'lime'}><Terminal />Deploy AskMi contract</Button>
 </form>

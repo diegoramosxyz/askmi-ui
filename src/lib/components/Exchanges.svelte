@@ -4,7 +4,7 @@
   import { questions } from '$lib/web3/store'
   import AnswerForm from './AnswerForm.svelte'
   import ExchangeInteraction from './ExchangeInteraction.svelte'
-  import makeBlockie from 'ethereum-blockies-base64'
+  import { getBlockie } from '$lib/web3/tools'
 </script>
 
 <section class="mb-3 max-w-prose mx-auto">
@@ -19,10 +19,10 @@
           href={`/questioner/${questioner}`}
           ><img
             class="rounded h-6"
-            src={makeBlockie(questioner)}
+            src={getBlockie(questioner)}
             alt="Blockie from questioner's address"
           />
-          <p class="font-mono">{shrinkAddress(questioner)}</p>
+          <p class="font-mono pt-0.5">{shrinkAddress(questioner)}</p>
         </a>
       </section>
       <div class="grid gap-5 mb-6">
@@ -37,6 +37,14 @@
               </button>
             </section> -->
 
+            {#if balance > ethers.BigNumber.from(0)}
+              <p class="mb-2 flex gap-2 items-center">
+                <span
+                  class="font-mono flex items-center text-sm font-bold px-2 pt-1 rounded-md bg-lime-200 text-lime-900"
+                  >Reward: {ethers.utils.formatEther(balance)} ETH</span
+                >
+              </p>
+            {/if}
             <header class="mb-3 flex gap-3 items-center">
               <h1 class="text-lg font-semibold">{resolvedQuestion}</h1>
             </header>
@@ -45,9 +53,6 @@
               <section class="ml-3 mb-3">
                 <p class="whitespace-pre-wrap">{resolvedAnswer}</p>
               </section>
-            {/if}
-            {#if balance > ethers.BigNumber.from(0)}
-              <p>Deposit: {ethers.utils.formatEther(balance)} ETH</p>
             {/if}
             <AnswerForm {digest} {exchangeIndex} {questioner} />
             <ExchangeInteraction {tips} {digest} {exchangeIndex} {questioner} />

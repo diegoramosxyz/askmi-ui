@@ -13,6 +13,8 @@
   import Navbar from '$lib/components/Navbar.svelte'
   import makeBlockie from 'ethereum-blockies-base64'
   import { shrinkAddress } from '$lib/utils/ui'
+  import Button from '$lib/components/Button.svelte'
+  import Plus from '$lib/svg/Plus.svelte'
 
   // TODO: Create function to check valid Ethereum addresses
   onMount(async () => {
@@ -25,7 +27,7 @@
   let index: number
 </script>
 
-<main class="max-w-screen-md mx-auto">
+<main class="px-3 max-w-screen-md mx-auto">
   {#if $loading === false}
     <Navbar />
     {#if !!$owner && !!$signer && $owner.toLowerCase() !== $signer.toLowerCase()}
@@ -68,9 +70,7 @@
           {/each}
         </section>
         <div>
-          <button class="px-4 py-1 font-medium bg-blue-800 text-white rounded"
-            >ASK</button
-          >
+          <Button color="lightBlue"><Plus /> Ask</Button>
         </div>
       </form>
     {/if}

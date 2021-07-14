@@ -16,6 +16,7 @@
   import TipCard from '$lib/components/TipCard.svelte'
   import Link from '$lib/svg/Link.svelte'
   import Button from '$lib/components/Button.svelte'
+  import Cog from '$lib/svg/Cog.svelte'
 
   // TODO: Create function to check valid Ethereum addresses
   onMount(async () => {
@@ -26,15 +27,15 @@
 
     factoryTiers.set([
       {
-        name: 'First',
+        name: 'Slow',
         value: +$tiers[0],
       },
       {
-        name: 'Second',
+        name: 'Medium',
         value: +$tiers[1],
       },
       {
-        name: 'Third',
+        name: 'Fast',
         value: +$tiers[2],
       },
     ])
@@ -63,7 +64,7 @@
   }
 </script>
 
-<main class="max-w-screen-md mx-auto">
+<main class="px-3 max-w-screen-md mx-auto">
   <Navbar />
   {#if !$loading}
     <a
@@ -77,14 +78,22 @@
         Edit your AskMi instance
       </h1>
     </header>
-    <form class="grid gap-3" on:submit|preventDefault={() => updateTiers()}>
-      <TierCards />
-      <Button color="green">Update Tiers</Button>
-    </form>
-    <form class="grid gap-3" on:submit|preventDefault={() => updateTip()}>
-      <TipCard />
-      <Button color="green">Update Tip</Button>
-    </form>
+    <div class="grid gap-5 items-start justify-center">
+      <form
+        class="grid gap-6 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
+        on:submit|preventDefault={() => updateTiers()}
+      >
+        <TierCards />
+        <Button color="lime"><Cog /> Update Tiers</Button>
+      </form>
+      <form
+        class="grid gap-6 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
+        on:submit|preventDefault={() => updateTip()}
+      >
+        <TipCard />
+        <Button color="lime"><Cog /> Update Tip</Button>
+      </form>
+    </div>
   {:else}
     <p>Loading...</p>
   {/if}

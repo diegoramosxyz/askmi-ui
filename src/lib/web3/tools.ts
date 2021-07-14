@@ -16,6 +16,7 @@ import { getQuestionsSubset } from './eventListeners'
 import type { AskMiFactory } from './askmi-factory'
 import { detectAccountsChanged, detectChainChanged } from './MetaMask'
 import { getBytes32FromMultiash } from '$lib/utils/cid'
+import makeBlockie from 'ethereum-blockies-base64'
 
 function setProvider() {
   // Get the provider from the browser
@@ -197,6 +198,14 @@ export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
     async (_tipper: string, _questioner: string, _exchangeIndex: BigNumber) =>
       await getQuestionsSubset()
   )
+}
+
+export function getBlockie(address: string | undefined) {
+  if (address) {
+    return makeBlockie(address)
+  }
+  // TODO: add fallback img
+  return ''
 }
 
 // Get the ETH balance for any account in human-readable form
