@@ -10,7 +10,7 @@
 
 <nav class="mb-3 flex justify-between items-center py-3">
   <section>
-    <a class="flex gap-2 items-center" href="/">
+    <a class="no-underline flex gap-2 items-center" href="/">
       <QuestionMark />
       <p>AskMi</p>
     </a>
@@ -18,7 +18,7 @@
   <section class="flex items-center gap-4">
     {#if !!$owner && !!$signer && $owner.toLowerCase() === $signer.toLowerCase() && !$page.path.startsWith('/edit/')}
       <a
-        class="flex items-center gap-2 px-3 py-1.5 ring-1 ring-trueGray-700 rounded"
+        class="no-underline flex items-center gap-2 px-3 py-1.5 ring-1 ring-trueGray-700 rounded"
         href={`/edit/${$page.params.address}`}
       >
         <Adjustments />

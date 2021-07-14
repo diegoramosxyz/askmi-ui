@@ -5,6 +5,8 @@
   import AnswerForm from './AnswerForm.svelte'
   import ExchangeInteraction from './ExchangeInteraction.svelte'
   import { getBlockie } from '$lib/web3/tools'
+  import marked from 'marked'
+  import DOMPurify from 'dompurify'
 </script>
 
 <section class="mb-3 max-w-prose mx-auto">
@@ -15,14 +17,16 @@
     {#each $questions as { questioner, questions }}
       <section class="grid justify-start mb-3">
         <a
-          class="p-1.5 flex gap-2 rounded transition focus:outline-none focus:ring-1 hover:ring-1 ring-trueGray-500"
+          class="no-underline p-1.5 flex gap-2 rounded transition focus:outline-none focus:ring-1 hover:ring-1 ring-trueGray-500"
           href={`/questioner/${questioner}`}
           ><img
             class="rounded h-6"
             src={getBlockie(questioner)}
             alt="Blockie from questioner's address"
           />
-          <p class="font-mono pt-0.5">{shrinkAddress(questioner)}</p>
+          <p class="font-mono pt-0.5">
+            {shrinkAddress(questioner)}
+          </p>
         </a>
       </section>
       <div class="grid gap-5 mb-6">
@@ -51,7 +55,9 @@
             <!-- If the answer exists -->
             {#if digest !== ''}
               <section class="ml-3 mb-3">
-                <p class="whitespace-pre-wrap">{resolvedAnswer}</p>
+                <div class="mb-3">
+                  {@html DOMPurify.sanitize(marked(resolvedAnswer || ''))}
+                </div>
               </section>
             {/if}
             <AnswerForm {digest} {exchangeIndex} {questioner} />
