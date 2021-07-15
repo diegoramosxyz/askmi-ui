@@ -33,7 +33,7 @@
             bind:value
             required={i === 0}
             type="number"
-            step="0.001"
+            step="0.0001"
             min="0"
             class="flex-none text-xl font-bold text-right w-28 bg-transparent focus:outline-none rounded ring-1 ring-trueGray-700 transition focus:ring-trueGray-400"
             placeholder="0"

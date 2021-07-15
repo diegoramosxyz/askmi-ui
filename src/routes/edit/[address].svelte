@@ -64,37 +64,33 @@
   }
 </script>
 
-<main class="px-3 max-w-screen-md mx-auto">
-  <Navbar />
-  {#if !$loading}
-    <a
-      class="flex items-center gap-2 col-start-1 row-start-1 hover:underline"
-      href={`/instance/${$page.params.address}`}
-      ><Link />
-      <p>Go to your AskMi instance</p>
-    </a>
-    <header>
-      <h1 class="my-4 text-center text-xl font-bold">
-        Edit your AskMi instance
-      </h1>
-    </header>
-    <div class="grid gap-5 items-start justify-center">
-      <form
-        class="grid gap-6 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
-        on:submit|preventDefault={() => updateTiers()}
-      >
-        <TierCards />
-        <Button color="lime"><Cog /> Update Tiers</Button>
-      </form>
-      <form
-        class="grid gap-6 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
-        on:submit|preventDefault={() => updateTip()}
-      >
-        <TipCard />
-        <Button color="lime"><Cog /> Update Tip</Button>
-      </form>
-    </div>
-  {:else}
-    <p>Loading...</p>
-  {/if}
-</main>
+<Navbar />
+{#if !$loading}
+  <a
+    class="flex items-center gap-2 col-start-1 row-start-1 hover:underline"
+    href={`/instance/${$page.params.address}`}
+    ><Link />
+    <p>Go to your AskMi instance</p>
+  </a>
+  <header>
+    <h1 class="my-4 text-center text-xl font-bold">Edit your AskMi instance</h1>
+  </header>
+  <div class="grid gap-5 items-start justify-center">
+    <form
+      class="grid gap-6 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
+      on:submit|preventDefault={() => updateTiers()}
+    >
+      <TierCards />
+      <Button color="lime"><Cog /> Update Tiers</Button>
+    </form>
+    <form
+      class="grid gap-6 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
+      on:submit|preventDefault={() => updateTip()}
+    >
+      <TipCard />
+      <Button color="lime"><Cog /> Update Tip</Button>
+    </form>
+  </div>
+{:else}
+  <p>Loading...</p>
+{/if}

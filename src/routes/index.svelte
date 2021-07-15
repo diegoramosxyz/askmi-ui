@@ -15,19 +15,17 @@
   })
 </script>
 
-<main class="px-3 lg:px-0 max-w-screen-md mx-auto">
-  <Navbar />
-  <Loading>
-    <!-- Check if the current signer alreadt has an AskMi contract -->
-    {#if $askMiAddress === null}
-      <InstatiateContractForm />
-    {:else}
-      <a
-        class="flex items-center gap-2 col-start-1 row-start-1 hover:underline"
-        href={`/instance/${$askMiAddress}`}
-        ><Link />
-        <p>Go to your AskMi instance</p>
-      </a>
-    {/if}
-  </Loading>
-</main>
+<Navbar />
+<Loading>
+  <!-- Check if the current signer alreadt has an AskMi contract -->
+  {#if $askMiAddress === null}
+    <InstatiateContractForm />
+  {:else}
+    <a
+      class="flex items-center gap-2 col-start-1 row-start-1 hover:underline"
+      href={`/instance/${$askMiAddress}`}
+      ><Link />
+      <p>Go to your AskMi instance</p>
+    </a>
+  {/if}
+</Loading>
