@@ -1,8 +1,7 @@
 <script lang="ts">
   import PaperAirplane from '$lib/svg/PaperAirplane.svelte'
-  import Trash from '$lib/svg/Trash.svelte'
   import { owner, signer, textAreaContent } from '$lib/web3/store'
-  import { removeQuestion, respond } from '$lib/web3/tools'
+  import { respond } from '$lib/web3/tools'
   import type { BigNumber } from '@ethersproject/bignumber'
   import Button from './Button.svelte'
   import marked from 'marked'
@@ -17,7 +16,8 @@
 
 {#if digest === '' && !!$owner && !!$signer && $owner.toLowerCase() === $signer.toLowerCase()}
   <details>
-    <summary class="mb-2 flex gap-1 items-center">Admin <ChebronDown /></summary
+    <summary class="mb-2 flex gap-1 items-center"
+      >Answer <ChebronDown /></summary
     >
     <form
       class="mb-5 grid justify-center"
@@ -40,11 +40,6 @@
       {/if}
       <div class="flex gap-4">
         <Button color="lightBlue"><PaperAirplane /> Answer</Button>
-        <Button
-          color="red"
-          click={() => removeQuestion(questioner, exchangeIndex)}
-          ><Trash /> Remove</Button
-        >
       </div>
     </form>
   </details>

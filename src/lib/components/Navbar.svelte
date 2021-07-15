@@ -10,19 +10,21 @@
 
 <nav class="mb-3 flex justify-between items-center py-3">
   <section>
-    <a class="no-underline flex gap-2 items-center" href="/">
+    <a class="flex no-underline gap-2 items-center" href="/">
       <QuestionMark />
       <p>AskMi</p>
     </a>
   </section>
-  <section class="flex items-center gap-4">
+  <section
+    class="flex flex-row-reverse sm:flex-row items-center gap-2 sm:gap-4"
+  >
     {#if !!$owner && !!$signer && $owner.toLowerCase() === $signer.toLowerCase() && !$page.path.startsWith('/edit/')}
       <a
         class="no-underline flex items-center gap-2 px-3 py-1.5 ring-1 ring-trueGray-700 rounded"
         href={`/edit/${$page.params.address}`}
       >
         <Adjustments />
-        <p>Edit Contract</p></a
+        <p class="hidden sm:block">Edit Contract</p></a
       >
     {/if}
     {#if $signer}

@@ -15,9 +15,9 @@
 </script>
 
 <section class="flex gap-2 justify-end">
-  {#if digest === '' && questioner.toLowerCase() === $signer.toLowerCase()}
+  {#if (digest === '' && $signer.toLowerCase() === questioner.toLowerCase()) || (digest === '' && $owner.toLowerCase() === $signer.toLowerCase())}
     <Button color="red" click={() => removeQuestion(questioner, exchangeIndex)}
-      ><Trash/> Remove</Button
+      ><Trash /> Remove</Button
     >
   {/if}
   {#if digest !== '' && !!$owner && !!$signer && $owner.toLowerCase() !== $signer.toLowerCase()}

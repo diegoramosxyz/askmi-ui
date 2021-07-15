@@ -16,10 +16,8 @@
   {#if $questions && $questions.length !== 0}
     {#each $questions as { questioner, questions }}
       <section class="grid justify-start mb-3">
-        <a
-          class="no-underline p-1.5 flex gap-2 rounded transition focus:outline-none focus:ring-1 hover:ring-1 ring-trueGray-500"
-          href={`/questioner/${questioner}`}
-          ><img
+        <div class="p-1.5 flex gap-2">
+          <img
             class="rounded h-6"
             src={getBlockie(questioner)}
             alt="Blockie from questioner's address"
@@ -27,7 +25,7 @@
           <p class="font-mono pt-0.5">
             {shrinkAddress(questioner)}
           </p>
-        </a>
+        </div>
       </section>
       <div class="grid gap-5 mb-6">
         {#each [...questions].reverse() as { answer: { digest }, exchangeIndex, balance, resolvedQuestion, resolvedAnswer, tips }}

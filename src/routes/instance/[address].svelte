@@ -50,7 +50,7 @@
         <textarea
           bind:value={$textAreaContent}
           cols="40"
-          rows="7"
+          rows="4"
           class="mb-3 px-3 py-2 bg-transparent ring-1 ring-trueGray-700 rounded resize-y"
           placeholder="Type here..."
         />
