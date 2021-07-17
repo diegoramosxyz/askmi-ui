@@ -24,7 +24,7 @@
     <Button
       color="lime"
       click={async () => await tipAsnwer(questioner, exchangeIndex)}
-      ><DollarSign /> Tips: {tips.toNumber()}</Button
+      ><DollarSign />Tips: {tips.toNumber()}</Button
     >
   {/if}
 </section>

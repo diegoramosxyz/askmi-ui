@@ -3,6 +3,8 @@ import type { AskMi } from './askmi'
 import {
   askMiAddress,
   askMiFactory,
+  factoryTiers,
+  factoryTip,
   loading,
   signer,
   textAreaContent,
@@ -198,6 +200,26 @@ export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
     async (_tipper: string, _questioner: string, _exchangeIndex: BigNumber) =>
       await getQuestionsSubset()
   )
+}
+
+export function updateTiers() {
+  let _tiers = get(factoryTiers)
+    .filter(({ value }) => value > 0)
+    .map(({ value }) => utils.parseEther(value.toString()))
+  get(askMi).updateTiers(_tiers)
+  get(askMi).once('TiersUpdated', (_askMiAddress: string) => {
+    console.log('Tiers Updated.')
+    location.reload()
+  })
+}
+
+export function updateTip() {
+  let _tip = utils.parseEther(get(factoryTip).toString())
+  get(askMi).updateTip(_tip)
+  get(askMi).once('TipUpdated', (_askMiAddress: string) => {
+    console.log('Tip Updated.')
+    location.reload()
+  })
 }
 
 export function getBlockie(address: string | undefined) {

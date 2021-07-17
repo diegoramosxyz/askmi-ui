@@ -12,6 +12,6 @@
 
 <button
   on:click={$$props.click}
-  class={`flex gap-1 items-center select-none focus:outline-none transition ring-1 focus:ring-offset-2 ring-offset-trueGray-900 font-medium px-2 py-1 normal-case rounded-md ${colors[color]}`}
+  class={`w-min flex gap-1 items-center whitespace-nowrap select-none focus:outline-none transition ring-1 focus:ring-offset-2 ring-offset-trueGray-900 font-medium px-2 py-1 normal-case rounded-md ${colors[color]}`}
   ><slot /></button
 >

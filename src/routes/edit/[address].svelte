@@ -1,22 +1,15 @@
 <script lang="ts">
   import { page } from '$app/stores'
   import { onMount } from 'svelte'
-  import { setUpAskMi } from '$lib/web3/tools'
-  import { ethers, utils } from 'ethers'
-  import {
-    askMi,
-    loading,
-    factoryTiers,
-    factoryTip,
-    tiers,
-    tip,
-  } from '$lib/web3/store'
-  import Navbar from '$lib/components/Navbar.svelte'
+  import { setUpAskMi, updateTiers, updateTip } from '$lib/web3/tools'
+  import { ethers } from 'ethers'
+  import { factoryTiers, factoryTip, tiers, tip } from '$lib/web3/store'
   import TierCards from '$lib/components/TierCards.svelte'
   import TipCard from '$lib/components/TipCard.svelte'
   import Link from '$lib/svg/Link.svelte'
   import Button from '$lib/components/Button.svelte'
   import Cog from '$lib/svg/Cog.svelte'
+  import Loading from '$lib/components/Loading.svelte'
 
   // TODO: Create function to check valid Ethereum addresses
   onMount(async () => {
@@ -42,30 +35,9 @@
 
     factoryTip.set(+ethers.utils.formatEther($tip))
   })
-
-  function updateTiers() {
-    let _tiers = $factoryTiers
-      .filter(({ value }) => value > 0)
-      .map(({ value }) => utils.parseEther(value.toString()))
-    $askMi.updateTiers(_tiers)
-    $askMi.once('TiersUpdated', (_askMiAddress: string) => {
-      console.log('Tiers Updated.')
-      location.reload()
-    })
-  }
-
-  function updateTip() {
-    let _tip = utils.parseEther($factoryTip.toString())
-    $askMi.updateTip(_tip)
-    $askMi.once('TipUpdated', (_askMiAddress: string) => {
-      console.log('Tip Updated.')
-      location.reload()
-    })
-  }
 </script>
 
-<Navbar />
-{#if !$loading}
+<Loading>
   <a
     class="flex items-center gap-2 col-start-1 row-start-1 hover:underline"
     href={`/instance/${$page.params.address}`}
@@ -91,6 +63,4 @@
       <Button color="lime"><Cog /> Update Tip</Button>
     </form>
   </div>
-{:else}
-  <p>Loading...</p>
-{/if}
+</Loading>

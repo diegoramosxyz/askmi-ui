@@ -27,7 +27,7 @@
         bind:value={$textAreaContent}
         cols="40"
         rows="5"
-        class="mb-3 px-3 py-2 bg-transparent ring-1 transition focus:outline-none  ring-trueGray-700 focus:ring-trueGray-500 rounded resize-y"
+        class="mb-3 px-3 py-2 bg-transparent ring-1 transition focus:outline-none ring-trueGray-700 focus:ring-trueGray-500 rounded resize-y"
         placeholder="Answer here..."
       />
       {#if $textAreaContent}

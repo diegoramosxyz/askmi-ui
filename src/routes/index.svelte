@@ -2,9 +2,7 @@
   import { onMount } from 'svelte'
   import { setUpAskMiFactory } from '$lib/web3/tools'
   import { askMiAddress } from '$lib/web3/store'
-  import Navbar from '$lib/components/Navbar.svelte'
   import InstatiateContractForm from '$lib/components/InstatiateContractForm.svelte'
-  import Loading from '$lib/components/Loading.svelte'
   import Link from '$lib/svg/Link.svelte'
 
   onMount(async () => {
@@ -15,17 +13,14 @@
   })
 </script>
 
-<Navbar />
-<Loading>
-  <!-- Check if the current signer alreadt has an AskMi contract -->
-  {#if $askMiAddress === null}
-    <InstatiateContractForm />
-  {:else}
-    <a
-      class="flex items-center gap-2 col-start-1 row-start-1 hover:underline"
-      href={`/instance/${$askMiAddress}`}
-      ><Link />
-      <p>Go to your AskMi instance</p>
-    </a>
-  {/if}
-</Loading>
+<!-- Check if the current signer alreadt has an AskMi contract -->
+{#if $askMiAddress === null}
+  <InstatiateContractForm />
+{:else}
+  <a
+    class="flex items-center gap-2 col-start-1 row-start-1 hover:underline"
+    href={`/instance/${$askMiAddress}`}
+    ><Link />
+    <p>Go to your AskMi instance</p>
+  </a>
+{/if}
