@@ -27,3 +27,5 @@ export const factoryTiers: Writable<{ name: string; value: number }[]> =
 export const factoryTip: Writable<number> = writable()
 
 export const textAreaContent: Writable<string> = writable()
+export const tipUpdated: Writable<boolean> = writable()
+export const tiersUpdated: Writable<boolean> = writable()

@@ -9,7 +9,9 @@ import {
   questions,
   signer,
   textAreaContent,
+  tiersUpdated,
   tip,
+  tipUpdated,
 } from './store'
 import { get } from 'svelte/store'
 import { abi as askMiAbi } from '$lib/abi/AskMi.json'
@@ -184,6 +186,8 @@ export async function removeQuestion(
 ) {
   await get(askMi).removeQuestion(questioner, exchangeIndex)
 
+  // Do not wait for event
+  // Optimistically update state for better UX
   questions.set(
     get(questions).map((obj) => {
       if (obj.questioner === questioner) {
@@ -208,6 +212,8 @@ export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
     value: await get(askMi).tip(),
   })
 
+  // Do not wait for event
+  // Optimistically update state for better UX
   questions.set(
     get(questions).map((obj) => {
       if (obj.questioner === questioner) {
@@ -228,19 +234,25 @@ export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
   )
 }
 
-export function updateTiers() {
+export async function updateTiers() {
   let _tiers = get(factoryTiers)
     .filter(({ value }) => value > 0)
     .map(({ value }) => utils.parseEther(value.toString()))
-  get(askMi).updateTiers(_tiers)
+  await get(askMi).updateTiers(_tiers)
+  // Do not wait for event
+  // Optimistically update state for better UX
+  tiersUpdated.set(true)
   get(askMi).once('TiersUpdated', (_askMiAddress: string) => {
     location.reload()
   })
 }
 
-export function updateTip() {
+export async function updateTip() {
   let _tip = utils.parseEther(get(factoryTip).toString())
-  get(askMi).updateTip(_tip)
+  await get(askMi).updateTip(_tip)
+  // Do not wait for event
+  // Optimistically update state for better UX
+  tipUpdated.set(true)
   get(askMi).once('TipUpdated', (_askMiAddress: string) => {
     location.reload()
   })

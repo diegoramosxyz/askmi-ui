@@ -3,7 +3,14 @@
   import { onMount } from 'svelte'
   import { setUpAskMi, updateTiers, updateTip } from '$lib/web3/tools'
   import { ethers } from 'ethers'
-  import { factoryTiers, factoryTip, tiers, tip } from '$lib/web3/store'
+  import {
+    factoryTiers,
+    factoryTip,
+    tiers,
+    tiersUpdated,
+    tip,
+    tipUpdated,
+  } from '$lib/web3/store'
   import TierCards from '$lib/components/TierCards.svelte'
   import TipCard from '$lib/components/TipCard.svelte'
   import Link from '$lib/svg/Link.svelte'
@@ -34,6 +41,8 @@
     ])
 
     factoryTip.set(+ethers.utils.formatEther($tip))
+    tiersUpdated.set(false)
+    tipUpdated.set(false)
   })
 </script>
 
@@ -49,16 +58,30 @@
   </header>
   <div class="grid gap-5 justify-center">
     <form
-      class="grid gap-6 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
+      class="grid gap-4 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
       on:submit|preventDefault={() => updateTiers()}
     >
+      {#if $tiersUpdated === true}
+        <p
+          class="px-2 py-0.5 rounded font-bold bg-trueGray-300 text-trueGray-900"
+        >
+          Tiers will update soon!
+        </p>
+      {/if}
       <TierCards />
       <Button color="lime"><Cog />Update Tiers</Button>
     </form>
     <form
-      class="grid gap-6 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
+      class="grid gap-4 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
       on:submit|preventDefault={() => updateTip()}
     >
+      {#if $tipUpdated === true}
+        <p
+          class="px-2 py-0.5 rounded font-bold bg-trueGray-300 text-trueGray-900"
+        >
+          The tip cost will update soon!
+        </p>
+      {/if}
       <TipCard />
       <Button color="lime"><Cog />Update Tip</Button>
     </form>

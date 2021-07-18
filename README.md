@@ -30,9 +30,11 @@ AskMi (the website) will be the best and easiest to use graphical user interface
 
 ### IDEAS
 
+Make it so that the responder only gets a fraction of the reward once he responds and the rest of the reward when the questioner accepts the answer. We might leave this option up to the responder.
+
 Allow the responder to set not just the prices for the Priority Tiers, but also a timeout, such that the responder automatically gets back its deposit if the responder did not answer on time.
 
-This project could becomme a "file exchange." IPFS can store any file so people can pay to receive PDFs, MP4, ZIP files, etc.
+This project could becomme a "file exchange." IPFS can store any file so people can pay to receive PDFs, MP4, ZIP files, etc. It's an on-chain method to commission work.
 
 ### THOUGHTS
 
