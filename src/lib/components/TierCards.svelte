@@ -18,28 +18,26 @@
 
 <section>
   <header class="mb-3">
-    <h1 class="text-center text-lg font-bold">
+    <h2 class="text-center text-lg font-bold">
       Select the contract's tiers <span class="text-sm">(Min. 1 tier)</span>
-    </h1>
+    </h2>
   </header>
-  <div class="grid gap-4">
+  <div class="grid gap-4 justify-center">
     {#each $factoryTiers as { name, value }, i}
       <article class="flex gap-2 items-end">
         <label class="flex-1" for={name}>{name}</label>
-        <div class="flex gap-3 items-end">
-          <input
-            {name}
-            id={name}
-            bind:value
-            required={i === 0}
-            type="number"
-            step="0.0001"
-            min="0"
-            class="flex-none text-xl font-bold text-right w-28 bg-transparent focus:outline-none rounded ring-1 ring-trueGray-700 transition focus:ring-trueGray-400"
-            placeholder="0"
-          />
-          <span class="text-sm font-semibold">ETH</span>
-        </div>
+        <input
+          {name}
+          id={name}
+          bind:value
+          required={i === 0}
+          type="number"
+          step="0.0001"
+          min="0"
+          class="flex-none text-xl font-bold text-right w-28 bg-transparent focus:outline-none rounded ring-1 ring-trueGray-700 transition focus:ring-trueGray-400"
+          placeholder="0"
+        />
+        <span class="text-sm font-semibold">ETH</span>
       </article>
     {/each}
   </div>

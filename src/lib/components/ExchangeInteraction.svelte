@@ -1,8 +1,6 @@
 <script lang="ts">
   import DollarSign from '$lib/svg/DollarSign.svelte'
-
   import { owner, signer } from '$lib/web3/store'
-
   import { removeQuestion, tipAsnwer } from '$lib/web3/tools'
   import type { BigNumber } from '@ethersproject/bignumber'
   import Button from './Button.svelte'

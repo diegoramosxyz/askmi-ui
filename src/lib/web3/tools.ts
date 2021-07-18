@@ -6,6 +6,7 @@ import {
   factoryTiers,
   factoryTip,
   loading,
+  questions,
   signer,
   textAreaContent,
   tip,
@@ -19,6 +20,7 @@ import type { AskMiFactory } from './askmi-factory'
 import { detectAccountsChanged, detectChainChanged } from './MetaMask'
 import { getBytes32FromMultiash } from '$lib/utils/cid'
 import makeBlockie from 'ethereum-blockies-base64'
+import { goto } from '$app/navigation'
 
 function setProvider() {
   // Get the provider from the browser
@@ -43,8 +45,6 @@ async function setOwner() {
 async function setTiers() {
   let _tiers = await get(askMi).getTiers()
   let formattedTiers = _tiers.map((tier) => ethers.utils.formatEther(tier))
-
-  // Load stores
   tiers.set(formattedTiers)
 }
 
@@ -58,7 +58,6 @@ async function setAskMiAddress() {
     askMiAddress.set(await get(askMiFactory).getMyAskMi(get(signer)))
   } catch (error) {
     askMiAddress.set(null)
-    console.log('This address does not have an AskMi instance.')
   }
 }
 
@@ -148,14 +147,15 @@ export async function ask(_tierIndex: number) {
   // Conver CID into a multihash object
   let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
   // Call the ask function
-  get(askMi).ask(digest, hashFunction, size, BigNumber.from(_tierIndex), {
+  await get(askMi).ask(digest, hashFunction, size, BigNumber.from(_tierIndex), {
     value: utils.parseEther(get(tiers)[_tierIndex]),
   })
+  // Reset input field
+  textAreaContent.set('')
   // Update questions when event has been emitted
   get(askMi).once(
     'QuestionAsked',
     async (_questioner: string, _exchangeIndex: BigNumber) => {
-      textAreaContent.set('')
       await getQuestionsSubset()
     }
   )
@@ -166,12 +166,13 @@ export async function respond(questioner: string, qIndex: ethers.BigNumber) {
   // Conver CID into a multihash object
   let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
   // Call the ask function
-  get(askMi).respond(questioner, digest, hashFunction, size, qIndex)
-
+  await get(askMi).respond(questioner, digest, hashFunction, size, qIndex)
+  // Reset input field
+  textAreaContent.set('')
+  // Update questions when event has been emitted
   get(askMi).once(
     'QuestionAnswered',
     async (_questioner: string, _exchangeIndex: BigNumber) => {
-      textAreaContent.set('')
       await getQuestionsSubset()
     }
   )
@@ -181,7 +182,19 @@ export async function removeQuestion(
   questioner: string,
   exchangeIndex: BigNumber
 ) {
-  get(askMi).removeQuestion(questioner, exchangeIndex)
+  await get(askMi).removeQuestion(questioner, exchangeIndex)
+
+  questions.set(
+    get(questions).map((obj) => {
+      if (obj.questioner === questioner) {
+        // Delete the element from the exchanges array
+        // before the transaction is completed for better UX
+        obj.questions.splice(exchangeIndex.toNumber(), 1)
+        return obj
+      }
+      return obj
+    })
+  )
 
   get(askMi).once(
     'QuestionRemoved',
@@ -191,9 +204,22 @@ export async function removeQuestion(
 }
 
 export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
-  get(askMi).issueTip(questioner, exchangeIndex, {
+  await get(askMi).issueTip(questioner, exchangeIndex, {
     value: await get(askMi).tip(),
   })
+
+  questions.set(
+    get(questions).map((obj) => {
+      if (obj.questioner === questioner) {
+        // Increment tips by one
+        obj.questions[exchangeIndex.toNumber()].tips = BigNumber.from(
+          obj.questions[exchangeIndex.toNumber()].tips.toNumber() + 1
+        )
+        return obj
+      }
+      return obj
+    })
+  )
 
   get(askMi).once(
     'TipIssued',
@@ -208,7 +234,6 @@ export function updateTiers() {
     .map(({ value }) => utils.parseEther(value.toString()))
   get(askMi).updateTiers(_tiers)
   get(askMi).once('TiersUpdated', (_askMiAddress: string) => {
-    console.log('Tiers Updated.')
     location.reload()
   })
 }
@@ -217,8 +242,21 @@ export function updateTip() {
   let _tip = utils.parseEther(get(factoryTip).toString())
   get(askMi).updateTip(_tip)
   get(askMi).once('TipUpdated', (_askMiAddress: string) => {
-    console.log('Tip Updated.')
     location.reload()
+  })
+}
+
+export function instantiateAskMi() {
+  let _tiers = get(factoryTiers)
+    .filter(({ value }) => value > 0)
+    .map(({ value }) => utils.parseEther(value.toString()))
+  let _tip = utils.parseEther(get(factoryTip).toString())
+  // Deploy an AskMi instance
+  get(askMiFactory).instantiateAskMi(_tiers, _tip)
+  // Listen to the AskMiInstantiated event
+  get(askMiFactory).once('AskMiInstantiated', (_askMiAddress: string) => {
+    // Redirect user to the newly create AskMi instance
+    goto(`/instance/${_askMiAddress}`)
   })
 }
 

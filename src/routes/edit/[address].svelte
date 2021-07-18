@@ -47,20 +47,20 @@
   <header>
     <h1 class="my-4 text-center text-xl font-bold">Edit your AskMi instance</h1>
   </header>
-  <div class="grid gap-5 items-start justify-center">
+  <div class="grid gap-5 justify-center">
     <form
       class="grid gap-6 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
       on:submit|preventDefault={() => updateTiers()}
     >
       <TierCards />
-      <Button color="lime"><Cog /> Update Tiers</Button>
+      <Button color="lime"><Cog />Update Tiers</Button>
     </form>
     <form
       class="grid gap-6 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
       on:submit|preventDefault={() => updateTip()}
     >
       <TipCard />
-      <Button color="lime"><Cog /> Update Tip</Button>
+      <Button color="lime"><Cog />Update Tip</Button>
     </form>
   </div>
 </Loading>

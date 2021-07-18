@@ -2,8 +2,8 @@
   import { onMount } from 'svelte'
   import { setUpAskMiFactory } from '$lib/web3/tools'
   import { askMiAddress } from '$lib/web3/store'
-  import InstatiateContractForm from '$lib/components/InstatiateContractForm.svelte'
   import Link from '$lib/svg/Link.svelte'
+  import InstantiateAskMi from '$lib/components/InstantiateAskMi.svelte'
 
   onMount(async () => {
     let { VITE_ASKMI_FACTORY, VITE_CHAIN_ID } = import.meta.env
@@ -15,7 +15,9 @@
 
 <!-- Check if the current signer alreadt has an AskMi contract -->
 {#if $askMiAddress === null}
-  <InstatiateContractForm />
+  <div class="grid justify-center">
+    <InstantiateAskMi />
+  </div>
 {:else}
   <a
     class="flex items-center gap-2 col-start-1 row-start-1 hover:underline"
