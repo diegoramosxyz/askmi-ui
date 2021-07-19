@@ -6,6 +6,8 @@
   import marked from 'marked'
   import DOMPurify from 'dompurify'
   import Blockie from './Blockie.svelte'
+  import { getMultihashFromBytes32 as getCid } from '$lib/utils/cid'
+  import { resolveIpfs } from '$lib/web3/eventListeners'
 </script>
 
 <section class="mb-3 max-w-prose mx-auto">
@@ -20,7 +22,7 @@
         </div>
       </section>
       <div class="grid gap-5 mb-6">
-        {#each [...questions].reverse() as { answer: { digest }, exchangeIndex, balance, resolvedQuestion, resolvedAnswer, tips }}
+        {#each [...questions].reverse() as { answer, question, exchangeIndex, balance, tips }}
           <article
             class="px-4 py-3 rounded max-w-prose ring-1 ring-trueGray-800"
           >
@@ -33,18 +35,35 @@
               </p>
             {/if}
             <header class="mb-3 flex gap-3 items-center">
-              <h1 class="text-lg font-semibold">{resolvedQuestion}</h1>
+              {#await resolveIpfs(getCid(question))}
+                <p>...waiting</p>
+              {:then questionText}
+                <h1 class="text-lg font-semibold">{questionText}</h1>
+              {:catch}
+                <p class="text-red-600 font-mono">Data unavailable</p>
+              {/await}
             </header>
             <!-- If the answer exists -->
-            {#if digest !== ''}
+            {#if answer.digest !== ''}
               <section class="ml-3 mb-3">
                 <div class="mb-3">
-                  {@html DOMPurify.sanitize(marked(resolvedAnswer || ''))}
+                  {#await resolveIpfs(getCid(answer))}
+                    <p>...waiting</p>
+                  {:then asnwerText}
+                    {@html DOMPurify.sanitize(marked(asnwerText || ''))}
+                  {:catch}
+                    <p class="text-red-600 font-mono">Data unavailable</p>
+                  {/await}
                 </div>
               </section>
             {/if}
-            <AnswerForm {digest} {exchangeIndex} {questioner} />
-            <ExchangeInteraction {tips} {digest} {exchangeIndex} {questioner} />
+            <AnswerForm digest={answer.digest} {exchangeIndex} {questioner} />
+            <ExchangeInteraction
+              {tips}
+              digest={answer.digest}
+              {exchangeIndex}
+              {questioner}
+            />
           </article>
         {/each}
       </div>

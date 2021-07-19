@@ -1,5 +1,4 @@
 import { askMi, questioners, questions } from './store'
-import { getMultihashFromBytes32 as getCid } from '$lib/utils/cid'
 import { get } from 'svelte/store'
 
 // Ethers docs
@@ -7,10 +6,15 @@ import { get } from 'svelte/store'
 
 // https://docs.ethers.io/v5/api/contract/contract/#Contract-on
 
-async function resolveIpfs(cid: string | null) {
-  if (cid !== null) {
-    let res = await fetch(`https://ipfs.io/ipfs/${cid}`)
-    return await res.text()
+export async function resolveIpfs(cid: string | null) {
+  if (!!cid) {
+    const res = await fetch(`https://ipfs.io/ipfs/${cid}`)
+    const text = await res.text()
+    if (res.ok) {
+      return text
+    } else {
+      throw new Error(text)
+    }
   }
   return null
 }
@@ -30,23 +34,12 @@ export async function getQuestionsSubset() {
     // This is done to limit the amount request made by the browser to IPFS
     let _questions = (await get(askMi).getQuestions(questioner)).slice(-3)
 
-    // Get the data from IPFS using the CID for questions and answers
-    let _fetchedContent = await Promise.all(
-      _questions.map(async (qAndA) => {
-        return {
-          ...qAndA,
-          resolvedQuestion: await resolveIpfs(getCid(qAndA.question)),
-          resolvedAnswer: await resolveIpfs(getCid(qAndA.answer)),
-        }
-      })
-    )
-
     // Push the new elements into the questions array
     questions.set([
       ...get(questions),
       {
-        questioner: questioner.toLocaleLowerCase(),
-        questions: _fetchedContent,
+        questioner,
+        questions: _questions,
       },
     ])
   })

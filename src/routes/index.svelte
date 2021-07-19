@@ -13,6 +13,10 @@
   })
 </script>
 
+<svelte:head>
+  <title>AskMi</title>
+</svelte:head>
+
 <!-- Check if the current signer alreadt has an AskMi contract -->
 {#if $askMiAddress === null}
   <div class="grid justify-center">

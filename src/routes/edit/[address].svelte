@@ -46,6 +46,10 @@
   })
 </script>
 
+<svelte:head>
+  <title>Edit AskMi Instance</title>
+</svelte:head>
+
 <Loading>
   <a
     class="flex items-center gap-2 col-start-1 row-start-1 hover:underline"

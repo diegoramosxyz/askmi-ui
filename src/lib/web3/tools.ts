@@ -6,6 +6,7 @@ import {
   factoryTiers,
   factoryTip,
   loading,
+  pendingTx,
   questions,
   signer,
   textAreaContent,
@@ -149,11 +150,16 @@ export async function ask(_tierIndex: number) {
   // Conver CID into a multihash object
   let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
   // Call the ask function
-  await get(askMi).ask(digest, hashFunction, size, BigNumber.from(_tierIndex), {
-    value: utils.parseEther(get(tiers)[_tierIndex]),
-  })
-  // Reset input field
-  textAreaContent.set('')
+  let { hash, wait } = await get(askMi).ask(
+    digest,
+    hashFunction,
+    size,
+    BigNumber.from(_tierIndex),
+    {
+      value: utils.parseEther(get(tiers)[_tierIndex]),
+    }
+  )
+
   // Update questions when event has been emitted
   get(askMi).once(
     'QuestionAsked',
@@ -161,6 +167,12 @@ export async function ask(_tierIndex: number) {
       await getQuestionsSubset()
     }
   )
+
+  pendingTx.set(hash)
+  // Reset input field
+  textAreaContent.set('')
+  await wait()
+  pendingTx.set(null)
 }
 
 export async function respond(questioner: string, qIndex: ethers.BigNumber) {
@@ -168,9 +180,14 @@ export async function respond(questioner: string, qIndex: ethers.BigNumber) {
   // Conver CID into a multihash object
   let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
   // Call the ask function
-  await get(askMi).respond(questioner, digest, hashFunction, size, qIndex)
-  // Reset input field
-  textAreaContent.set('')
+  let { hash, wait } = await get(askMi).respond(
+    questioner,
+    digest,
+    hashFunction,
+    size,
+    qIndex
+  )
+
   // Update questions when event has been emitted
   get(askMi).once(
     'QuestionAnswered',
@@ -178,6 +195,12 @@ export async function respond(questioner: string, qIndex: ethers.BigNumber) {
       await getQuestionsSubset()
     }
   )
+
+  pendingTx.set(hash)
+  // Reset input field
+  textAreaContent.set('')
+  await wait()
+  pendingTx.set(null)
 }
 
 export async function removeQuestion(

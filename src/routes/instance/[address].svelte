@@ -15,6 +15,10 @@
   })
 </script>
 
+<svelte:head>
+  <title>AskMi Instance</title>
+</svelte:head>
+
 <Loading>
   <QuestionForm />
   <Exchanges />

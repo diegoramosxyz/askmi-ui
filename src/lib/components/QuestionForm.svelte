@@ -1,9 +1,16 @@
 <script lang="ts">
   import { ask } from '$lib/web3/tools'
-  import { owner, tiers, textAreaContent, signer } from '$lib/web3/store'
+  import {
+    owner,
+    tiers,
+    textAreaContent,
+    signer,
+    pendingTx,
+  } from '$lib/web3/store'
   import Button from '$lib/components/Button.svelte'
   import Plus from '$lib/svg/Plus.svelte'
   import Blockie from './Blockie.svelte'
+  import Pending from './Pending.svelte'
 
   let _tierIndex: number = 0
 </script>
@@ -20,10 +27,11 @@
       a question:
     </p>
     <textarea
+      disabled={!!$pendingTx}
       bind:value={$textAreaContent}
       cols="40"
       rows="4"
-      class="mb-3 px-3 py-2 bg-transparent ring-1 transition focus:outline-none ring-trueGray-700 focus:ring-trueGray-500 rounded resize-y"
+      class="disabled:opacity-50 disabled:cursor-not-allowed mb-3 px-3 py-2 bg-transparent ring-1 transition focus:outline-none ring-trueGray-700 focus:ring-trueGray-500 rounded resize-y"
       placeholder="Type here..."
     />
     <section class="flex gap-4 mb-2 items-center">
@@ -31,6 +39,7 @@
       {#each $tiers as tier, i}
         <article class="flex gap-2 items-center">
           <input
+            disabled={!!$pendingTx}
             type="radio"
             id={tier}
             name="tier"
@@ -41,6 +50,8 @@
         </article>
       {/each}
     </section>
-    <Button color="lightBlue"><Plus /> Ask</Button>
+    <Pending>
+      <Button color="lightBlue"><Plus /> Ask</Button>
+    </Pending>
   </form>
 {/if}

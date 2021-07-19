@@ -1,4 +1,9 @@
-import type { BigNumber, Contract, Transaction, CallOverrides } from 'ethers'
+import type {
+  BigNumber,
+  Contract,
+  CallOverrides,
+  ContractTransaction,
+} from 'ethers'
 
 export type Cid = {
   digest: string
@@ -12,8 +17,6 @@ export type Exchange = {
   exchangeIndex: BigNumber
   balance: BigNumber
   tips: BigNumber
-  resolvedQuestion: string | null
-  resolvedAnswer: string | null
 }
 
 export interface AskMi extends Contract {
@@ -27,12 +30,12 @@ export interface AskMi extends Contract {
     _size: BigNumber,
     _tierIndex: BigNumber,
     overrides: CallOverrides
-  ): Promise<Transaction>
+  ): Promise<ContractTransaction>
   issueTip(
     _questioner: string,
     _exchangeIndex: BigNumber,
     overrides: CallOverrides
-  ): Promise<Transaction>
+  ): Promise<ContractTransaction>
 
   /**
    * STATE MODIFIER FUNCTIONS
@@ -41,16 +44,16 @@ export interface AskMi extends Contract {
   removeQuestion(
     _questioner: string,
     _exchangeIndex: BigNumber
-  ): Promise<Transaction>
+  ): Promise<ContractTransaction>
   respond(
     _questioner: string,
     _digest: string,
     _hashFunction: BigNumber,
     _size: BigNumber,
     _exchangeIndex: BigNumber
-  ): Promise<Transaction>
-  updateTiers(_newTiers: BigNumber[]): Promise<Transaction>
-  updateTip(_newTipPrice: BigNumber): Promise<Transaction>
+  ): Promise<ContractTransaction>
+  updateTiers(_newTiers: BigNumber[]): Promise<ContractTransaction>
+  updateTip(_newTipPrice: BigNumber): Promise<ContractTransaction>
 
   /**
    * GETTER FUNCTIONS
