@@ -44,3 +44,18 @@ export async function getQuestionsSubset() {
     ])
   })
 }
+
+export async function getAllQuestionsFromQuestioner(address: string) {
+  // Check if the query corresponds to an ETH address
+  if (/^0x[a-fA-F0-9]{40}$/.test(address)) {
+    let _questions = await get(askMi).getQuestions(address)
+
+    // Push the new elements into the questions array
+    questions.set([
+      {
+        questioner: address,
+        questions: _questions,
+      },
+    ])
+  }
+}

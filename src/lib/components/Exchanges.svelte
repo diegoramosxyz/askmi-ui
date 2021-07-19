@@ -1,18 +1,44 @@
 <script lang="ts">
   import { ethers } from 'ethers'
-  import { questions } from '$lib/web3/store'
+  import { owner, questions, signer } from '$lib/web3/store'
   import AnswerForm from './AnswerForm.svelte'
   import ExchangeInteraction from './ExchangeInteraction.svelte'
   import marked from 'marked'
   import DOMPurify from 'dompurify'
   import Blockie from './Blockie.svelte'
   import { getMultihashFromBytes32 as getCid } from '$lib/utils/cid'
-  import { resolveIpfs } from '$lib/web3/eventListeners'
+  import {
+    getAllQuestionsFromQuestioner,
+    getQuestionsSubset,
+    resolveIpfs,
+  } from '$lib/web3/eventListeners'
+  import Button from './Button.svelte'
+
+  let pressed: boolean = false
 </script>
 
 <section class="mb-3 max-w-prose mx-auto">
-  <header class="mb-3">
+  <header class="mb-3 flex items-center justify-between">
     <h1 class="text-xl font-medium">Questions</h1>
+    {#if !!$owner && !!$signer && $owner.toLowerCase() !== $signer.toLowerCase()}
+      {#if !pressed}
+        <Button
+          color="lightBlue"
+          click={() => {
+            pressed = true
+            getAllQuestionsFromQuestioner($signer)
+          }}>Your questions</Button
+        >
+      {:else}
+        <Button
+          color="lightBlue"
+          click={() => {
+            pressed = false
+            getQuestionsSubset()
+          }}>All questions</Button
+        >
+      {/if}
+    {/if}
   </header>
   {#if $questions && $questions.length !== 0}
     {#each $questions as { questioner, questions }}
