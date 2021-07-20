@@ -43,11 +43,6 @@
         on:click={() => connectToMetaMask(signer)}
         class="flex items-center gap-2 px-3 py-1.5 ring-1 ring-trueGray-700 rounded"
       >
-        <img
-          class="rounded h-6"
-          src={getBlockie($signer)}
-          alt="Blockie from questioner's address"
-        />
         <p>MetaMask</p>
       </button>
     {/if}
