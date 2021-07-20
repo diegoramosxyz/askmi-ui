@@ -19,33 +19,37 @@ export async function resolveIpfs(cid: string | null) {
   return null
 }
 
-export async function getQuestionsSubset() {
-  // 1- Get questioners
-  // 2- remove the first element of the array (which is the 0 address)
-  // 3- Remove all other questioners, but the last 5
-  // This is done to limit the FETCH resquest made to IPFS
-  questioners.set((await get(askMi).getQuestioners()).slice(1).slice(-5))
-  // Initialize the questions array
-  questions.set([])
+export async function getQuestionsSubset(questioner?: string | null) {
+  if (!!questioner) {
+    getAllQuestionsFromQuestioner(questioner)
+  } else {
+    // 1- Get questioners
+    // 2- remove the first element of the array (which is the 0 address)
+    // 3- Remove all other questioners, but the last 5
+    // This is done to limit the FETCH resquest made to IPFS
+    questioners.set((await get(askMi).getQuestioners()).slice(1).slice(-5))
+    // Initialize the questions array
+    questions.set([])
 
-  // Fetch data from IPFS
-  get(questioners).map(async (questioner) => {
-    // Get only the last 3 questions asked by the questioner
-    // This is done to limit the amount request made by the browser to IPFS
-    let _questions = (await get(askMi).getQuestions(questioner)).slice(-3)
+    // Fetch data from IPFS
+    get(questioners).map(async (questioner) => {
+      // Get only the last 3 questions asked by the questioner
+      // This is done to limit the amount request made by the browser to IPFS
+      let _questions = (await get(askMi).getQuestions(questioner)).slice(-3)
 
-    // Push the new elements into the questions array
-    questions.set([
-      ...get(questions),
-      {
-        questioner,
-        questions: _questions,
-      },
-    ])
-  })
+      // Push the new elements into the questions array
+      questions.set([
+        ...get(questions),
+        {
+          questioner,
+          questions: _questions,
+        },
+      ])
+    })
+  }
 }
 
-export async function getAllQuestionsFromQuestioner(address: string) {
+async function getAllQuestionsFromQuestioner(address: string) {
   // Check if the query corresponds to an ETH address
   if (/^0x[a-fA-F0-9]{40}$/.test(address)) {
     let _questions = await get(askMi).getQuestions(address)

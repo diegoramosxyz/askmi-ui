@@ -65,7 +65,11 @@ async function setAskMiAddress() {
 }
 
 // Set up event listeners and load store with initial data
-export async function setUpAskMi(address: string, chainId: ImportMetaEnv['']) {
+export async function setUpAskMi(
+  address: string,
+  chainId: ImportMetaEnv[''],
+  questioner?: string | null
+) {
   // Check that the environment variables are loaded
   if (typeof chainId == 'string') {
     loading.set(true)
@@ -88,7 +92,7 @@ export async function setUpAskMi(address: string, chainId: ImportMetaEnv['']) {
     await setTiers()
     await setTip()
 
-    await getQuestionsSubset()
+    await getQuestionsSubset(questioner)
 
     loading.set(false)
   } else {

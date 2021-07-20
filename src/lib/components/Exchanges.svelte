@@ -7,45 +7,26 @@
   import DOMPurify from 'dompurify'
   import Blockie from './Blockie.svelte'
   import { getMultihashFromBytes32 as getCid } from '$lib/utils/cid'
-  import {
-    getAllQuestionsFromQuestioner,
-    getQuestionsSubset,
-    resolveIpfs,
-  } from '$lib/web3/eventListeners'
-  import Button from './Button.svelte'
-
-  let pressed: boolean = false
+  import { resolveIpfs } from '$lib/web3/eventListeners'
+  import { page } from '$app/stores'
 </script>
 
 <section class="mb-3 max-w-prose mx-auto">
   <header class="mb-3 flex items-center justify-between">
     <h1 class="text-xl font-medium">Questions</h1>
-    {#if !!$owner && !!$signer && $owner.toLowerCase() !== $signer.toLowerCase()}
-      {#if !pressed}
-        <Button
-          color="lightBlue"
-          click={() => {
-            pressed = true
-            getAllQuestionsFromQuestioner($signer)
-          }}>Your questions</Button
-        >
-      {:else}
-        <Button
-          color="lightBlue"
-          click={() => {
-            pressed = false
-            getQuestionsSubset()
-          }}>All questions</Button
-        >
-      {/if}
+    {#if !!$page.query.get('questioner')}
+      <a rel="external" href={$page.path}>Clear filter</a>
     {/if}
   </header>
   {#if $questions && $questions.length !== 0}
     {#each $questions as { questioner, questions }}
       <section class="grid justify-start mb-3">
-        <div class="p-1.5 flex gap-2">
+        <a
+          href={`${$page.path}?questioner=${questioner}`}
+          class="no-underline hover:ring-1 ring-trueGray-700 rounded transition p-1.5 flex gap-2"
+        >
           <Blockie address={questioner} />
-        </div>
+        </a>
       </section>
       <div class="grid gap-5 mb-6">
         {#each [...questions].reverse() as { answer, question, exchangeIndex, balance, tips }}
