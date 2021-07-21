@@ -5,6 +5,7 @@ import {
   askMiFactory,
   factoryTiers,
   factoryTip,
+  leaderboard,
   loading,
   pendingTx,
   questions,
@@ -130,6 +131,67 @@ export async function setUpAskMiFactory(
 
     // Check if the current signer has created an AskMi contract
     await setAskMiAddress()
+
+    // Get every AskMiInstantiated event emitted by the factory contract
+    let events = await get(askMiFactory).queryFilter({
+      address,
+      topics: [utils.id('AskMiInstantiated(address)')],
+    })
+
+    // Get the address for every AskMi instance
+    let askMis = events.map(
+      (event) => event.args && event.args['_askMiAddress']
+    )
+
+    // Initialize leaderboard
+    leaderboard.set([])
+    async function asyncForEach<T>(
+      array: T[],
+      callback: (item: T, index: number, allItems: T[]) => void
+    ) {
+      await Promise.all(array.map(callback))
+    }
+
+    // async function asyncForEach(
+    //   array: any[],
+    //   callback: (value: any, index?: number, array?: any[]) => any
+    // ): Promise<void> {
+    //   for (let index = 0; index < array.length; index++) {
+    //     await callback(array[index], index, array)
+    //   }
+    // }
+
+    await asyncForEach(askMis, async (address) => {
+      let askMi = new Contract(
+        address,
+        askMiAbi,
+        get(provider).getSigner()
+      ) as AskMi
+
+      // Get every QuestionAnswered event emitted by this contract
+      let events = await askMi.queryFilter({
+        topics: [utils.id('QuestionAnswered(address,uint256)')],
+      })
+
+      let owner = await askMi.owner()
+
+      // Push a new element into the leaderboard
+      leaderboard.set([
+        ...get(leaderboard),
+        {
+          contract: address,
+          owner,
+          answeredCount: events.length,
+        },
+      ])
+    })
+
+    // Sort descending by the number of questions answered
+    let sortedLeaderboard = get(leaderboard).sort(
+      (a, b) => b.answeredCount - a.answeredCount
+    )
+
+    leaderboard.set(sortedLeaderboard)
 
     loading.set(false)
   } else {

@@ -30,3 +30,6 @@ export const textAreaContent: Writable<string> = writable()
 export const tipUpdated: Writable<boolean> = writable()
 export const tiersUpdated: Writable<boolean> = writable()
 export const pendingTx: Writable<string | null> = writable()
+export const leaderboard: Writable<
+  { contract: string; owner: string; answeredCount: number }[]
+> = writable()

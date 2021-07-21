@@ -4,6 +4,7 @@
   import { askMiAddress } from '$lib/web3/store'
   import Link from '$lib/svg/Link.svelte'
   import InstantiateAskMi from '$lib/components/InstantiateAskMi.svelte'
+  import Leaderboard from '$lib/components/Leaderboard.svelte'
 
   onMount(async () => {
     let { VITE_ASKMI_FACTORY, VITE_CHAIN_ID } = import.meta.env
@@ -30,3 +31,4 @@
     <p>Go to your AskMi instance</p>
   </a>
 {/if}
+<Leaderboard />
