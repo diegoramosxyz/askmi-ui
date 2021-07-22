@@ -5,6 +5,7 @@
   import Exchanges from '$lib/components/Exchanges.svelte'
   import QuestionForm from '$lib/components/QuestionForm.svelte'
   import Loading from '$lib/components/Loading.svelte'
+  // import QuestionersExport from '$lib/components/QuestionersExport.svelte'
 
   // TODO: Create function to check valid Ethereum addresses
   onMount(async () => {
@@ -25,5 +26,6 @@
 
 <Loading>
   <QuestionForm />
+  <!-- <QuestionersExport /> -->
   <Exchanges />
 </Loading>

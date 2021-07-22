@@ -18,17 +18,19 @@
   <title>AskMi</title>
 </svelte:head>
 
-<!-- Check if the current signer alreadt has an AskMi contract -->
-{#if $askMiAddress === null}
-  <div class="grid justify-center">
-    <InstantiateAskMi />
-  </div>
-{:else}
-  <a
-    class="flex items-center gap-2 col-start-1 row-start-1 hover:underline"
-    href={`/instance/${$askMiAddress}`}
-    ><Link />
-    <p>Go to your AskMi instance</p>
-  </a>
-{/if}
-<Leaderboard />
+<div class="grid gap-5 sm:gap-0 sm:grid-cols-2 justify-center items-start">
+  <!-- Check if the current signer alreadt has an AskMi contract -->
+  {#if $askMiAddress === null}
+    <div class="grid justify-center">
+      <InstantiateAskMi />
+    </div>
+  {:else}
+    <a
+      class="flex items-center gap-2 col-start-1 row-start-1 hover:underline"
+      href={`/instance/${$askMiAddress}`}
+      ><Link />
+      <p>Go to your AskMi instance</p>
+    </a>
+  {/if}
+  <Leaderboard />
+</div>

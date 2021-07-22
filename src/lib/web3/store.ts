@@ -33,3 +33,4 @@ export const pendingTx: Writable<string | null> = writable()
 export const leaderboard: Writable<
   { contract: string; owner: string; answeredCount: number }[]
 > = writable()
+export const search: Writable<string> = writable()

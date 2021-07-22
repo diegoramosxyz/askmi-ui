@@ -6,18 +6,17 @@
   import Adjustments from '$lib/svg/Adjustments.svelte'
   import { getBlockie } from '$lib/web3/tools'
   import QuestionMark from '$lib/svg/QuestionMark.svelte'
+  import Search from './Search.svelte'
 </script>
 
 <nav class="mb-3 flex justify-between items-center py-3">
   <section>
-    <a class="flex no-underline gap-2 items-center" href="/">
+    <a class="hidden md:flex no-underline gap-2 items-center" href="/">
       <QuestionMark />
       <p>AskMi</p>
     </a>
   </section>
-  <section
-    class="flex flex-row-reverse sm:flex-row items-center gap-2 sm:gap-4"
-  >
+  <section class="flex flex-row-reverse sm:flex-row gap-2 sm:gap-4">
     {#if !!$owner && !!$signer && $owner.toLowerCase() === $signer.toLowerCase() && !$page.path.startsWith('/edit/')}
       <a
         class="no-underline flex items-center gap-2 px-3 py-1.5 ring-1 ring-trueGray-700 rounded"
@@ -29,7 +28,7 @@
     {/if}
     {#if $signer}
       <button
-        class="flex items-center gap-2 px-3 py-1.5 ring-1 ring-trueGray-700 rounded"
+        class="hidden sm:flex items-center gap-2 px-3 py-1.5 ring-1 ring-trueGray-700 rounded"
       >
         <img
           class="rounded h-6"
@@ -45,6 +44,9 @@
       >
         <p>MetaMask</p>
       </button>
+    {/if}
+    {#if !!$page && $page.path === '/'}
+      <Search />
     {/if}
   </section>
 </nav>

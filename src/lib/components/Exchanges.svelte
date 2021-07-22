@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ethers } from 'ethers'
-  import { owner, questions, signer } from '$lib/web3/store'
+  import { questions } from '$lib/web3/store'
   import AnswerForm from './AnswerForm.svelte'
   import ExchangeInteraction from './ExchangeInteraction.svelte'
   import marked from 'marked'
