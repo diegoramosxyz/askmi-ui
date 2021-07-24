@@ -33,6 +33,9 @@ function setProvider() {
 
 async function setChainId() {
   const _chainId = await window.ethereum.request({ method: 'eth_chainId' })
+  if (_chainId !== '0x3') {
+    alert('This contract has only been deployed to the Ropsten Testnet.')
+  }
   chainId.set(_chainId)
 }
 

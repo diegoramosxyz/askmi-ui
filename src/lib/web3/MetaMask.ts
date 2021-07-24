@@ -34,7 +34,7 @@ export async function detectProvider() {
 export async function detectChainChanged() {
   window.ethereum.on('chainChanged', (chainId: string) => {
     // window.location.reload()
-    console.log(`Network changed to: ${chainId}`)
+    alert('This contract has only been deployed to the Ropsten Testnet.')
   })
 }
 

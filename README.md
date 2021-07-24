@@ -44,8 +44,6 @@ Also, the questioners will be incetivized by the tips.
 
 _Disclaimer: I'm using this project to learn solidity. I might say or code some outrageous things._
 
-### Sources
+### TODO
 
-https://medium.com/coinmonks/state-machines-in-solidity-9e2d8a6d7a11
-
-http://amavridou.com/papers/mavridou2018SC.pdf
+- [] Refactor and reorganize the entire code base.
