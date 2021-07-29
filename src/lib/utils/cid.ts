@@ -17,6 +17,20 @@ import type { Cid } from '$lib/web3/askmi'
  */
 export function getBytes32FromMultiash(multihash: string) {
   const decoded = utils.base58.decode(multihash)
+  // INPUT EXAMPLE: Hello, world?
+  // OUTPUT EXAMPLE:
+
+  //   {
+  //     "digest": "0x744d7ad0f5893404994e4bfc6af6fb365439d15d7338b7f8ff1b39c5f3593fad",
+  //     "hashFunction": {
+  //         "type": "BigNumber",
+  //         "hex": "0x12"
+  //     },
+  //     "size": {
+  //         "type": "BigNumber",
+  //         "hex": "0x20"
+  //     }
+  // }
 
   return {
     digest: utils.hexlify(decoded.slice(2)),

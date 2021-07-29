@@ -12,10 +12,6 @@ Tipping is preffered to sending ETH directly to the responder because the amount
 
 As seen in websites such as Quora and Yahoo Answers, people are willing to answer questions, even when there is no economic incentive for doing so. AskMi aims to provide an economic incentive for anyone to provide the best answer to any question in a decentralized and non-custodial fashion.
 
-### THE SERVICE AND THE SMART-CONTRACT
-
-AskMi (the website) will be the best and easiest to use graphical user interface to interact with an AskMi instance. It will show stats for the responder and allow viewers to tip answers, signaling approval and support. Such tips will be distributed between the responder and questioner.
-
 ### ACTIONS
 
 - The Responder deploys an AskMi instance to provide a pay-per-response service. He does so by setting the Priority Tiers he wishes to charge and the cost to Tip answers.
@@ -28,13 +24,15 @@ AskMi (the website) will be the best and easiest to use graphical user interface
 
 - The responder answers the question and gets the reward/deposit.
 
+- Anyone can tip answered questions
+
 ### IDEAS
 
 Make it so that the responder only gets a fraction of the reward once he responds and the rest of the reward when the questioner accepts the answer. We might leave this option up to the responder.
 
 Allow the responder to set not just the prices for the Priority Tiers, but also a timeout, such that the responder automatically gets back its deposit if the responder did not answer on time.
 
-This project could becomme a "file exchange." IPFS can store any file so people can pay to receive PDFs, MP4, ZIP files, etc. It's an on-chain method to commission work.
+This project could becomme a "public file exchange." IPFS can store any file so people can pay to receive PDFs, MP4, ZIP files, etc. It's an on-chain method to commission work.
 
 ### THOUGHTS
 
@@ -44,6 +42,10 @@ Also, the questioners will be incetivized by the tips.
 
 _Disclaimer: I'm using this project to learn solidity. I might say or code some outrageous things._
 
+### CODE
+
+Read the [Solidity code](https://github.com/diegoramosxyz/askmi).
+
 ### TODO
 
-- [] Refactor and reorganize the entire code base.
+[] Refactor and reorganize the entire code base.
