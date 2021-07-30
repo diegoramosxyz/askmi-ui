@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { factoryTip } from '$lib/web3/store'
+  import { factoryTip, symbol } from '$lib/web3/store'
   factoryTip.set(0)
 </script>
 
@@ -21,7 +21,13 @@
         class="flex-none text-xl font-bold text-right w-28 bg-transparent focus:outline-none rounded ring-1 ring-trueGray-700 transition focus:ring-trueGray-400"
         placeholder="0"
       />
-      <span class="text-sm font-semibold">ETH</span>
+      <span class="text-sm font-semibold"
+        >{#if !!symbol}
+          {$symbol}
+        {:else}
+          ETH
+        {/if}</span
+      >
     </article>
   </div>
 </section>

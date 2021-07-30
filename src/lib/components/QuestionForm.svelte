@@ -6,11 +6,13 @@
     textAreaContent,
     signer,
     pendingTx,
+    symbol,
   } from '$lib/web3/store'
   import Button from '$lib/components/Button.svelte'
   import Plus from '$lib/svg/Plus.svelte'
   import Blockie from './Blockie.svelte'
   import Pending from './Pending.svelte'
+  import InfoBubble from './InfoBubble.svelte'
 
   let _tierIndex: number = 0
 </script>
@@ -34,11 +36,12 @@
       class="disabled:opacity-50 disabled:cursor-not-allowed mb-3 px-3 py-2 bg-transparent ring-1 transition focus:outline-none ring-trueGray-700 focus:ring-trueGray-500 rounded resize-y"
       placeholder="Type here..."
     />
-    <section class="flex gap-4 mb-2 items-center">
-      <h1 class="font-bold text-lg">Tier:</h1>
+    <h1 class="font-bold text-lg mb-1">Tiers <InfoBubble /></h1>
+    <div class="flex justify-around mb-4">
       {#each $tiers as tier, i}
-        <article class="flex gap-2 items-center">
+        <article class="grid gap-1 justify-center">
           <input
+            class="w-full"
             disabled={!!$pendingTx}
             type="radio"
             id={tier}
@@ -46,10 +49,16 @@
             bind:group={_tierIndex}
             value={i}
           />
-          <label for={tier}>{tier} ETH</label>
+          <label for={tier}>
+            {#if !!symbol}
+              {tier} {$symbol}
+            {:else}
+              Ξ {tier}
+            {/if}</label
+          >
         </article>
       {/each}
-    </section>
+    </div>
     <Pending>
       <Button color="lightBlue"><Plus /> Ask</Button>
     </Pending>

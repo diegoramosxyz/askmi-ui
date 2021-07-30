@@ -7,10 +7,10 @@
   import Leaderboard from '$lib/components/Leaderboard.svelte'
 
   onMount(async () => {
-    let { VITE_ASKMI_FACTORY, VITE_CHAIN_ID } = import.meta.env
+    let { VITE_ASKMI_FACTORY, VITE_CHAIN_ID, VITE_ERC20 } = import.meta.env
 
     // Set up event listeners and load stores with initial data
-    await setUpAskMiFactory(VITE_ASKMI_FACTORY, VITE_CHAIN_ID)
+    await setUpAskMiFactory(VITE_ASKMI_FACTORY, VITE_CHAIN_ID, VITE_ERC20)
   })
 </script>
 

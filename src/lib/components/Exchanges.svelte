@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ethers } from 'ethers'
-  import { questions } from '$lib/web3/store'
+  import { questions, symbol } from '$lib/web3/store'
   import AnswerForm from './AnswerForm.svelte'
   import ExchangeInteraction from './ExchangeInteraction.svelte'
   import marked from 'marked'
@@ -37,8 +37,13 @@
               <p class="mb-2 flex gap-2 items-center">
                 <span
                   class="font-mono flex items-center text-sm font-bold px-2 pt-1 rounded-md bg-lime-200 text-lime-900"
-                  >Reward: {ethers.utils.formatEther(balance)} ETH</span
-                >
+                  >Reward: {ethers.utils.formatEther(balance)}
+                  {#if !!symbol}
+                    {$symbol}
+                  {:else}
+                    ETH
+                  {/if}
+                </span>
               </p>
             {/if}
             <header class="mb-3 flex gap-3 items-center">

@@ -1,6 +1,6 @@
-import type { ethers } from 'ethers'
+import type { BigNumber, ethers } from 'ethers'
 import { Writable, writable } from 'svelte/store'
-import type { AskMi, Exchange } from './askmi'
+import type { AskMi, ERC20, Exchange } from './askmi'
 import type { AskMiFactory } from './askmi-factory'
 
 export type questionsByQuestioner = {
@@ -9,8 +9,10 @@ export type questionsByQuestioner = {
 }[]
 
 export const askMi: Writable<AskMi> = writable()
+export const askMi_ERC20: Writable<AskMi> = writable()
 export const askMiAddress: Writable<string | null> = writable()
 export const askMiFactory: Writable<AskMiFactory> = writable()
+export const askMiFactory_ERC20: Writable<AskMiFactory> = writable()
 export const provider: Writable<ethers.providers.Web3Provider> = writable()
 export const signer: Writable<string> = writable()
 export const chainId: Writable<string | null> = writable()
@@ -34,3 +36,9 @@ export const leaderboard: Writable<
   { contract: string; owner: string; answeredCount: number }[]
 > = writable()
 export const search: Writable<string> = writable()
+
+// ERC20
+export const erc20: Writable<ERC20> = writable()
+export const approved: Writable<boolean> = writable()
+export const symbol: Writable<string> = writable()
+export const decimals: Writable<BigNumber> = writable()

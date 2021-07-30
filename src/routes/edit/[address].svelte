@@ -20,10 +20,10 @@
 
   // TODO: Create function to check valid Ethereum addresses
   onMount(async () => {
-    let { VITE_CHAIN_ID } = import.meta.env
+    let { VITE_CHAIN_ID, VITE_ERC20 } = import.meta.env
 
     // Set up event listeners and load stores with initial data
-    await setUpAskMi($page.params.address, VITE_CHAIN_ID)
+    await setUpAskMi($page.params.address, VITE_CHAIN_ID, VITE_ERC20)
 
     factoryTiers.set([
       {

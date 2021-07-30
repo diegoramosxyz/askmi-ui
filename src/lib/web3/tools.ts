@@ -1,8 +1,13 @@
 import { ethers, Contract, BigNumber, utils } from 'ethers'
-import type { AskMi } from './askmi'
+import type { AskMi, ERC20 } from './askmi'
 import {
+  approved,
   askMiAddress,
   askMiFactory,
+  askMiFactory_ERC20,
+  askMi_ERC20,
+  decimals,
+  erc20,
   factoryTiers,
   factoryTip,
   leaderboard,
@@ -10,14 +15,18 @@ import {
   pendingTx,
   questions,
   signer,
+  symbol,
   textAreaContent,
   tiersUpdated,
   tip,
   tipUpdated,
 } from './store'
 import { get } from 'svelte/store'
+import { abi as erc20ABI } from '$lib/abi/MyToken.json'
 import { abi as askMiAbi } from '$lib/abi/AskMi.json'
 import { abi as askMiFactoryAbi } from '$lib/abi/AskMiFactory.json'
+import { abi as askMiAbi_ERC20 } from '$lib/abi/AskMi_ERC20.json'
+import { abi as askMiFactoryAbi_ERC20 } from '$lib/abi/AskMiFactory_ERC20.json'
 import { provider, askMi, owner, tiers, chainId } from './store'
 import { getQuestionsSubset } from './eventListeners'
 import type { AskMiFactory } from './askmi-factory'
@@ -34,7 +43,7 @@ function setProvider() {
 async function setChainId() {
   const _chainId = await window.ethereum.request({ method: 'eth_chainId' })
   if (_chainId !== '0x3') {
-    alert('This contract has only been deployed to the Ropsten Testnet.')
+    // alert('This contract has only been deployed to the Ropsten Testnet.')
   }
   chainId.set(_chainId)
 }
@@ -68,14 +77,45 @@ async function setAskMiAddress() {
   }
 }
 
+async function checkApproved() {
+  const approvedAmount = await get(erc20).allowance(
+    get(signer),
+    get(askMi).address
+  )
+
+  // Check that user has approved spending
+  approved.set(approvedAmount.gt(BigNumber.from(0)))
+}
+
+export async function approve() {
+  const totalSupply = await get(erc20).totalSupply()
+  await get(erc20).approve(get(askMi).address, totalSupply)
+  // Approval(address owner, address spender, uint256 value)
+  get(erc20).once(
+    'Approval',
+    async (owner: string, spender: string, value: BigNumber) => {
+      approved.set(true)
+    }
+  )
+}
+
+async function getSymbol() {
+  symbol.set(await get(erc20).symbol())
+}
+
+async function getDecimals() {
+  decimals.set(await get(erc20).decimals())
+}
+
 // Set up event listeners and load store with initial data
 export async function setUpAskMi(
   address: string,
   chainId: ImportMetaEnv[''],
+  _erc20: ImportMetaEnv[''],
   questioner?: string | null
 ) {
   // Check that the environment variables are loaded
-  if (typeof chainId == 'string') {
+  if (typeof chainId == 'string' && typeof _erc20 == 'string') {
     loading.set(true)
     // Get the web3 provider (MetaMask) and the contract object
     setProvider()
@@ -92,11 +132,24 @@ export async function setUpAskMi(
       new Contract(address, askMiAbi, get(provider).getSigner()) as AskMi
     )
 
+    askMi_ERC20.set(
+      new Contract(address, askMiAbi_ERC20, get(provider).getSigner()) as AskMi
+    )
+
     await setOwner()
     await setTiers()
     await setTip()
 
+    erc20.set(
+      new Contract(_erc20, erc20ABI, get(provider).getSigner()) as ERC20
+    )
+
+    await checkApproved()
+
     await getQuestionsSubset(questioner)
+
+    await getSymbol()
+    await getDecimals()
 
     loading.set(false)
   } else {
@@ -107,10 +160,15 @@ export async function setUpAskMi(
 // Set up event listeners and load store with initial data
 export async function setUpAskMiFactory(
   address: ImportMetaEnv[''],
-  chainId: ImportMetaEnv['']
+  chainId: ImportMetaEnv[''],
+  _erc20: ImportMetaEnv['']
 ) {
   // Check that the environment variables are loaded
-  if (typeof address == 'string' && typeof chainId == 'string') {
+  if (
+    typeof address == 'string' &&
+    typeof chainId == 'string' &&
+    typeof _erc20 == 'string'
+  ) {
     loading.set(true)
     // Get the web3 provider (MetaMask) and the contract object
     setProvider()
@@ -131,6 +189,21 @@ export async function setUpAskMiFactory(
         get(provider).getSigner()
       ) as AskMiFactory
     )
+
+    askMiFactory_ERC20.set(
+      new Contract(
+        address,
+        askMiFactoryAbi_ERC20,
+        get(provider).getSigner()
+      ) as AskMiFactory
+    )
+
+    erc20.set(
+      new Contract(_erc20, erc20ABI, get(provider).getSigner()) as ERC20
+    )
+
+    await getSymbol()
+    await getDecimals()
 
     // Check if the current signer has created an AskMi contract
     await setAskMiAddress()
@@ -219,7 +292,7 @@ export async function ask(_tierIndex: number) {
   // Conver CID into a multihash object
   let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
   // Call the ask function
-  let { hash, wait } = await get(askMi).ask(
+  let { hash, wait } = await get(askMi_ERC20).ask(
     digest,
     hashFunction,
     size,
@@ -230,7 +303,7 @@ export async function ask(_tierIndex: number) {
   )
 
   // Update questions when event has been emitted
-  get(askMi).once(
+  get(askMi_ERC20).once(
     'QuestionAsked',
     async (_questioner: string, _exchangeIndex: BigNumber) => {
       await getQuestionsSubset()
@@ -249,7 +322,7 @@ export async function respond(questioner: string, qIndex: ethers.BigNumber) {
   // Conver CID into a multihash object
   let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
   // Call the ask function
-  let { hash, wait } = await get(askMi).respond(
+  let { hash, wait } = await get(askMi_ERC20).respond(
     questioner,
     digest,
     hashFunction,
@@ -258,7 +331,7 @@ export async function respond(questioner: string, qIndex: ethers.BigNumber) {
   )
 
   // Update questions when event has been emitted
-  get(askMi).once(
+  get(askMi_ERC20).once(
     'QuestionAnswered',
     async (_questioner: string, _exchangeIndex: BigNumber) => {
       await getQuestionsSubset()
@@ -276,7 +349,7 @@ export async function removeQuestion(
   questioner: string,
   exchangeIndex: BigNumber
 ) {
-  await get(askMi).removeQuestion(questioner, exchangeIndex)
+  await get(askMi_ERC20).removeQuestion(questioner, exchangeIndex)
 
   // Do not wait for event
   // Optimistically update state for better UX
@@ -292,7 +365,7 @@ export async function removeQuestion(
     })
   )
 
-  get(askMi).once(
+  get(askMi_ERC20).once(
     'QuestionRemoved',
     async (_questioner: string, _exchangeIndex: BigNumber) =>
       await getQuestionsSubset()
@@ -300,8 +373,8 @@ export async function removeQuestion(
 }
 
 export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
-  await get(askMi).issueTip(questioner, exchangeIndex, {
-    value: await get(askMi).tip(),
+  await get(askMi_ERC20).issueTip(questioner, exchangeIndex, {
+    value: await get(askMi_ERC20).tip(),
   })
 
   // Do not wait for event
@@ -319,7 +392,7 @@ export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
     })
   )
 
-  get(askMi).once(
+  get(askMi_ERC20).once(
     'TipIssued',
     async (_tipper: string, _questioner: string, _exchangeIndex: BigNumber) =>
       await getQuestionsSubset()
@@ -330,38 +403,43 @@ export async function updateTiers() {
   let _tiers = get(factoryTiers)
     .filter(({ value }) => value > 0)
     .map(({ value }) => utils.parseEther(value.toString()))
-  await get(askMi).updateTiers(_tiers)
+  await get(askMi_ERC20).updateTiers(_tiers)
   // Do not wait for event
   // Optimistically update state for better UX
   tiersUpdated.set(true)
-  get(askMi).once('TiersUpdated', (_askMiAddress: string) => {
+  get(askMi_ERC20).once('TiersUpdated', (_askMiAddress: string) => {
     location.reload()
   })
 }
 
 export async function updateTip() {
   let _tip = utils.parseEther(get(factoryTip).toString())
-  await get(askMi).updateTip(_tip)
+  await get(askMi_ERC20).updateTip(_tip)
   // Do not wait for event
   // Optimistically update state for better UX
   tipUpdated.set(true)
-  get(askMi).once('TipUpdated', (_askMiAddress: string) => {
+  get(askMi_ERC20).once('TipUpdated', (_askMiAddress: string) => {
     location.reload()
   })
 }
 
 export function instantiateAskMi() {
-  let _tiers = get(factoryTiers)
-    .filter(({ value }) => value > 0)
-    .map(({ value }) => utils.parseEther(value.toString()))
-  let _tip = utils.parseEther(get(factoryTip).toString())
-  // Deploy an AskMi instance
-  get(askMiFactory).instantiateAskMi(_tiers, _tip)
-  // Listen to the AskMiInstantiated event
-  get(askMiFactory).once('AskMiInstantiated', (_askMiAddress: string) => {
-    // Redirect user to the newly create AskMi instance
-    goto(`/instance/${_askMiAddress}`)
-  })
+  if (!!decimals) {
+    let _tiers = get(factoryTiers)
+      .filter(({ value }) => value > 0)
+      .map(({ value }) => utils.parseUnits(value.toString(), get(decimals)))
+    let _tip = utils.parseUnits(get(factoryTip).toString(), get(decimals))
+    // Deploy an AskMi instance
+    get(askMiFactory_ERC20).instantiateAskMi(_tiers, _tip)
+    // Listen to the AskMiInstantiated event
+    get(askMiFactory_ERC20).once(
+      'AskMiInstantiated',
+      (_askMiAddress: string) => {
+        // Redirect user to the newly create AskMi instance
+        goto(`/instance/${_askMiAddress}`)
+      }
+    )
+  }
 }
 
 export function getBlockie(address: string | undefined) {
