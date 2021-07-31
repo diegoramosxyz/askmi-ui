@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ask } from '$lib/web3/tools'
+  import { approve } from '$lib/web3/tools'
   import {
     owner,
     tiers,
@@ -7,12 +7,14 @@
     signer,
     pendingTx,
     symbol,
+    approved,
   } from '$lib/web3/store'
   import Button from '$lib/components/Button.svelte'
   import Plus from '$lib/svg/Plus.svelte'
   import Blockie from './Blockie.svelte'
   import Pending from './Pending.svelte'
   import InfoBubble from './InfoBubble.svelte'
+  import { ask } from '$lib/abi-functions/askmi'
 
   let _tierIndex: number = 0
 </script>
@@ -36,7 +38,7 @@
       class="disabled:opacity-50 disabled:cursor-not-allowed mb-3 px-3 py-2 bg-transparent ring-1 transition focus:outline-none ring-trueGray-700 focus:ring-trueGray-500 rounded resize-y"
       placeholder="Type here..."
     />
-    <h1 class="font-bold text-lg mb-1">Tiers <InfoBubble /></h1>
+    <h1 class="font-bold text-lg mb-2">Tiers <InfoBubble /></h1>
     <div class="flex justify-around mb-4">
       {#each $tiers as tier, i}
         <article class="grid gap-1 justify-center">
@@ -60,7 +62,14 @@
       {/each}
     </div>
     <Pending>
-      <Button color="lightBlue"><Plus /> Ask</Button>
+      {#if !!approved && $approved === true}
+        <Button color="lightBlue"><Plus /> Ask</Button>
+      {/if}
+      {#if !!approved && $approved === false}
+        <Button color="lime" click={() => approve()}
+          >Approve spending {$symbol}</Button
+        >
+      {/if}
     </Pending>
   </form>
 {/if}

@@ -1,6 +1,6 @@
 import { ethers, utils } from 'ethers'
 import { Buffer } from 'buffer'
-import type { Cid } from '$lib/web3/askmi'
+import type { Cid } from '$lib/abi-types/askmi'
 
 /**
  * @typedef {Object} Multihash
@@ -60,4 +60,17 @@ export function getMultihashFromBytes32(multihash: Cid) {
   multihashBytes.set(hashBytes, 2)
 
   return utils.base58.encode(multihashBytes)
+}
+
+export async function resolveIpfs(cid: string | null) {
+  if (!!cid) {
+    const res = await fetch(`https://ipfs.io/ipfs/${cid}`)
+    const text = await res.text()
+    if (res.ok) {
+      return text
+    } else {
+      throw new Error(text)
+    }
+  }
+  return null
 }

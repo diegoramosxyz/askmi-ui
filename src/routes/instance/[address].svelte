@@ -5,21 +5,36 @@
   import Exchanges from '$lib/components/Exchanges.svelte'
   import QuestionForm from '$lib/components/QuestionForm.svelte'
   import Loading from '$lib/components/Loading.svelte'
-  import { approved } from '$lib/web3/store'
-  import Approve from '$lib/components/Approve.svelte'
   // import QuestionersExport from '$lib/components/QuestionersExport.svelte'
 
   // TODO: Create function to check valid Ethereum addresses
   onMount(async () => {
-    let { VITE_CHAIN_ID, VITE_ERC20 } = import.meta.env
+    let {
+      VITE_ROPSTEN_CHAIN_ID,
+      VITE_ROPSTEN_ERC20,
+      VITE_MUMBAI_CHAIN_ID,
+      VITE_MUMBAI_ERC20,
+    } = import.meta.env
 
-    // Set up event listeners and load stores with initial data
-    await setUpAskMi(
-      $page.params.address,
-      VITE_CHAIN_ID,
-      VITE_ERC20,
-      $page.query.get('questioner')
-    )
+    const _chainId = await window.ethereum.request({ method: 'eth_chainId' })
+
+    if (_chainId === '0x3') {
+      // Set up event listeners and load stores with initial data
+      await setUpAskMi(
+        $page.params.address,
+        VITE_ROPSTEN_CHAIN_ID,
+        VITE_ROPSTEN_ERC20,
+        $page.query.get('questioner')
+      )
+    }
+    if (_chainId === '0x13881') {
+      await setUpAskMi(
+        $page.params.address,
+        VITE_MUMBAI_CHAIN_ID,
+        VITE_MUMBAI_ERC20,
+        $page.query.get('questioner')
+      )
+    }
   })
 </script>
 
@@ -28,12 +43,7 @@
 </svelte:head>
 
 <Loading>
-  {#if !!approved && $approved === true}
-    <QuestionForm />
-  {/if}
-  {#if !!approved && $approved === false}
-    <Approve />
-  {/if}
+  <QuestionForm />
   <!-- <QuestionersExport /> -->
   <Exchanges />
 </Loading>

@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { getBlockie } from '$lib/web3/tools'
-  import { shrinkAddress } from '$lib/utils/ui'
+  import { getBlockie, shrinkAddress } from '$lib/utils/ui'
 
   export let address: string
 </script>

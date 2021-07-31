@@ -1,10 +1,9 @@
 <script>
   import { page } from '$app/stores'
-  import { shrinkAddress } from '$lib/utils/ui'
+  import { getBlockie, shrinkAddress } from '$lib/utils/ui'
   import { owner, signer } from '$lib/web3/store'
   import { connectToMetaMask } from '$lib/web3/MetaMask'
   import Adjustments from '$lib/svg/Adjustments.svelte'
-  import { getBlockie } from '$lib/web3/tools'
   import QuestionMark from '$lib/svg/QuestionMark.svelte'
   import Search from './Search.svelte'
 </script>

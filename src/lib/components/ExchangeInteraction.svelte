@@ -1,10 +1,10 @@
 <script lang="ts">
   import DollarSign from '$lib/svg/DollarSign.svelte'
   import { owner, signer } from '$lib/web3/store'
-  import { removeQuestion, tipAsnwer } from '$lib/web3/tools'
   import type { BigNumber } from '@ethersproject/bignumber'
   import Button from './Button.svelte'
   import Trash from '$lib/svg/Trash.svelte'
+  import { removeQuestion, tipAsnwer } from '$lib/abi-functions/askmi'
 
   export let digest: string
   export let questioner: string

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from '$app/stores'
   import { onMount } from 'svelte'
-  import { setUpAskMi, updateTiers, updateTip } from '$lib/web3/tools'
+  import { setUpAskMi } from '$lib/web3/tools'
   import { ethers } from 'ethers'
   import {
     factoryTiers,
@@ -17,13 +17,34 @@
   import Button from '$lib/components/Button.svelte'
   import Cog from '$lib/svg/Cog.svelte'
   import Loading from '$lib/components/Loading.svelte'
+  import { updateTiers, updateTip } from '$lib/abi-functions/askmi'
 
   // TODO: Create function to check valid Ethereum addresses
   onMount(async () => {
-    let { VITE_CHAIN_ID, VITE_ERC20 } = import.meta.env
+    let {
+      VITE_ROPSTEN_CHAIN_ID,
+      VITE_ROPSTEN_ERC20,
+      VITE_MUMBAI_CHAIN_ID,
+      VITE_MUMBAI_ERC20,
+    } = import.meta.env
 
-    // Set up event listeners and load stores with initial data
-    await setUpAskMi($page.params.address, VITE_CHAIN_ID, VITE_ERC20)
+    const _chainId = await window.ethereum.request({ method: 'eth_chainId' })
+
+    if (_chainId === '0x3') {
+      // Set up event listeners and load stores with initial data
+      await setUpAskMi(
+        $page.params.address,
+        VITE_ROPSTEN_CHAIN_ID,
+        VITE_ROPSTEN_ERC20
+      )
+    }
+    if (_chainId === '0x13881') {
+      await setUpAskMi(
+        $page.params.address,
+        VITE_MUMBAI_CHAIN_ID,
+        VITE_MUMBAI_ERC20
+      )
+    }
 
     factoryTiers.set([
       {

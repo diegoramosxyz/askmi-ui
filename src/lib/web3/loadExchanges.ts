@@ -6,19 +6,6 @@ import { get } from 'svelte/store'
 
 // https://docs.ethers.io/v5/api/contract/contract/#Contract-on
 
-export async function resolveIpfs(cid: string | null) {
-  if (!!cid) {
-    const res = await fetch(`https://ipfs.io/ipfs/${cid}`)
-    const text = await res.text()
-    if (res.ok) {
-      return text
-    } else {
-      throw new Error(text)
-    }
-  }
-  return null
-}
-
 export async function getQuestionsSubset(questioner?: string | null) {
   if (!!questioner) {
     getAllQuestionsFromQuestioner(questioner)

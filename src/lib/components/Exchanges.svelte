@@ -6,8 +6,10 @@
   import marked from 'marked'
   import DOMPurify from 'dompurify'
   import Blockie from './Blockie.svelte'
-  import { getMultihashFromBytes32 as getCid } from '$lib/utils/cid'
-  import { resolveIpfs } from '$lib/web3/eventListeners'
+  import {
+    getMultihashFromBytes32 as getCid,
+    resolveIpfs,
+  } from '$lib/utils/cid'
   import { page } from '$app/stores'
 </script>
 

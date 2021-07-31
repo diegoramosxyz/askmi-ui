@@ -1,7 +1,6 @@
 <script lang="ts">
   import PaperAirplane from '$lib/svg/PaperAirplane.svelte'
   import { owner, signer, textAreaContent } from '$lib/web3/store'
-  import { respond } from '$lib/web3/tools'
   import type { BigNumber } from '@ethersproject/bignumber'
   import Button from './Button.svelte'
   import marked from 'marked'
@@ -9,6 +8,7 @@
   import Markdown from '$lib/svg/Markdown.svelte'
   import ChebronDown from '$lib/svg/Chebron-Down.svelte'
   import Pending from './Pending.svelte'
+  import { respond } from '$lib/abi-functions/askmi'
 
   export let digest: string
   export let questioner: string

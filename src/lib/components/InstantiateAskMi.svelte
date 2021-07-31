@@ -3,7 +3,7 @@
   import TipCard from '$lib/components/TipCard.svelte'
   import Button from '$lib/components/Button.svelte'
   import Terminal from '$lib/svg/Terminal.svelte'
-  import { instantiateAskMi } from '$lib/web3/tools'
+  import { instantiateAskMi } from '$lib/abi-functions/askmi-factory'
 </script>
 
 <form

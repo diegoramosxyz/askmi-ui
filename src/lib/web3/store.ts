@@ -1,7 +1,8 @@
+import type { AskMi, Exchange } from '$lib/abi-types/askmi'
+import type { AskMiFactory } from '$lib/abi-types/askmi-factory'
+import type { ERC20 } from '$lib/abi-types/erc20'
 import type { BigNumber, ethers } from 'ethers'
 import { Writable, writable } from 'svelte/store'
-import type { AskMi, ERC20, Exchange } from './askmi'
-import type { AskMiFactory } from './askmi-factory'
 
 export type questionsByQuestioner = {
   questioner: string
