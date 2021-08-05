@@ -6,6 +6,7 @@
   import {
     factoryTiers,
     factoryTip,
+    selectedToken,
     tiers,
     tiersUpdated,
     tip,
@@ -84,7 +85,7 @@
   <div class="grid gap-5 justify-center">
     <form
       class="grid gap-4 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
-      on:submit|preventDefault={() => updateTiers()}
+      on:submit|preventDefault={() => updateTiers($selectedToken)}
     >
       {#if $tiersUpdated === true}
         <p
@@ -98,7 +99,7 @@
     </form>
     <form
       class="grid gap-4 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
-      on:submit|preventDefault={() => updateTip()}
+      on:submit|preventDefault={() => updateTip($selectedToken)}
     >
       {#if $tipUpdated === true}
         <p

@@ -1,7 +1,7 @@
 import type {
   BigNumber,
   Contract,
-  // CallOverrides,
+  CallOverrides,
   ContractTransaction,
 } from 'ethers'
 
@@ -11,10 +11,21 @@ export type Cid = {
   size: BigNumber
 }
 
+export type Tip = {
+  token: string
+  tip: BigNumber
+}
+
+export type Fees = {
+  removal: BigNumber
+  developer: BigNumber
+}
+
 export type Exchange = {
   question: Cid
   answer: Cid
-  exchangeIndex: BigNumber
+  token: string
+  index: BigNumber
   balance: BigNumber
   tips: BigNumber
 }
@@ -25,49 +36,65 @@ export interface AskMi extends Contract {
    */
 
   ask(
-    _digest: string,
-    _hashFunction: BigNumber,
-    _size: BigNumber,
-    _tierIndex: BigNumber
-    // overrides: CallOverrides
+    functionsContract: string,
+    token: string,
+    digest: string,
+    hashFunction: BigNumber,
+    size: BigNumber,
+    index: BigNumber,
+    overrides?: CallOverrides
   ): Promise<ContractTransaction>
+
   issueTip(
-    _questioner: string,
-    _exchangeIndex: BigNumber
-    // overrides: CallOverrides
+    functionsContract: string,
+    questioner: string,
+    index: BigNumber,
+    overrides?: CallOverrides
   ): Promise<ContractTransaction>
 
   /**
    * STATE MODIFIER FUNCTIONS
    */
 
-  removeQuestion(
-    _questioner: string,
-    _exchangeIndex: BigNumber
+  remove(
+    functionsContract: string,
+    questioner: string,
+    index: BigNumber
   ): Promise<ContractTransaction>
+
   respond(
-    _questioner: string,
-    _digest: string,
-    _hashFunction: BigNumber,
-    _size: BigNumber,
-    _exchangeIndex: BigNumber
+    functionsContract: string,
+    questioner: string,
+    digest: string,
+    hashFunction: BigNumber,
+    size: BigNumber,
+    index: BigNumber
   ): Promise<ContractTransaction>
-  updateTiers(_newTiers: BigNumber[]): Promise<ContractTransaction>
-  updateTip(_newTipPrice: BigNumber): Promise<ContractTransaction>
+
+  toggleDisabled(functionsContract: string): Promise<ContractTransaction>
+
+  updateTiers(
+    functionsContract: string,
+    token: string,
+    tiers: BigNumber[]
+  ): Promise<ContractTransaction>
+
+  updateTip(
+    functionsContract: string,
+    tip: BigNumber,
+    token: string
+  ): Promise<ContractTransaction>
 
   /**
    * GETTER FUNCTIONS
    */
 
-  getTiers(): Promise<BigNumber[]>
-  getQuestioners(): Promise<string[]>
-  getQuestions(_questioner: string): Promise<Exchange[]>
-
-  /**
-   * VARIABLES
-   */
-
-  tip(): Promise<BigNumber>
-  fee(): Promise<BigNumber>
-  owner(): Promise<string>
+  _disabled(): Promise<boolean>
+  _fees(): Promise<Fees>
+  _owner(): Promise<string>
+  getTiers(token: string): Promise<BigNumber[]>
+  questioners(): Promise<string[]>
+  questions(_questioner: string): Promise<Exchange[]>
+  supportedTokens(): Promise<string[]>
+  tipAndToken(): Promise<[BigNumber, string]>
 }

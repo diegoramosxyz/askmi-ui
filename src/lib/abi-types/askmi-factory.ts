@@ -1,9 +1,14 @@
 import type { BigNumber, Contract } from 'ethers'
 
 export interface AskMiFactory extends Contract {
-  /**
-   * FUNCTIONS
-   */
-  getMyAskMi(_owner: string): Promise<string>
-  instantiateAskMi(_tiers: BigNumber[], _tip: BigNumber): Promise<string>
+  getMyAskMi(owner: string): Promise<string>
+
+  instantiateAskMi(
+    functionsContract: string,
+    tiersToken: string,
+    tipToken: string,
+    tiers: BigNumber[],
+    tip: BigNumber,
+    removalFee: BigNumber
+  ): Promise<string>
 }

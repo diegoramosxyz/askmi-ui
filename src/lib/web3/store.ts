@@ -43,3 +43,7 @@ export const erc20: Writable<ERC20> = writable()
 export const approved: Writable<boolean> = writable()
 export const symbol: Writable<string> = writable()
 export const decimals: Writable<BigNumber> = writable()
+
+export const functionsContract: Writable<string> = writable()
+export const removalFee: Writable<BigNumber> = writable()
+export const selectedToken: Writable<string> = writable()

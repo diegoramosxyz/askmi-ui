@@ -3,12 +3,11 @@ import {
   approved,
   askMiAddress,
   askMiFactory,
-  askMiFactory_ERC20,
-  askMi_ERC20,
   decimals,
   erc20,
   leaderboard,
   loading,
+  selectedToken,
   signer,
   symbol,
   tip,
@@ -17,8 +16,6 @@ import { get } from 'svelte/store'
 import { abi as erc20ABI } from '$lib/abi/MyToken.json'
 import { abi as askMiAbi } from '$lib/abi/AskMi.json'
 import { abi as askMiFactoryAbi } from '$lib/abi/AskMiFactory.json'
-import { abi as askMiAbi_ERC20 } from '$lib/abi/AskMi_ERC20.json'
-import { abi as askMiFactoryAbi_ERC20 } from '$lib/abi/AskMiFactory_ERC20.json'
 import { provider, askMi, owner, tiers, chainId } from './store'
 import { detectAccountsChanged, detectChainChanged } from './MetaMask'
 import type { AskMiFactory } from '$lib/abi-types/askmi-factory'
@@ -47,7 +44,7 @@ async function setOwner() {
 }
 
 async function setTiers() {
-  let _tiers = await get(askMi).getTiers()
+  let _tiers = await get(askMi).getTiers(get(selectedToken))
   let formattedTiers = _tiers.map((tier) => ethers.utils.formatEther(tier))
   tiers.set(formattedTiers)
 }
@@ -71,7 +68,7 @@ async function checkApproved() {
     get(askMi).address
   )
 
-  let _tiers = await get(askMi).getTiers()
+  let _tiers = await get(askMi).getTiers(get(selectedToken))
 
   // Check that the amount approved is greater than
   // the most expensive tier
@@ -121,10 +118,6 @@ export async function setUpAskMi(
 
     askMi.set(
       new Contract(address, askMiAbi, get(provider).getSigner()) as AskMi
-    )
-
-    askMi_ERC20.set(
-      new Contract(address, askMiAbi_ERC20, get(provider).getSigner()) as AskMi
     )
 
     await setOwner()
@@ -177,14 +170,6 @@ export async function setUpAskMiFactory(
       new Contract(
         address,
         askMiFactoryAbi,
-        get(provider).getSigner()
-      ) as AskMiFactory
-    )
-
-    askMiFactory_ERC20.set(
-      new Contract(
-        address,
-        askMiFactoryAbi_ERC20,
         get(provider).getSigner()
       ) as AskMiFactory
     )

@@ -7,9 +7,9 @@ import {
   pendingTx,
   questions,
   textAreaContent,
-  tiers,
   tiersUpdated,
   tipUpdated,
+  functionsContract,
 } from '$lib/web3/store'
 import { BigNumber, utils } from 'ethers'
 import { get } from 'svelte/store'
@@ -26,16 +26,18 @@ export async function fetchTextToIPFS() {
   return Hash
 }
 
-export async function ask(_tierIndex: number) {
+export async function ask(token: string, index: number) {
   const cid = await fetchTextToIPFS()
   // Conver CID into a multihash object
   let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
   // Call the ask function
   let { hash, wait } = await get(askMi_ERC20).ask(
+    get(functionsContract),
+    token,
     digest,
     hashFunction,
     size,
-    BigNumber.from(_tierIndex)
+    BigNumber.from(index)
     // {
     //   value: utils.parseEther(get(tiers)[_tierIndex]),
     // }
@@ -62,6 +64,7 @@ export async function respond(questioner: string, qIndex: BigNumber) {
   let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
   // Call the ask function
   let { hash, wait } = await get(askMi_ERC20).respond(
+    get(functionsContract),
     questioner,
     digest,
     hashFunction,
@@ -113,6 +116,7 @@ export async function removeQuestion(
 
 export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
   await get(askMi_ERC20).issueTip(
+    get(functionsContract),
     questioner,
     exchangeIndex
     //    {
@@ -146,11 +150,11 @@ export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
   // )
 }
 
-export async function updateTiers() {
-  let _tiers = get(factoryTiers)
+export async function updateTiers(token: string) {
+  let tiers = get(factoryTiers)
     .filter(({ value }) => value > 0)
     .map(({ value }) => utils.parseEther(value.toString()))
-  await get(askMi_ERC20).updateTiers(_tiers)
+  await get(askMi_ERC20).updateTiers(get(functionsContract), token, tiers)
   // Do not wait for event
   // Optimistically update state for better UX
   tiersUpdated.set(true)
@@ -159,9 +163,9 @@ export async function updateTiers() {
   })
 }
 
-export async function updateTip() {
+export async function updateTip(token: string) {
   let _tip = utils.parseEther(get(factoryTip).toString())
-  await get(askMi_ERC20).updateTip(_tip)
+  await get(askMi_ERC20).updateTip(get(functionsContract), _tip, token)
   // Do not wait for event
   // Optimistically update state for better UX
   tipUpdated.set(true)
