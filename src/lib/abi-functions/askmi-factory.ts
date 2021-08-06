@@ -1,18 +1,30 @@
 import { goto } from '$app/navigation'
-import { askMiFactory_ERC20, decimals, removalFee } from '$lib/web3/store'
+import { askMiFactory, erc20Store } from '$lib/web3/store'
+import type { BigNumber } from 'ethers'
 import { get } from 'svelte/store'
 
-export function instantiateAskMi() {
-  if (!!decimals) {
+export function instantiateAskMi(
+  functionsContract: string,
+  tiersToken: string,
+  tipToken: string,
+  tiers: BigNumber[],
+  tip: BigNumber,
+  removalFee: BigNumber
+) {
+  if (!!get(erc20Store).decimals) {
     // Deploy an AskMi instance
-    get(askMiFactory_ERC20).instantiateAskMi(get(removalFee))
-    // Listen to the AskMiInstantiated event
-    get(askMiFactory_ERC20).once(
-      'AskMiInstantiated',
-      (_askMiAddress: string) => {
-        // Redirect user to the newly create AskMi instance
-        goto(`/instance/${_askMiAddress}`)
-      }
+    get(askMiFactory).instantiateAskMi(
+      functionsContract,
+      tiersToken,
+      tipToken,
+      tiers,
+      tip,
+      removalFee
     )
+    // Listen to the AskMiInstantiated event
+    get(askMiFactory).once('AskMiInstantiated', (_askMiAddress: string) => {
+      // Redirect user to the newly create AskMi instance
+      goto(`/instance/${_askMiAddress}`)
+    })
   }
 }

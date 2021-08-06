@@ -3,15 +3,7 @@
   import { onMount } from 'svelte'
   import { setUpAskMi } from '$lib/web3/tools'
   import { ethers } from 'ethers'
-  import {
-    factoryTiers,
-    factoryTip,
-    selectedToken,
-    tiers,
-    tiersUpdated,
-    tip,
-    tipUpdated,
-  } from '$lib/web3/store'
+  import { tiersUpdated, tipUpdated } from '$lib/web3/store'
   import TierCards from '$lib/components/TierCards.svelte'
   import TipCard from '$lib/components/TipCard.svelte'
   import Link from '$lib/svg/Link.svelte'

@@ -1,22 +1,18 @@
 import { getBytes32FromMultiash } from '$lib/utils/cid'
 import { getQuestionsSubset } from '$lib/web3/loadExchanges'
 import {
-  askMi_ERC20,
-  factoryTiers,
-  factoryTip,
-  pendingTx,
-  questions,
-  textAreaContent,
   tiersUpdated,
   tipUpdated,
   functionsContract,
+  askMi,
+  userInputs,
 } from '$lib/web3/store'
 import { BigNumber, utils } from 'ethers'
 import { get } from 'svelte/store'
 
 export async function fetchTextToIPFS() {
   const formData = new FormData()
-  formData.append('question', get(textAreaContent))
+  formData.append('question', get(userInputs).textArea)
 
   const res = await fetch('https://ipfs.infura.io:5001/api/v0/add', {
     method: 'POST',
@@ -31,7 +27,7 @@ export async function ask(token: string, index: number) {
   // Conver CID into a multihash object
   let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
   // Call the ask function
-  let { hash, wait } = await get(askMi_ERC20).ask(
+  let { hash, wait } = await get(askMi).ask(
     get(functionsContract),
     token,
     digest,
@@ -44,7 +40,7 @@ export async function ask(token: string, index: number) {
   )
 
   // Update questions when event has been emitted
-  get(askMi_ERC20).once(
+  get(askMi).once(
     'QuestionAsked',
     async (_questioner: string, _exchangeIndex: BigNumber) => {
       await getQuestionsSubset()
@@ -63,7 +59,7 @@ export async function respond(questioner: string, qIndex: BigNumber) {
   // Conver CID into a multihash object
   let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
   // Call the ask function
-  let { hash, wait } = await get(askMi_ERC20).respond(
+  let { hash, wait } = await get(askMi).respond(
     get(functionsContract),
     questioner,
     digest,
@@ -73,7 +69,7 @@ export async function respond(questioner: string, qIndex: BigNumber) {
   )
 
   // Update questions when event has been emitted
-  get(askMi_ERC20).once(
+  get(askMi).once(
     'QuestionAnswered',
     async (_questioner: string, _exchangeIndex: BigNumber) => {
       await getQuestionsSubset()
@@ -91,7 +87,7 @@ export async function removeQuestion(
   questioner: string,
   exchangeIndex: BigNumber
 ) {
-  await get(askMi_ERC20).removeQuestion(questioner, exchangeIndex)
+  await get(askMi).removeQuestion(questioner, exchangeIndex)
 
   // Do not wait for event
   // Optimistically update state for better UX
@@ -107,7 +103,7 @@ export async function removeQuestion(
     })
   )
 
-  get(askMi_ERC20).once(
+  get(askMi).once(
     'QuestionRemoved',
     async (_questioner: string, _exchangeIndex: BigNumber) =>
       await getQuestionsSubset()
@@ -115,12 +111,12 @@ export async function removeQuestion(
 }
 
 export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
-  await get(askMi_ERC20).issueTip(
+  await get(askMi).issueTip(
     get(functionsContract),
     questioner,
     exchangeIndex
     //    {
-    //   value: await get(askMi_ERC20).tip(),
+    //   value: await get(askMi).tip(),
     // }
   )
 
@@ -143,7 +139,7 @@ export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
     })
   )
 
-  // get(askMi_ERC20).once(
+  // get(askMi).once(
   //   'TipIssued',
   //   async (_tipper: string, _questioner: string, _exchangeIndex: BigNumber) =>
   //     await getQuestionsSubset()
@@ -154,22 +150,22 @@ export async function updateTiers(token: string) {
   let tiers = get(factoryTiers)
     .filter(({ value }) => value > 0)
     .map(({ value }) => utils.parseEther(value.toString()))
-  await get(askMi_ERC20).updateTiers(get(functionsContract), token, tiers)
+  await get(askMi).updateTiers(get(functionsContract), token, tiers)
   // Do not wait for event
   // Optimistically update state for better UX
   tiersUpdated.set(true)
-  get(askMi_ERC20).once('TiersUpdated', (_askMiAddress: string) => {
+  get(askMi).once('TiersUpdated', (_askMiAddress: string) => {
     location.reload()
   })
 }
 
 export async function updateTip(token: string) {
   let _tip = utils.parseEther(get(factoryTip).toString())
-  await get(askMi_ERC20).updateTip(get(functionsContract), _tip, token)
+  await get(askMi).updateTip(get(functionsContract), _tip, token)
   // Do not wait for event
   // Optimistically update state for better UX
   tipUpdated.set(true)
-  get(askMi_ERC20).once('TipUpdated', (_askMiAddress: string) => {
+  get(askMi).once('TipUpdated', (_askMiAddress: string) => {
     location.reload()
   })
 }
