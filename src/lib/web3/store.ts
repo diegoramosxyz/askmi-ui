@@ -1,7 +1,7 @@
 import type { AskMi, Exchange, Fees, Tip } from '$lib/abi-types/askmi'
 import type { AskMiFactory } from '$lib/abi-types/askmi-factory'
 import type { ERC20 } from '$lib/abi-types/erc20'
-import { BigNumber, ethers, constants } from 'ethers'
+import { BigNumber, ethers, constants, utils } from 'ethers'
 import { Writable, writable } from 'svelte/store'
 
 const bigZero = BigNumber.from(0)
@@ -9,14 +9,14 @@ const bigZero = BigNumber.from(0)
 export type UserInputs = {
   tiersToken: string
   tiers: {
-    slow: string
-    medium: string
-    fast: string
+    slow: number
+    medium: number
+    fast: number
   }
   tipToken: string
-  tip: string
+  tip: number
   textArea: string
-  removalFee: string
+  removalFee: number
 }
 
 export type ERC20Store = {
@@ -26,7 +26,7 @@ export type ERC20Store = {
 }
 
 export type AskMiStore = {
-  address: string
+  address: string | null
   _owner: string
   _disabled: boolean
   _tip: Tip
@@ -56,7 +56,7 @@ export type Leaderboard = {
 
 function createAskMiStore() {
   const { subscribe, update } = writable<AskMiStore>({
-    address: '0x0',
+    address: constants.AddressZero,
     _owner: '',
     _disabled: false,
     _tip: {
@@ -160,17 +160,18 @@ function createLeaderboard() {
 }
 
 function createUserInputs() {
-  const { subscribe, update } = writable<UserInputs>({
-    tiersToken: '',
-    tiers: { slow: '0', medium: '0', fast: '0' },
-    tipToken: '',
-    tip: '',
+  const { subscribe, update, set } = writable<UserInputs>({
+    tiersToken: constants.AddressZero,
+    tiers: { slow: 0, medium: 0, fast: 0 },
+    tipToken: constants.AddressZero,
+    tip: 0,
     textArea: '',
-    removalFee: '',
+    removalFee: 0,
   })
 
   return {
     subscribe,
+    set,
     tiersToken: (tiersToken: UserInputs['tiersToken']) =>
       update((inputs) => ({ ...inputs, tiersToken })),
     tiers: (key: keyof UserInputs['tiers'], value: string) =>
@@ -190,8 +191,8 @@ function createUserInputs() {
       update((inputs) => ({ ...inputs, removalFee })),
     tiersAsArray: (tiers: UserInputs['tiers']) => {
       let keys = Object.keys(tiers) as Array<keyof UserInputs['tiers']>
-      let values = keys.map((key) => BigNumber.from(tiers[key]))
-      return values.filter((value) => value.toNumber() > 0)
+      let values = keys.map((key) => utils.parseUnits(tiers[key].toString()))
+      return values.filter((value) => value.gt(BigNumber.from(0)))
     },
   }
 }

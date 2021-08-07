@@ -1,9 +1,10 @@
-import { ethers, Contract, BigNumber, utils, constants } from 'ethers'
+import { ethers, Contract, BigNumber, utils } from 'ethers'
 import {
   askMiFactory,
   askMiStore,
   erc20,
   erc20Store,
+  functionsContract,
   leaderboard,
   loading,
   provider,
@@ -56,7 +57,7 @@ async function setAskMiAddress() {
       await get(askMiFactory).getMyAskMi(get(web3Store).signer)
     )
   } catch (error) {
-    askMiStore.address('')
+    askMiStore.address(null)
   }
 }
 
@@ -147,12 +148,14 @@ export async function setUpAskMi(
 // Set up event listeners and load store with initial data
 export async function setUpAskMiFactory(
   address: ImportMetaEnv[''],
+  functions: ImportMetaEnv[''],
   chainId: ImportMetaEnv[''],
   _erc20: ImportMetaEnv['']
 ) {
   // Check that the environment variables are loaded
   if (
     typeof address == 'string' &&
+    typeof functions == 'string' &&
     typeof chainId == 'string' &&
     typeof _erc20 == 'string'
   ) {
@@ -183,6 +186,8 @@ export async function setUpAskMiFactory(
 
     await getSymbol()
     await getDecimals()
+
+    functionsContract.set(functions)
 
     // Check if the current signer has created an AskMi contract
     await setAskMiAddress()

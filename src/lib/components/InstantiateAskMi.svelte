@@ -1,6 +1,7 @@
 <script lang="ts">
   import TierCards from '$lib/components/TierCards.svelte'
   import TipCard from '$lib/components/TipCard.svelte'
+  import RemovalFee from '$lib/components/RemovalFee.svelte'
   import Button from '$lib/components/Button.svelte'
   import Terminal from '$lib/svg/Terminal.svelte'
   import { instantiateAskMi } from '$lib/abi-functions/askmi-factory'
@@ -29,6 +30,7 @@
   </header>
   <TierCards />
   <TipCard />
+  <RemovalFee />
   <p>Developer fee: <span class="font-mono">0.5%</span> of rewards.</p>
   <Button color={'lime'}><Terminal />Deploy AskMi contract</Button>
 </form>

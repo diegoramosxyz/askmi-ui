@@ -21,7 +21,6 @@
       VITE_LOCALHOST_ASKMI_FUNCTIONS,
       VITE_LOCALHOST_ERC20,
     } = import.meta.env
-    // 7A69
 
     const _chainId = await window.ethereum.request({ method: 'eth_chainId' })
 
@@ -29,6 +28,7 @@
       // Set up event listeners and load stores with initial data
       await setUpAskMiFactory(
         VITE_ROPSTEN_ASKMI_FACTORY,
+        VITE_ROPSTEN_ASKMI_FUNCTIONS,
         VITE_ROPSTEN_CHAIN_ID,
         VITE_ROPSTEN_ERC20
       )
@@ -36,12 +36,15 @@
     if (_chainId === '0x13881') {
       await setUpAskMiFactory(
         VITE_MUMBAI_ASKMI_FACTORY,
+        VITE_MUMBAI_ASKMI_FUNCTIONS,
         VITE_MUMBAI_CHAIN_ID,
         VITE_MUMBAI_ERC20
       )
-    } else {
+    }
+    if (_chainId === '0x7a69') {
       await setUpAskMiFactory(
         VITE_LOCALHOST_ASKMI_FACTORY,
+        VITE_LOCALHOST_ASKMI_FUNCTIONS,
         VITE_LOCALHOST_CHAIN_ID,
         VITE_LOCALHOST_ERC20
       )
