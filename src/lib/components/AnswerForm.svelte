@@ -1,6 +1,5 @@
 <script lang="ts">
   import PaperAirplane from '$lib/svg/PaperAirplane.svelte'
-  import { owner, signer, textAreaContent } from '$lib/web3/store'
   import type { BigNumber } from '@ethersproject/bignumber'
   import Button from './Button.svelte'
   import marked from 'marked'
@@ -9,13 +8,17 @@
   import ChebronDown from '$lib/svg/Chebron-Down.svelte'
   import Pending from './Pending.svelte'
   import { respond } from '$lib/abi-functions/askmi'
+  import { askMiStore, userInputs, web3Store } from '$lib/web3/store'
+  let { isOwnerCheck } = askMiStore
 
   export let digest: string
   export let questioner: string
   export let exchangeIndex: BigNumber
+
+  $: isOwner = isOwnerCheck($web3Store.signer, $askMiStore._owner)
 </script>
 
-{#if digest === '' && !!$owner && !!$signer && $owner.toLowerCase() === $signer.toLowerCase()}
+{#if digest === '' && isOwner}
   <Pending>
     <details>
       <summary class="mb-2 flex gap-1 items-center"
@@ -27,18 +30,18 @@
           respond(questioner, exchangeIndex)}
       >
         <textarea
-          bind:value={$textAreaContent}
+          bind:value={$userInputs.textArea}
           cols="40"
           rows="5"
           class="mb-3 px-3 py-2 bg-transparent ring-1 transition focus:outline-none ring-trueGray-700 focus:ring-trueGray-500 rounded resize-y"
           placeholder="Answer here..."
         />
-        {#if $textAreaContent}
+        {#if $userInputs.textArea}
           <h2 class="flex gap-1 items-center font-semibold mb-1">
             <Markdown /> Preview
           </h2>
           <div class="mb-3">
-            {@html DOMPurify.sanitize(marked($textAreaContent))}
+            {@html DOMPurify.sanitize(marked($userInputs.textArea))}
           </div>
         {/if}
         <div class="flex gap-4">

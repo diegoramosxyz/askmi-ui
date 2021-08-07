@@ -1,16 +1,22 @@
 import type { AskMi, Exchange, Fees, Tip } from '$lib/abi-types/askmi'
 import type { AskMiFactory } from '$lib/abi-types/askmi-factory'
 import type { ERC20 } from '$lib/abi-types/erc20'
-import type { ethers } from 'ethers'
-import { BigNumber } from 'ethers'
+import { BigNumber, ethers, constants } from 'ethers'
 import { Writable, writable } from 'svelte/store'
+
+const bigZero = BigNumber.from(0)
 
 export type UserInputs = {
   tiersToken: string
-  tiers: { slow: number; medium: number; fast: number }
+  tiers: {
+    slow: string
+    medium: string
+    fast: string
+  }
   tipToken: string
   tip: string
   textArea: string
+  removalFee: string
 }
 
 export type ERC20Store = {
@@ -36,7 +42,7 @@ export type AskMiStore = {
 }
 
 export type Web3Store = {
-  provider: ethers.providers.Web3Provider | null
+  // provider: ethers.providers.Web3Provider
   signer: string
   chainId: string | null
   pendingTx: string | null
@@ -50,16 +56,16 @@ export type Leaderboard = {
 
 function createAskMiStore() {
   const { subscribe, update } = writable<AskMiStore>({
-    address: '',
+    address: '0x0',
     _owner: '',
     _disabled: false,
     _tip: {
-      token: '',
-      tip: BigNumber.from(0),
+      token: constants.AddressZero,
+      tip: bigZero,
     },
     _fees: {
-      removal: BigNumber.from(0),
-      developer: BigNumber.from(0),
+      removal: bigZero,
+      developer: bigZero,
     },
     _questioners: [],
     _exchanges: {},
@@ -69,84 +75,142 @@ function createAskMiStore() {
 
   return {
     subscribe,
-    increment: () =>
-      update((askMi) => {
-        return {
-          ...askMi,
-          boni: 'facio',
-        }
-      }),
+    address: (address: AskMiStore['address']) =>
+      update((data) => ({ ...data, address })),
+    _owner: (_owner: AskMiStore['_owner']) =>
+      update((data) => ({ ...data, _owner })),
+    _disabled: (_disabled: AskMiStore['_disabled']) =>
+      update((data) => ({ ...data, _disabled })),
+    _tip: (_tip: AskMiStore['_tip']) => update((data) => ({ ...data, _tip })),
+    _fees: (_fees: AskMiStore['_fees']) =>
+      update((data) => ({ ...data, _fees })),
+    _questioners: (_questioners: AskMiStore['_questioners']) =>
+      update((data) => ({ ...data, _questioners })),
+    _exchanges: (_exchanges: AskMiStore['_exchanges']) =>
+      update((data) => ({ ...data, _exchanges })),
+    _supportedTokens: (_supportedTokens: AskMiStore['_supportedTokens']) =>
+      update((data) => ({ ...data, _supportedTokens })),
+    _tiers: (_tiers: AskMiStore['_tiers']) =>
+      update((data) => ({ ...data, _tiers })),
+    sliceQuestioners: (allQuestioners: string[]) =>
+      update((data) => ({
+        ...data,
+        _questioners: allQuestioners.slice(1).slice(-5),
+      })),
+    updateOneExchange: (questioner: string, exchanges: Exchange[]) =>
+      update((data) => ({
+        ...data,
+        _exchanges: {
+          ...data._exchanges,
+          [questioner]: exchanges,
+        },
+      })),
+    plusOneTips: (questioner: string, index: number) =>
+      update((data) => ({
+        ...data,
+        _exchanges: {
+          ...data._exchanges,
+          [questioner]: data._exchanges[questioner].splice(index, 1, {
+            ...data._exchanges[questioner][index],
+            tips: BigNumber.from(
+              data._exchanges[questioner][index].tips.toNumber() + 1
+            ),
+          }),
+        },
+      })),
+    removeOneExchange: (questioner: string, index: number) =>
+      update((data) => ({
+        ...data,
+        _exchanges: {
+          ...data._exchanges,
+          [questioner]: data._exchanges[questioner].splice(index, 1),
+        },
+      })),
+    isOwnerCheck: (signer: Web3Store['signer'], _owner: AskMiStore['_owner']) =>
+      signer.toLowerCase() === _owner.toLowerCase(),
+    isQuestionerCheck: (questioner: string, signer: Web3Store['signer']) =>
+      questioner.toLowerCase() === signer.toLowerCase(),
   }
 }
 
 function createWeb3Store() {
   const { subscribe, update } = writable<Web3Store>({
-    provider: null,
     signer: '',
     chainId: '',
-    pendingTx: null,
+    pendingTx: '',
   })
 
   return {
     subscribe,
-    change: () =>
-      update((web3Store) => {
-        return {
-          ...web3Store,
-        }
-      }),
+    // provider: (provider: Web3Store['provider']) =>
+    //   update((inputs) => ({ ...inputs, provider })),
+    signer: (signer: Web3Store['signer']) =>
+      update((inputs) => ({ ...inputs, signer })),
+    chainId: (chainId: Web3Store['chainId']) =>
+      update((inputs) => ({ ...inputs, chainId })),
+    pendingTx: (pendingTx: Web3Store['pendingTx']) =>
+      update((inputs) => ({ ...inputs, pendingTx })),
   }
 }
 
 function createLeaderboard() {
-  const { subscribe, update } = writable<Leaderboard>([])
+  const { subscribe, set } = writable<Leaderboard>([])
 
-  return {
-    subscribe,
-    change: () =>
-      update((leaderboard) => {
-        return {
-          ...leaderboard,
-        }
-      }),
-  }
+  return { subscribe, set }
 }
 
 function createUserInputs() {
   const { subscribe, update } = writable<UserInputs>({
     tiersToken: '',
-    tiers: { slow: 0, medium: 0, fast: 0 },
+    tiers: { slow: '0', medium: '0', fast: '0' },
     tipToken: '',
     tip: '',
     textArea: '',
+    removalFee: '',
   })
 
   return {
     subscribe,
-    change: () =>
-      update((inputs) => {
-        return {
-          ...inputs,
-        }
-      }),
+    tiersToken: (tiersToken: UserInputs['tiersToken']) =>
+      update((inputs) => ({ ...inputs, tiersToken })),
+    tiers: (key: keyof UserInputs['tiers'], value: string) =>
+      update((inputs) => ({
+        ...inputs,
+        tiers: {
+          ...inputs.tiers,
+          [key]: value,
+        },
+      })),
+    tipToken: (tipToken: UserInputs['tipToken']) =>
+      update((inputs) => ({ ...inputs, tipToken })),
+    tip: (tip: UserInputs['tip']) => update((inputs) => ({ ...inputs, tip })),
+    textArea: (textArea: UserInputs['textArea']) =>
+      update((inputs) => ({ ...inputs, textArea })),
+    removalFee: (removalFee: UserInputs['removalFee']) =>
+      update((inputs) => ({ ...inputs, removalFee })),
+    tiersAsArray: (tiers: UserInputs['tiers']) => {
+      let keys = Object.keys(tiers) as Array<keyof UserInputs['tiers']>
+      let values = keys.map((key) => BigNumber.from(tiers[key]))
+      return values.filter((value) => value.toNumber() > 0)
+    },
   }
 }
 
 function createERC20Store() {
   const { subscribe, update } = writable<ERC20Store>({
     approved: false,
-    decimals: BigNumber.from(0),
+    decimals: bigZero,
     symbol: '',
   })
 
   return {
     subscribe,
-    change: () =>
-      update((inputs) => {
-        return {
-          ...inputs,
-        }
-      }),
+    approved: (approved: ERC20Store['approved']) =>
+      update((inputs) => ({ ...inputs, approved })),
+    decimals: (decimals: ERC20Store['decimals']) =>
+      update((inputs) => ({ ...inputs, decimals })),
+    symbol: (symbol: ERC20Store['symbol']) =>
+      update((inputs) => ({ ...inputs, symbol })),
   }
 }
 
@@ -158,7 +222,7 @@ export const erc20Store = createERC20Store()
 
 // UI
 export const loading: Writable<boolean> = writable()
-export const search: Writable<string> = writable()
+export const search: Writable<string> = writable('')
 export const tipUpdated: Writable<boolean> = writable()
 export const tiersUpdated: Writable<boolean> = writable()
 
@@ -167,3 +231,6 @@ export const askMi: Writable<AskMi> = writable()
 export const askMiFactory: Writable<AskMiFactory> = writable()
 export const erc20: Writable<ERC20> = writable()
 export const functionsContract: Writable<string> = writable()
+
+// Other
+export const provider: Writable<ethers.providers.Web3Provider> = writable()

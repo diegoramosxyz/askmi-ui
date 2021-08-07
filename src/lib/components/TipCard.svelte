@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { factoryTip, symbol } from '$lib/web3/store'
-  factoryTip.set(0)
+  import { erc20Store, userInputs } from '$lib/web3/store'
 </script>
 
 <section>
@@ -14,7 +13,7 @@
         name="tip"
         id="tip"
         required
-        bind:value={$factoryTip}
+        bind:value={$userInputs.tip}
         type="number"
         step="0.01"
         min="0"
@@ -22,8 +21,8 @@
         placeholder="0"
       />
       <span class="text-sm font-semibold"
-        >{#if !!symbol}
-          {$symbol}
+        >{#if !!$erc20Store.symbol}
+          {$erc20Store.symbol}
         {:else}
           ETH
         {/if}</span

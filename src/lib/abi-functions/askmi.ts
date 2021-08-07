@@ -6,8 +6,10 @@ import {
   functionsContract,
   askMi,
   userInputs,
+  web3Store,
+  askMiStore,
 } from '$lib/web3/store'
-import { BigNumber, utils } from 'ethers'
+import { BigNumber } from 'ethers'
 import { get } from 'svelte/store'
 
 export async function fetchTextToIPFS() {
@@ -47,11 +49,11 @@ export async function ask(token: string, index: number) {
     }
   )
 
-  pendingTx.set(hash)
+  web3Store.pendingTx(hash)
   // Reset input field
-  textAreaContent.set('')
+  userInputs.textArea('')
   await wait()
-  pendingTx.set(null)
+  web3Store.pendingTx(hash)
 }
 
 export async function respond(questioner: string, qIndex: BigNumber) {
@@ -76,11 +78,11 @@ export async function respond(questioner: string, qIndex: BigNumber) {
     }
   )
 
-  pendingTx.set(hash)
+  web3Store.pendingTx(hash)
   // Reset input field
-  textAreaContent.set('')
+  userInputs.textArea('')
   await wait()
-  pendingTx.set(null)
+  web3Store.pendingTx(hash)
 }
 
 export async function removeQuestion(
@@ -91,17 +93,8 @@ export async function removeQuestion(
 
   // Do not wait for event
   // Optimistically update state for better UX
-  questions.set(
-    get(questions).map((obj) => {
-      if (obj.questioner === questioner) {
-        // Delete the element from the exchanges array
-        // before the transaction is completed for better UX
-        obj.questions.splice(exchangeIndex.toNumber(), 1)
-        return obj
-      }
-      return obj
-    })
-  )
+
+  askMiStore.removeOneExchange(questioner, exchangeIndex.toNumber())
 
   get(askMi).once(
     'QuestionRemoved',
@@ -120,24 +113,7 @@ export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
     // }
   )
 
-  // TODO: DEBUG THIS
-  // Do not wait for event
-  // Optimistically update state for better UX
-  questions.set(
-    get(questions).map((obj) => {
-      if (obj.questioner === questioner) {
-        let selected = obj.questions[exchangeIndex.toNumber()]
-
-        obj.questions[exchangeIndex.toNumber()] = {
-          ...selected,
-          tips: BigNumber.from(selected.tips.toNumber() + 1),
-        }
-        // Increment tips by one
-        return obj
-      }
-      return obj
-    })
-  )
+  askMiStore.plusOneTips(questioner, exchangeIndex.toNumber())
 
   // get(askMi).once(
   //   'TipIssued',
@@ -147,9 +123,8 @@ export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
 }
 
 export async function updateTiers(token: string) {
-  let tiers = get(factoryTiers)
-    .filter(({ value }) => value > 0)
-    .map(({ value }) => utils.parseEther(value.toString()))
+  let tiers = userInputs.tiersAsArray(get(userInputs).tiers)
+
   await get(askMi).updateTiers(get(functionsContract), token, tiers)
   // Do not wait for event
   // Optimistically update state for better UX
@@ -160,8 +135,8 @@ export async function updateTiers(token: string) {
 }
 
 export async function updateTip(token: string) {
-  let _tip = utils.parseEther(get(factoryTip).toString())
-  await get(askMi).updateTip(get(functionsContract), _tip, token)
+  let tip = BigNumber.from(get(userInputs).tip)
+  await get(askMi).updateTip(get(functionsContract), tip, token)
   // Do not wait for event
   // Optimistically update state for better UX
   tipUpdated.set(true)

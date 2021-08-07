@@ -2,8 +2,12 @@
   import { page } from '$app/stores'
   import { onMount } from 'svelte'
   import { setUpAskMi } from '$lib/web3/tools'
-  import { ethers } from 'ethers'
-  import { tiersUpdated, tipUpdated } from '$lib/web3/store'
+  import {
+    askMiStore,
+    tiersUpdated,
+    tipUpdated,
+    userInputs,
+  } from '$lib/web3/store'
   import TierCards from '$lib/components/TierCards.svelte'
   import TipCard from '$lib/components/TipCard.svelte'
   import Link from '$lib/svg/Link.svelte'
@@ -39,22 +43,10 @@
       )
     }
 
-    factoryTiers.set([
-      {
-        name: 'Slow',
-        value: +$tiers[0],
-      },
-      {
-        name: 'Medium',
-        value: +$tiers[1],
-      },
-      {
-        name: 'Fast',
-        value: +$tiers[2],
-      },
-    ])
+    userInputs.tiers('slow', $askMiStore._tiers[''][0].toString())
+    userInputs.tiers('medium', $askMiStore._tiers[''][1].toString())
+    userInputs.tiers('fast', $askMiStore._tiers[''][2].toString())
 
-    factoryTip.set(+ethers.utils.formatEther($tip))
     tiersUpdated.set(false)
     tipUpdated.set(false)
   })
@@ -77,7 +69,7 @@
   <div class="grid gap-5 justify-center">
     <form
       class="grid gap-4 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
-      on:submit|preventDefault={() => updateTiers($selectedToken)}
+      on:submit|preventDefault={() => updateTiers($userInputs.tiersToken)}
     >
       {#if $tiersUpdated === true}
         <p
@@ -91,7 +83,7 @@
     </form>
     <form
       class="grid gap-4 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
-      on:submit|preventDefault={() => updateTip($selectedToken)}
+      on:submit|preventDefault={() => updateTip($userInputs.tiersToken)}
     >
       {#if $tipUpdated === true}
         <p

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { ethers } from 'ethers'
-  import { questions, symbol } from '$lib/web3/store'
   import AnswerForm from './AnswerForm.svelte'
   import ExchangeInteraction from './ExchangeInteraction.svelte'
   import marked from 'marked'
@@ -11,6 +10,7 @@
     resolveIpfs,
   } from '$lib/utils/cid'
   import { page } from '$app/stores'
+  import { askMiStore, erc20Store } from '$lib/web3/store'
 </script>
 
 <section class="mb-3 max-w-prose mx-auto">
@@ -20,8 +20,8 @@
       <a rel="external" href={$page.path}>Clear filter</a>
     {/if}
   </header>
-  {#if $questions && $questions.length !== 0}
-    {#each $questions as { questioner, questions }}
+  {#if $askMiStore._questioners && $askMiStore._questioners.length !== 0}
+    {#each $askMiStore._questioners as questioner}
       <section class="grid justify-start mb-3">
         <a
           href={`${$page.path}?questioner=${questioner}`}
@@ -31,7 +31,7 @@
         </a>
       </section>
       <div class="grid gap-5 mb-6">
-        {#each [...questions].reverse() as { answer, question, exchangeIndex, balance, tips }}
+        {#each [...$askMiStore._exchanges[questioner]].reverse() as { answer, question, index, balance, tips }}
           <article
             class="px-4 py-3 rounded max-w-prose ring-1 ring-trueGray-800"
           >
@@ -40,8 +40,8 @@
                 <span
                   class="font-mono flex items-center text-sm font-bold px-2 pt-1 rounded-md bg-lime-200 text-lime-900"
                   >Reward: {ethers.utils.formatEther(balance)}
-                  {#if !!symbol}
-                    {$symbol}
+                  {#if !!$erc20Store.symbol}
+                    {$erc20Store.symbol}
                   {:else}
                     ETH
                   {/if}
@@ -71,11 +71,15 @@
                 </div>
               </section>
             {/if}
-            <AnswerForm digest={answer.digest} {exchangeIndex} {questioner} />
+            <AnswerForm
+              digest={answer.digest}
+              exchangeIndex={index}
+              {questioner}
+            />
             <ExchangeInteraction
               {tips}
               digest={answer.digest}
-              {exchangeIndex}
+              exchangeIndex={index}
               {questioner}
             />
           </article>

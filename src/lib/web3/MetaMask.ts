@@ -4,8 +4,7 @@
 
 import detectEthereumProvider from '@metamask/detect-provider'
 import { get } from 'svelte/store'
-import type { Writable } from 'svelte/store'
-import { signer } from './store'
+import { web3Store } from './store'
 
 export async function detectProvider() {
   // this returns the provider, or null if it wasn't detected
@@ -50,8 +49,8 @@ export function detectAccountsChanged(customCallback?: () => any) {
         if (accounts.length === 0) {
           // MetaMask is locked or the user has not connected any accounts
           console.log('Please connect to MetaMask.')
-        } else if (accounts[0] !== get(signer)) {
-          signer.set(accounts[0])
+        } else if (accounts[0] !== get(web3Store).signer) {
+          web3Store.signer(accounts[0])
           // Add any custom logic to update UI
           if (customCallback) {
             await customCallback()
@@ -82,7 +81,7 @@ export function detectAccountsChanged(customCallback?: () => any) {
 // MetaMask will reject any additional requests while the first is still
 // pending.
 
-export function connectToMetaMask(signer: Writable<string>) {
+export function connectToMetaMask() {
   window.ethereum
     .request({ method: 'eth_requestAccounts' })
     .then((accounts: string[]) => {
@@ -90,7 +89,7 @@ export function connectToMetaMask(signer: Writable<string>) {
         // MetaMask is locked or the user has not connected any accounts
         console.log('Please connect to MetaMask.')
       } else {
-        signer.set(accounts[0])
+        web3Store.signer(accounts[0])
       }
     })
     .catch((err: any) => {

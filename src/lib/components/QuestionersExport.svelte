@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { questions } from '$lib/web3/store'
+  import { askMiStore, web3Store } from '$lib/web3/store'
 
   function content(arr: any[]) {
     if (!!arr) {
@@ -9,7 +9,7 @@
     }
   }
 
-  $: csvContent2 = content($questions)
+  $: csvContent2 = content($askMiStore._exchanges[$web3Store.signer])
 </script>
 
 <a href={csvContent2} download="questioners.csv">Download questioners.csv </a>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { leaderboard, provider, search } from '$lib/web3/store'
+  import { leaderboard, provider, search, web3Store } from '$lib/web3/store'
   import { onMount } from 'svelte'
   import Blockie from './Blockie.svelte'
 

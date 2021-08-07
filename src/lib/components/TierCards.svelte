@@ -1,19 +1,8 @@
 <script lang="ts">
-  import { factoryTiers, symbol } from '$lib/web3/store'
-  factoryTiers.set([
-    {
-      name: 'Slow',
-      value: 0,
-    },
-    {
-      name: 'Medium',
-      value: 0,
-    },
-    {
-      name: 'Fast',
-      value: 0,
-    },
-  ])
+  import { erc20Store, userInputs } from '$lib/web3/store'
+  import type { UserInputs } from '$lib/web3/store'
+
+  let keys = Object.keys($userInputs.tiers) as Array<keyof UserInputs['tiers']>
 </script>
 
 <section>
@@ -23,13 +12,13 @@
     </h2>
   </header>
   <div class="grid gap-4 justify-center">
-    {#each $factoryTiers as { name, value }, i}
+    {#each keys as key, i}
       <article class="flex gap-2 items-end">
-        <label class="flex-1" for={name}>{name}</label>
+        <label class="flex-1 capitalize" for={key}>{key}</label>
         <input
-          {name}
-          id={name}
-          bind:value
+          name={key}
+          id={key}
+          bind:value={$userInputs.tiers[key]}
           required={i === 0}
           type="number"
           step="0.01"
@@ -38,8 +27,8 @@
           placeholder="0"
         />
         <span class="text-sm font-semibold">
-          {#if !!symbol}
-            {$symbol}
+          {#if !!$erc20Store.symbol}
+            {$erc20Store.symbol}
           {:else}
             ETH
           {/if}

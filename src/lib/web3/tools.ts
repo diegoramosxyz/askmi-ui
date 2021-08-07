@@ -1,22 +1,19 @@
-import { ethers, Contract, BigNumber, utils } from 'ethers'
+import { ethers, Contract, BigNumber, utils, constants } from 'ethers'
 import {
-  approved,
-  askMiAddress,
   askMiFactory,
-  decimals,
+  askMiStore,
   erc20,
+  erc20Store,
   leaderboard,
   loading,
-  selectedToken,
-  signer,
-  symbol,
-  tip,
+  provider,
+  web3Store,
 } from './store'
 import { get } from 'svelte/store'
 import { abi as erc20ABI } from '$lib/abi/MyToken.json'
 import { abi as askMiAbi } from '$lib/abi/AskMi.json'
 import { abi as askMiFactoryAbi } from '$lib/abi/AskMiFactory.json'
-import { provider, askMi, owner, tiers, chainId } from './store'
+import { askMi } from './store'
 import { detectAccountsChanged, detectChainChanged } from './MetaMask'
 import type { AskMiFactory } from '$lib/abi-types/askmi-factory'
 import { getQuestionsSubset } from './loadExchanges'
@@ -29,50 +26,55 @@ function setProvider() {
 }
 
 async function setChainId() {
-  const _chainId = await window.ethereum.request({ method: 'eth_chainId' })
-  chainId.set(_chainId)
+  const chainId = await window.ethereum.request({ method: 'eth_chainId' })
+  web3Store.chainId(chainId)
 }
 
 async function setSigner() {
   const accounts = await get(provider).listAccounts()
-  signer.set(accounts[0])
+  web3Store.signer(accounts[0])
 }
 
 async function setOwner() {
-  const _owner = await get(askMi).owner()
-  owner.set(_owner)
+  const _owner = await get(askMi)._owner()
+  askMiStore._owner(_owner)
 }
 
 async function setTiers() {
-  let _tiers = await get(askMi).getTiers(get(selectedToken))
-  let formattedTiers = _tiers.map((tier) => ethers.utils.formatEther(tier))
-  tiers.set(formattedTiers)
+  let _tiers = await get(askMi).getTiers(get(askMiStore)._supportedTokens[0])
+  askMiStore._tiers({ token: _tiers })
 }
 
 async function setTip() {
-  const _tip = await get(askMi).tip()
-  tip.set(_tip.toString())
+  const [tip, token] = await get(askMi).tipAndToken()
+  askMiStore._tip({ tip, token })
 }
 
 async function setAskMiAddress() {
   try {
-    askMiAddress.set(await get(askMiFactory).getMyAskMi(get(signer)))
+    askMiStore.address(
+      await get(askMiFactory).getMyAskMi(get(web3Store).signer)
+    )
   } catch (error) {
-    askMiAddress.set(null)
+    askMiStore.address('')
   }
+}
+
+async function getSupportedTokens() {
+  askMiStore._supportedTokens(await get(askMi).supportedTokens())
 }
 
 async function checkApproved() {
   const approvedAmount = await get(erc20).allowance(
-    get(signer),
+    get(web3Store).signer,
     get(askMi).address
   )
 
-  let _tiers = await get(askMi).getTiers(get(selectedToken))
+  let tiers = get(askMiStore)._tiers[get(askMiStore)._supportedTokens[0]]
 
   // Check that the amount approved is greater than
   // the most expensive tier
-  approved.set(approvedAmount.gt(_tiers[_tiers.length - 1]))
+  erc20Store.approved(approvedAmount.gt(tiers[tiers.length - 1]))
 }
 
 export async function approve() {
@@ -82,17 +84,17 @@ export async function approve() {
   get(erc20).once(
     'Approval',
     async (owner: string, spender: string, value: BigNumber) => {
-      approved.set(true)
+      erc20Store.approved(true)
     }
   )
 }
 
 async function getSymbol() {
-  symbol.set(await get(erc20).symbol())
+  erc20Store.symbol(await get(erc20).symbol())
 }
 
 async function getDecimals() {
-  decimals.set(await get(erc20).decimals())
+  erc20Store.decimals(await get(erc20).decimals())
 }
 
 // Set up event listeners and load store with initial data
@@ -109,6 +111,7 @@ export async function setUpAskMi(
     setProvider()
     // Set the signer on page load
     await setSigner()
+    await getSupportedTokens()
     // Detect account changes
     detectAccountsChanged(checkApproved)
     // Set the Chain ID
@@ -191,9 +194,7 @@ export async function setUpAskMiFactory(
     })
 
     // Get the address for every AskMi instance
-    let askMis = events.map(
-      (event) => event.args && event.args['_askMiAddress']
-    )
+    let askMis = events.map((event) => event.args && event.args['askMi'])
 
     // Initialize leaderboard
     leaderboard.set([])

@@ -1,20 +1,27 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { setUpAskMiFactory } from '$lib/web3/tools'
-  import { askMiAddress } from '$lib/web3/store'
   import Link from '$lib/svg/Link.svelte'
   import InstantiateAskMi from '$lib/components/InstantiateAskMi.svelte'
   import Leaderboard from '$lib/components/Leaderboard.svelte'
+  import { askMiStore } from '$lib/web3/store'
 
   onMount(async () => {
     let {
       VITE_ROPSTEN_CHAIN_ID,
       VITE_ROPSTEN_ASKMI_FACTORY,
+      VITE_ROPSTEN_ASKMI_FUNCTIONS,
       VITE_ROPSTEN_ERC20,
       VITE_MUMBAI_CHAIN_ID,
       VITE_MUMBAI_ASKMI_FACTORY,
+      VITE_MUMBAI_ASKMI_FUNCTIONS,
       VITE_MUMBAI_ERC20,
+      VITE_LOCALHOST_CHAIN_ID,
+      VITE_LOCALHOST_ASKMI_FACTORY,
+      VITE_LOCALHOST_ASKMI_FUNCTIONS,
+      VITE_LOCALHOST_ERC20,
     } = import.meta.env
+    // 7A69
 
     const _chainId = await window.ethereum.request({ method: 'eth_chainId' })
 
@@ -32,6 +39,12 @@
         VITE_MUMBAI_CHAIN_ID,
         VITE_MUMBAI_ERC20
       )
+    } else {
+      await setUpAskMiFactory(
+        VITE_LOCALHOST_ASKMI_FACTORY,
+        VITE_LOCALHOST_CHAIN_ID,
+        VITE_LOCALHOST_ERC20
+      )
     }
   })
 </script>
@@ -42,14 +55,14 @@
 
 <div class="grid gap-5 sm:gap-0 sm:grid-cols-2 justify-center items-start">
   <!-- Check if the current signer alreadt has an AskMi contract -->
-  {#if $askMiAddress === null}
+  {#if $askMiStore.address === null}
     <div class="grid justify-center">
       <InstantiateAskMi />
     </div>
   {:else}
     <a
       class="flex items-center gap-2 col-start-1 row-start-1 hover:underline"
-      href={`/instance/${$askMiAddress}`}
+      href={`/instance/${$askMiStore.address}`}
       ><Link />
       <p>Go to your AskMi instance</p>
     </a>
