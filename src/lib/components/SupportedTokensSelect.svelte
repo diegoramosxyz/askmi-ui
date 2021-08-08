@@ -1,16 +1,24 @@
 <script lang="ts">
   import ChebronDown from '$lib/svg/Chebron-Down.svelte'
   import { askMiStore, userInputs } from '$lib/web3/store'
+  import { onMount } from 'svelte'
   import Blockie from './Blockie.svelte'
   export let withInput: boolean
   export let tipOrTiers: 'tipToken' | 'tiersToken'
+
+  onMount(() => {
+    userInputs.tiersToken($askMiStore['_supportedTokens'][0])
+    userInputs.tipToken($askMiStore['_tip']['token'])
+  })
 
   let knownTokens: { [key: string]: string } = {
     '0x0000000000000000000000000000000000000000': 'Ethereum',
     '0x5FbDB2315678afecb367f032d93F642f64180aa3': 'Dai',
   }
 
-  $: supportedTokens = $askMiStore['_supportedTokens']
+  $: supportedTokens = Array.from(
+    new Set([...$askMiStore['_supportedTokens'], $askMiStore['_tip']['token']])
+  )
   let knownAddresses = Object.keys(knownTokens)
 
   let menu: boolean = false

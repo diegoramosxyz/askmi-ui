@@ -7,7 +7,7 @@
   <header class="mb-3">
     <h1 class="text-center text-lg font-bold">Select the cost to tip</h1>
   </header>
-  <TokenSelect tipOrTiers="tipToken" />
+  <slot name="selector" />
   <div class="grid gap-4">
     <article class="flex gap-2 items-end">
       <label for="tip">Tip</label>

@@ -15,8 +15,8 @@
   import Cog from '$lib/svg/Cog.svelte'
   import Loading from '$lib/components/Loading.svelte'
   import { updateTiers, updateTip } from '$lib/abi-functions/askmi'
-  import TokenSelect from '$lib/components/TokenSelect.svelte'
   import SupportedTokensSelect from '$lib/components/SupportedTokensSelect.svelte'
+  import { utils } from 'ethers'
 
   // TODO: Create function to check valid Ethereum addresses
   onMount(async () => {
@@ -61,9 +61,24 @@
       )
     }
 
-    userInputs.tiers('slow', $askMiStore['_tiers'][''][0].toString())
-    userInputs.tiers('medium', $askMiStore['_tiers'][''][1].toString())
-    userInputs.tiers('fast', $askMiStore['_tiers'][''][2].toString())
+    userInputs.tiers(
+      'slow',
+      utils.formatUnits($askMiStore['_tiers'][$userInputs['tiersToken']][0], 18)
+    )
+    userInputs.tiers(
+      'medium',
+      utils.formatUnits(
+        $askMiStore['_tiers'][$userInputs['tiersToken']][1] || 0,
+        18
+      )
+    )
+    userInputs.tiers(
+      'fast',
+      utils.formatUnits(
+        $askMiStore['_tiers'][$userInputs['tiersToken']][2] || 0,
+        18
+      )
+    )
 
     tiersUpdated.set(false)
     tipUpdated.set(false)
@@ -88,7 +103,6 @@
     <div
       class="grid gap-4 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
     >
-      <SupportedTokensSelect withInput={true} tipOrTiers={'tiersToken'} />
       {#if $tiersUpdated === true}
         <p
           class="px-2 py-0.5 rounded font-bold bg-trueGray-300 text-trueGray-900"
@@ -96,7 +110,11 @@
           Tiers will update soon!
         </p>
       {/if}
-      <TierCards />
+      <TierCards>
+        <div slot="selector">
+          <SupportedTokensSelect withInput={true} tipOrTiers={'tiersToken'} />
+        </div>
+      </TierCards>
       <Button click={() => updateTiers($userInputs['tiersToken'])} color="lime"
         ><Cog />Update Tiers</Button
       >
@@ -111,7 +129,11 @@
           The tip cost will update soon!
         </p>
       {/if}
-      <TipCard />
+      <TipCard>
+        <div slot="selector">
+          <SupportedTokensSelect withInput={true} tipOrTiers={'tipToken'} />
+        </div>
+      </TipCard>
       <Button click={() => updateTip($userInputs['tiersToken'])} color="lime"
         ><Cog />Update Tip</Button
       >

@@ -8,6 +8,7 @@
   import { userInputs } from '$lib/web3/store'
   import { BigNumber } from '@ethersproject/bignumber'
   import { utils } from 'ethers'
+  import TokenSelect from './TokenSelect.svelte'
 
   $: tiers = userInputs.tiersAsArray($userInputs['tiers'])
   $: tip = utils.parseUnits($userInputs['tip'].toString(), 18)
@@ -20,8 +21,16 @@
   <header>
     <h1 class="text-xl font-bold text-center">Deploy an AskMi instance</h1>
   </header>
-  <TierCards />
-  <TipCard />
+  <TierCards>
+    <div slot="selector">
+      <TokenSelect tipOrTiers="tiersToken" />
+    </div>
+  </TierCards>
+  <TipCard>
+    <div slot="selector">
+      <TokenSelect tipOrTiers="tipToken" />
+    </div>
+  </TipCard>
   <!-- <RemovalFee /> -->
   <p>Developer fee: <span class="font-mono">0.5%</span> of rewards.</p>
   <Button

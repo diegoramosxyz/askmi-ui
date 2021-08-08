@@ -14,7 +14,8 @@
       Select the contract's tiers <span class="text-sm">(Min. 1 tier)</span>
     </h2>
   </header>
-  <TokenSelect tipOrTiers="tiersToken" />
+
+  <slot name="selector" />
   <div class="grid gap-4 justify-center">
     {#each tiers as tier, i}
       <article class="flex gap-2 items-end">

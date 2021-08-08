@@ -8,6 +8,7 @@ import {
   leaderboard,
   loading,
   provider,
+  userInputs,
   web3Store,
 } from './store'
 import { get } from 'svelte/store'
@@ -50,6 +51,7 @@ async function setTiers() {
 async function setTip() {
   const [token, tip] = await get(askMi)._tip()
   askMiStore._tip({ tip, token })
+  userInputs.tip(+utils.formatUnits(tip))
 }
 
 async function setAskMiAddress() {
