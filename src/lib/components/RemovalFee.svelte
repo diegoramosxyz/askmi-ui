@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { erc20Store, userInputs } from '$lib/web3/store'
+  import { userInputs } from '$lib/web3/store'
 </script>
 
-<section>
+<section class="grid place-items-center">
   <header class="mb-3">
     <h1 class="text-center text-lg font-bold">Fee for deleting a question</h1>
   </header>
@@ -12,21 +12,15 @@
       <input
         name="removal"
         id="removal"
+        bind:value={$userInputs['removalFee']}
         required
-        bind:value={$userInputs.removalFee}
         type="number"
-        step="0.01"
+        step="0.1"
         min="0"
         class="flex-none text-xl font-bold text-right w-28 bg-transparent focus:outline-none rounded ring-1 ring-trueGray-700 transition focus:ring-trueGray-400"
         placeholder="0"
       />
-      <span class="text-sm font-semibold"
-        >{#if !!$erc20Store.symbol}
-          {$erc20Store.symbol}
-        {:else}
-          ETH
-        {/if}</span
-      >
+      <span class="text-sm font-semibold">%</span>
     </article>
   </div>
 </section>

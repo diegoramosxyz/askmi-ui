@@ -1,15 +1,13 @@
 import { getBytes32FromMultiash } from '$lib/utils/cid'
 import { getQuestionsSubset } from '$lib/web3/loadExchanges'
 import {
-  tiersUpdated,
-  tipUpdated,
   functionsContract,
   askMi,
   userInputs,
   web3Store,
   askMiStore,
 } from '$lib/web3/store'
-import { BigNumber } from 'ethers'
+import { BigNumber, constants, ContractTransaction } from 'ethers'
 import { get } from 'svelte/store'
 
 export async function fetchTextToIPFS() {
@@ -29,31 +27,41 @@ export async function ask(token: string, index: number) {
   // Conver CID into a multihash object
   let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
   // Call the ask function
-  let { hash, wait } = await get(askMi).ask(
-    get(functionsContract),
-    token,
-    digest,
-    hashFunction,
-    size,
-    BigNumber.from(index)
-    // {
-    //   value: utils.parseEther(get(tiers)[_tierIndex]),
-    // }
-  )
+  let tx: ContractTransaction
+  if (token === constants.AddressZero) {
+    tx = await get(askMi).ask(
+      get(functionsContract),
+      token,
+      digest,
+      hashFunction,
+      size,
+      BigNumber.from(index),
+      {
+        value: get(askMiStore)._tiers[token][index],
+      }
+    )
+  } else {
+    tx = await get(askMi).ask(
+      get(functionsContract),
+      token,
+      digest,
+      hashFunction,
+      size,
+      BigNumber.from(index)
+    )
+  }
 
-  // Update questions when event has been emitted
-  get(askMi).once(
-    'QuestionAsked',
-    async (_questioner: string, _exchangeIndex: BigNumber) => {
-      await getQuestionsSubset()
-    }
-  )
-
-  web3Store.pendingTx(hash)
+  web3Store.pendingTx(tx.hash)
   // Reset input field
   userInputs.textArea('')
-  await wait()
-  web3Store.pendingTx(hash)
+
+  try {
+    await tx.wait()
+    await getQuestionsSubset()
+  } catch (error) {
+    console.log(error)
+  }
+  web3Store.pendingTx(tx.hash)
 }
 
 export async function respond(questioner: string, qIndex: BigNumber) {
@@ -81,7 +89,12 @@ export async function respond(questioner: string, qIndex: BigNumber) {
   web3Store.pendingTx(hash)
   // Reset input field
   userInputs.textArea('')
-  await wait()
+  try {
+    await wait()
+    await getQuestionsSubset()
+  } catch (error) {
+    console.log(error)
+  }
   web3Store.pendingTx(hash)
 }
 
@@ -95,12 +108,6 @@ export async function removeQuestion(
   // Optimistically update state for better UX
 
   askMiStore.removeOneExchange(questioner, exchangeIndex.toNumber())
-
-  get(askMi).once(
-    'QuestionRemoved',
-    async (_questioner: string, _exchangeIndex: BigNumber) =>
-      await getQuestionsSubset()
-  )
 }
 
 export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
@@ -123,24 +130,24 @@ export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
 }
 
 export async function updateTiers(token: string) {
-  let tiers = userInputs.tiersAsArray(get(userInputs).tiers)
+  let tiers = userInputs.tiersAsArray(get(userInputs)['tiers'])
 
   await get(askMi).updateTiers(get(functionsContract), token, tiers)
   // Do not wait for event
   // Optimistically update state for better UX
-  tiersUpdated.set(true)
-  get(askMi).once('TiersUpdated', (_askMiAddress: string) => {
-    location.reload()
-  })
+  // tiersUpdated.set(true)
+  // get(askMi).once('TiersUpdated', (_askMiAddress: string) => {
+  //   location.reload()
+  // })
 }
 
 export async function updateTip(token: string) {
-  let tip = BigNumber.from(get(userInputs).tip)
+  let tip = BigNumber.from(get(userInputs)['tip'])
   await get(askMi).updateTip(get(functionsContract), tip, token)
   // Do not wait for event
   // Optimistically update state for better UX
-  tipUpdated.set(true)
-  get(askMi).once('TipUpdated', (_askMiAddress: string) => {
-    location.reload()
-  })
+  // tipUpdated.set(true)
+  // get(askMi).once('TipUpdated', (_askMiAddress: string) => {
+  //   location.reload()
+  // })
 }

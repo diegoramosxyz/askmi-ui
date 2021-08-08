@@ -9,7 +9,7 @@
 
   let { isOwnerCheck } = askMiStore
 
-  $: isOwner = isOwnerCheck($web3Store.signer, $askMiStore._owner)
+  $: isOwner = isOwnerCheck($web3Store['signer'], $askMiStore['_owner'])
 </script>
 
 <nav class="mb-3 flex justify-between items-center py-3">
@@ -29,16 +29,16 @@
         <p class="hidden sm:block">Edit Contract</p></a
       >
     {/if}
-    {#if $web3Store.signer}
+    {#if $web3Store['signer']}
       <button
         class="hidden sm:flex items-center gap-2 px-3 py-1.5 ring-1 ring-trueGray-700 rounded"
       >
         <img
           class="rounded h-6"
-          src={getBlockie($web3Store.signer)}
+          src={getBlockie($web3Store['signer'])}
           alt="Blockie from questioner's address"
         />
-        {shrinkAddress($web3Store.signer)}</button
+        {shrinkAddress($web3Store['signer'])}</button
       >
     {:else}
       <button

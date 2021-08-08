@@ -4,7 +4,6 @@ import type { BigNumber } from 'ethers'
 import { get } from 'svelte/store'
 
 export function instantiateAskMi(
-  functionsContract: string,
   tiersToken: string,
   tipToken: string,
   tiers: BigNumber[],
@@ -14,7 +13,6 @@ export function instantiateAskMi(
   if (!!get(erc20Store).decimals) {
     // Deploy an AskMi instance
     get(askMiFactory).instantiateAskMi(
-      functionsContract,
       tiersToken,
       tipToken,
       tiers,

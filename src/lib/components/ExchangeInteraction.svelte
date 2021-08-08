@@ -12,8 +12,8 @@
   export let exchangeIndex: BigNumber
   export let tips: BigNumber
 
-  $: isOwner = isOwnerCheck($web3Store.signer, $askMiStore._owner)
-  $: isQuestioner = isQuestionerCheck('test', $web3Store.signer)
+  $: isOwner = isOwnerCheck($web3Store['signer'], $askMiStore['_owner'])
+  $: isQuestioner = isQuestionerCheck('test', $web3Store['signer'])
 </script>
 
 <section class="flex gap-2 justify-end">

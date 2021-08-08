@@ -1,24 +1,28 @@
 <script lang="ts">
   import { erc20Store, userInputs } from '$lib/web3/store'
   import type { UserInputs } from '$lib/web3/store'
+  import TokenSelect from './TokenSelect.svelte'
 
-  let keys = Object.keys($userInputs.tiers) as Array<keyof UserInputs['tiers']>
+  let tiers = Object.keys($userInputs['tiers']) as Array<
+    keyof UserInputs['tiers']
+  >
 </script>
 
-<section>
+<section class="grid place-items-center">
   <header class="mb-3">
     <h2 class="text-center text-lg font-bold">
       Select the contract's tiers <span class="text-sm">(Min. 1 tier)</span>
     </h2>
   </header>
+  <TokenSelect tipOrTiers="tiersToken" />
   <div class="grid gap-4 justify-center">
-    {#each keys as key, i}
+    {#each tiers as tier, i}
       <article class="flex gap-2 items-end">
-        <label class="flex-1 capitalize" for={key}>{key}</label>
+        <label class="flex-1 capitalize" for={tier}>{tier}</label>
         <input
-          name={key}
-          id={key}
-          bind:value={$userInputs.tiers[key]}
+          name={tier}
+          id={tier}
+          bind:value={$userInputs['tiers'][tier]}
           required={i === 0}
           type="number"
           step="0.01"
@@ -27,8 +31,8 @@
           placeholder="0"
         />
         <span class="text-sm font-semibold">
-          {#if !!$erc20Store.symbol}
-            {$erc20Store.symbol}
+          {#if !!$erc20Store['symbol']}
+            {$erc20Store['symbol']}
           {:else}
             ETH
           {/if}

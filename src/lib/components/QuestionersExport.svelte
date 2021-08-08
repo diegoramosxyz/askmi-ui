@@ -9,7 +9,7 @@
     }
   }
 
-  $: csvContent2 = content($askMiStore._exchanges[$web3Store.signer])
+  $: csvContent2 = content($askMiStore['_exchanges'][$web3Store['signer']])
 </script>
 
 <a href={csvContent2} download="questioners.csv">Download questioners.csv </a>

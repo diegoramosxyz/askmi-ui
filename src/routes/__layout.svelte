@@ -1,7 +1,13 @@
 <script>
   import Banner from '$lib/components/Banner.svelte'
   import Navbar from '$lib/components/Navbar.svelte'
-  import { askMiStore, userInputs, web3Store } from '$lib/web3/store'
+  import {
+    askMiStore,
+    erc20Store,
+    functionsContract,
+    userInputs,
+    web3Store,
+  } from '$lib/web3/store'
   import '../app.postcss'
 </script>
 
@@ -18,4 +24,10 @@
 </pre>
 <pre>
   {JSON.stringify($userInputs, null, 2)}
+</pre>
+<pre>
+  {JSON.stringify({functionsContract: $functionsContract}, null, 2)}
+</pre>
+<pre>
+  {JSON.stringify($erc20Store, null, 2)}
 </pre>

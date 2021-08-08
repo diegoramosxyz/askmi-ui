@@ -20,8 +20,8 @@
       <a rel="external" href={$page.path}>Clear filter</a>
     {/if}
   </header>
-  {#if $askMiStore._questioners && $askMiStore._questioners.length !== 0}
-    {#each $askMiStore._questioners as questioner}
+  {#if $askMiStore['_questioners'] && $askMiStore['_questioners'].length !== 0}
+    {#each $askMiStore['_questioners'] as questioner}
       <section class="grid justify-start mb-3">
         <a
           href={`${$page.path}?questioner=${questioner}`}
@@ -31,7 +31,7 @@
         </a>
       </section>
       <div class="grid gap-5 mb-6">
-        {#each [...$askMiStore._exchanges[questioner]].reverse() as { answer, question, index, balance, tips }}
+        {#each [...$askMiStore['_exchanges'][questioner]].reverse() as { answer, question, index, balance, tips }}
           <article
             class="px-4 py-3 rounded max-w-prose ring-1 ring-trueGray-800"
           >
@@ -40,8 +40,8 @@
                 <span
                   class="font-mono flex items-center text-sm font-bold px-2 pt-1 rounded-md bg-lime-200 text-lime-900"
                   >Reward: {ethers.utils.formatEther(balance)}
-                  {#if !!$erc20Store.symbol}
-                    {$erc20Store.symbol}
+                  {#if !!$erc20Store['symbol']}
+                    {$erc20Store['symbol']}
                   {:else}
                     ETH
                   {/if}

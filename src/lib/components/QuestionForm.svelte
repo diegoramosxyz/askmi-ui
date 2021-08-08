@@ -12,41 +12,45 @@
     userInputs,
     web3Store,
   } from '$lib/web3/store'
+  import { utils } from 'ethers'
+  import SupportedTokensSelect from './SupportedTokensSelect.svelte'
 
   let { isOwnerCheck } = askMiStore
 
   let index: number = 0
 
-  $: isOwner = isOwnerCheck($web3Store.signer, $askMiStore._owner)
+  $: isOwner = isOwnerCheck($web3Store['signer'], $askMiStore['_owner'])
+  $: tiers = $askMiStore['_tiers'][$askMiStore._supportedTokens[0]].map(
+    (tier) => utils.formatUnits(tier, 18)
+  )
 </script>
 
 <!-- If the account is NOT the owner -->
-{#if isOwner}
-  <form
-    class="mb-5 grid justify-center"
-    on:submit|preventDefault={async () =>
-      await ask($userInputs.tiersToken, index)}
-  >
+{#if !isOwner}
+  <div class="mb-5 grid justify-center">
     <p class="mb-2 p-1.5 flex gap-2 items-center">
       Ask
-      <Blockie address={$askMiStore._owner} />
+      <Blockie address={$askMiStore['_owner']} />
       a question:
     </p>
     <textarea
-      disabled={!!$web3Store.pendingTx}
-      bind:value={$userInputs.textArea}
+      disabled={!!$web3Store['pendingTx']}
+      bind:value={$userInputs['textArea']}
       cols="40"
       rows="4"
       class="disabled:opacity-50 disabled:cursor-not-allowed mb-3 px-3 py-2 bg-transparent ring-1 transition focus:outline-none ring-trueGray-700 focus:ring-trueGray-500 rounded resize-y"
       placeholder="Type here..."
     />
-    <h1 class="font-bold text-lg mb-2">Tiers <InfoBubble /></h1>
+    <div class="flex justify-between">
+      <h1 class="font-bold text-lg mb-2">Tiers <InfoBubble /></h1>
+      <SupportedTokensSelect withInput={false} tipOrTiers={'tiersToken'} />
+    </div>
     <div class="flex justify-around mb-4">
-      {#each $askMiStore._tiers[$askMiStore._supportedTokens[0]] as tier, i}
+      {#each tiers as tier, i}
         <article class="grid gap-1 justify-center">
           <input
             class="w-full"
-            disabled={!!$web3Store.pendingTx}
+            disabled={!!$web3Store['pendingTx']}
             type="radio"
             id={tier.toString()}
             name="tier"
@@ -54,8 +58,8 @@
             value={i}
           />
           <label for={tier.toString()}>
-            {#if !!$erc20Store.symbol}
-              {tier} {$erc20Store.symbol}
+            {#if !!$erc20Store['symbol']}
+              {tier} {$erc20Store['symbol']}
             {:else}
               Ξ {tier}
             {/if}</label
@@ -64,14 +68,17 @@
       {/each}
     </div>
     <Pending>
-      {#if $erc20Store.approved === true}
-        <Button color="lightBlue"><Plus /> Ask</Button>
+      {#if $erc20Store['approved'] === true}
+        <Button
+          click={async () => await ask($askMiStore._supportedTokens[0], index)}
+          color="lightBlue"><Plus /> Ask</Button
+        >
       {/if}
-      {#if $erc20Store.approved === false}
+      {#if $erc20Store['approved'] === false}
         <Button color="lime" click={() => approve()}
-          >Approve spending {$erc20Store.symbol}</Button
+          >Approve spending {$erc20Store['symbol']}</Button
         >
       {/if}
     </Pending>
-  </form>
+  </div>
 {/if}

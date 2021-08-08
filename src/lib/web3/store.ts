@@ -33,11 +33,11 @@ export type AskMiStore = {
   _fees: Fees
   _questioners: string[]
   _exchanges: {
-    [questioner: string]: Exchange[]
+    [key: string]: Exchange[]
   }
   _supportedTokens: string[]
   _tiers: {
-    [token: string]: BigNumber[]
+    [key: string]: BigNumber[]
   }
 }
 
@@ -56,7 +56,7 @@ export type Leaderboard = {
 
 function createAskMiStore() {
   const { subscribe, update } = writable<AskMiStore>({
-    address: constants.AddressZero,
+    address: null,
     _owner: '',
     _disabled: false,
     _tip: {
@@ -127,7 +127,7 @@ function createAskMiStore() {
         },
       })),
     isOwnerCheck: (signer: Web3Store['signer'], _owner: AskMiStore['_owner']) =>
-      signer.toLowerCase() === _owner.toLowerCase(),
+      !!signer && !!_owner && signer.toLowerCase() === _owner.toLowerCase(),
     isQuestionerCheck: (questioner: string, signer: Web3Store['signer']) =>
       questioner.toLowerCase() === signer.toLowerCase(),
   }

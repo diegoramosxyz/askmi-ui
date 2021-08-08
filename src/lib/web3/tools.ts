@@ -42,12 +42,13 @@ async function setOwner() {
 }
 
 async function setTiers() {
-  let _tiers = await get(askMi).getTiers(get(askMiStore)._supportedTokens[0])
-  askMiStore._tiers({ token: _tiers })
+  let token = get(askMiStore)._supportedTokens[0]
+  let _tiers = await get(askMi).getTiers(token)
+  askMiStore._tiers({ [token]: _tiers })
 }
 
 async function setTip() {
-  const [tip, token] = await get(askMi).tipAndToken()
+  const [token, tip] = await get(askMi)._tip()
   askMiStore._tip({ tip, token })
 }
 
@@ -100,19 +101,23 @@ async function getDecimals() {
 
 // Set up event listeners and load store with initial data
 export async function setUpAskMi(
+  functions: ImportMetaEnv[''],
   address: string,
   chainId: ImportMetaEnv[''],
   _erc20: ImportMetaEnv[''],
   questioner?: string | null
 ) {
   // Check that the environment variables are loaded
-  if (typeof chainId == 'string' && typeof _erc20 == 'string') {
+  if (
+    typeof chainId == 'string' &&
+    typeof functions == 'string' &&
+    typeof _erc20 == 'string'
+  ) {
     loading.set(true)
     // Get the web3 provider (MetaMask) and the contract object
     setProvider()
     // Set the signer on page load
     await setSigner()
-    await getSupportedTokens()
     // Detect account changes
     detectAccountsChanged(checkApproved)
     // Set the Chain ID
@@ -124,9 +129,12 @@ export async function setUpAskMi(
       new Contract(address, askMiAbi, get(provider).getSigner()) as AskMi
     )
 
+    await getSupportedTokens()
     await setOwner()
     await setTiers()
     await setTip()
+
+    functionsContract.set(functions)
 
     erc20.set(
       new Contract(_erc20, erc20ABI, get(provider).getSigner()) as ERC20
@@ -164,8 +172,6 @@ export async function setUpAskMiFactory(
     setProvider()
     // Set the signer on page load
     await setSigner()
-    // Detect account changes
-    detectAccountsChanged(setAskMiAddress)
     // Set the Chain ID
     await setChainId()
     // Detect chain id changes
@@ -179,6 +185,9 @@ export async function setUpAskMiFactory(
         get(provider).getSigner()
       ) as AskMiFactory
     )
+
+    // Detect account changes
+    detectAccountsChanged(setAskMiAddress)
 
     erc20.set(
       new Contract(_erc20, erc20ABI, get(provider).getSigner()) as ERC20
@@ -231,7 +240,7 @@ export async function setUpAskMiFactory(
         topics: [utils.id('QuestionAnswered(address,uint256)')],
       })
 
-      let owner = await askMi.owner()
+      let owner = await askMi._owner()
 
       // Push a new element into the leaderboard
       leaderboard.set([

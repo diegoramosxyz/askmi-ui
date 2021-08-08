@@ -1,11 +1,13 @@
 <script lang="ts">
   import { erc20Store, userInputs } from '$lib/web3/store'
+  import TokenSelect from './TokenSelect.svelte'
 </script>
 
-<section>
+<section class="grid place-items-center">
   <header class="mb-3">
     <h1 class="text-center text-lg font-bold">Select the cost to tip</h1>
   </header>
+  <TokenSelect tipOrTiers="tipToken" />
   <div class="grid gap-4">
     <article class="flex gap-2 items-end">
       <label for="tip">Tip</label>
@@ -13,7 +15,7 @@
         name="tip"
         id="tip"
         required
-        bind:value={$userInputs.tip}
+        bind:value={$userInputs['tip']}
         type="number"
         step="0.01"
         min="0"
@@ -21,8 +23,8 @@
         placeholder="0"
       />
       <span class="text-sm font-semibold"
-        >{#if !!$erc20Store.symbol}
-          {$erc20Store.symbol}
+        >{#if !!$erc20Store['symbol']}
+          {$erc20Store['symbol']}
         {:else}
           ETH
         {/if}</span
