@@ -1,5 +1,8 @@
 <script lang="ts">
   import { userInputs } from '$lib/web3/store'
+
+  let val = 0.01
+  $: _ = userInputs.removalFee(Math.floor(val * 100))
 </script>
 
 <section class="grid place-items-center">
@@ -9,14 +12,17 @@
   <div class="grid gap-4">
     <article class="flex gap-2 items-end">
       <label for="removal">Removal Fee</label>
+      <!-- The removal fee must be multiplied by a 100 because -->
+      <!-- in solidity fee.removal goes from 1 to 10000 -->
       <input
         name="removal"
         id="removal"
-        bind:value={$userInputs['removalFee']}
+        bind:value={val}
         required
         type="number"
-        step="0.1"
-        min="0"
+        step="0.01"
+        min="0.01"
+        max="100"
         class="flex-none text-xl font-bold text-right w-28 bg-transparent focus:outline-none rounded ring-1 ring-trueGray-700 transition focus:ring-trueGray-400"
         placeholder="0"
       />
