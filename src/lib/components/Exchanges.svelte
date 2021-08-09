@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ethers } from 'ethers'
+  import { constants, ethers } from 'ethers'
   import AnswerForm from './AnswerForm.svelte'
   import ExchangeInteraction from './ExchangeInteraction.svelte'
   import marked from 'marked'
@@ -31,7 +31,7 @@
         </a>
       </section>
       <div class="grid gap-5 mb-6">
-        {#each [...$askMiStore['_exchanges'][questioner]].reverse() as { answer, question, index, balance, tips }}
+        {#each [...$askMiStore['_exchanges'][questioner]].reverse() as { answer, question, index, balance, tips, token }}
           <article
             class="px-4 py-3 rounded max-w-prose ring-1 ring-trueGray-800"
           >
@@ -40,10 +40,10 @@
                 <span
                   class="font-mono flex items-center text-sm font-bold px-2 pt-1 rounded-md bg-lime-200 text-lime-900"
                   >Reward: {ethers.utils.formatEther(balance)}
-                  {#if !!$erc20Store['symbol']}
-                    {$erc20Store['symbol']}
-                  {:else}
+                  {#if token === constants.AddressZero}
                     ETH
+                  {:else}
+                    {$erc20Store['symbol']}
                   {/if}
                 </span>
               </p>

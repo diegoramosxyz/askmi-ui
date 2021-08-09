@@ -85,6 +85,11 @@ export interface AskMi extends Contract {
     token: string
   ): Promise<ContractTransaction>
 
+  updateRemovalFee(
+    functionsContract: string,
+    removalFee: BigNumber
+  ): Promise<ContractTransaction>
+
   /**
    * GETTER FUNCTIONS
    */

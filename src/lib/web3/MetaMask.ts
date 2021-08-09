@@ -46,15 +46,15 @@ export function detectAccountsChanged(customCallback?: () => any) {
     window.ethereum
       .request({ method: 'eth_accounts' })
       .then(async (accounts: string[]) => {
-        if (accounts.length === 0) {
-          // MetaMask is locked or the user has not connected any accounts
-          console.log('Please connect to MetaMask.')
-        } else if (accounts[0] !== get(web3Store).signer) {
+        if (accounts.length > 0) {
           web3Store.signer(accounts[0])
           // Add any custom logic to update UI
           if (customCallback) {
             await customCallback()
           }
+        } else {
+          // MetaMask is locked or the user has not connected any accounts
+          console.log('Please connect to MetaMask.')
         }
       })
       .catch((err: Error) => {

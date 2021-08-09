@@ -12,7 +12,7 @@
     userInputs,
     web3Store,
   } from '$lib/web3/store'
-  import { utils } from 'ethers'
+  import { constants, utils } from 'ethers'
   import SupportedTokensSelect from './SupportedTokensSelect.svelte'
 
   let { isOwnerCheck } = askMiStore
@@ -68,15 +68,23 @@
       {/each}
     </div>
     <Pending>
-      {#if $erc20Store['approved'] === true}
+      {#if $userInputs['tiersToken'] !== constants.AddressZero}
+        {#if $erc20Store['approved'] === true}
+          <Button
+            click={async () =>
+              await ask($askMiStore._supportedTokens[0], index)}
+            color="lightBlue"><Plus /> Ask</Button
+          >
+        {/if}
+        {#if $erc20Store['approved'] === false}
+          <Button color="lime" click={() => approve()}
+            >Approve spending {$erc20Store['symbol']}</Button
+          >
+        {/if}
+      {:else}
         <Button
           click={async () => await ask($askMiStore._supportedTokens[0], index)}
           color="lightBlue"><Plus /> Ask</Button
-        >
-      {/if}
-      {#if $erc20Store['approved'] === false}
-        <Button color="lime" click={() => approve()}
-          >Approve spending {$erc20Store['symbol']}</Button
         >
       {/if}
     </Pending>

@@ -55,12 +55,9 @@ export async function ask(token: string, index: number) {
   // Reset input field
   userInputs.textArea('')
 
-  try {
-    await tx.wait()
-    await getQuestionsSubset()
-  } catch (error) {
-    console.log(error)
-  }
+  await tx.wait()
+  await getQuestionsSubset()
+
   web3Store.pendingTx(tx.hash)
 }
 
@@ -89,65 +86,100 @@ export async function respond(questioner: string, qIndex: BigNumber) {
   web3Store.pendingTx(hash)
   // Reset input field
   userInputs.textArea('')
-  try {
-    await wait()
-    await getQuestionsSubset()
-  } catch (error) {
-    console.log(error)
-  }
+
+  await wait()
+  await getQuestionsSubset()
+
   web3Store.pendingTx(hash)
 }
 
-export async function removeQuestion(
-  questioner: string,
-  exchangeIndex: BigNumber
-) {
-  await get(askMi).removeQuestion(questioner, exchangeIndex)
-
-  // Do not wait for event
-  // Optimistically update state for better UX
-
-  askMiStore.removeOneExchange(questioner, exchangeIndex.toNumber())
-}
-
-export async function tipAsnwer(questioner: string, exchangeIndex: BigNumber) {
-  await get(askMi).issueTip(
+export async function remove(questioner: string, exchangeIndex: BigNumber) {
+  let { hash, wait } = await get(askMi).remove(
     get(functionsContract),
     questioner,
     exchangeIndex
-    //    {
-    //   value: await get(askMi).tip(),
-    // }
   )
 
+  web3Store.pendingTx(hash)
+  askMiStore.removeOneExchange(questioner, exchangeIndex.toNumber())
+
+  await wait()
+
+  web3Store.pendingTx(hash)
+}
+
+export async function issueTip(questioner: string, exchangeIndex: BigNumber) {
+  let tx: ContractTransaction
+  let { token, tip } = get(askMiStore)['_tip']
+  if (token === constants.AddressZero) {
+    tx = await get(askMi).issueTip(
+      get(functionsContract),
+      questioner,
+      exchangeIndex,
+      {
+        value: tip,
+      }
+    )
+  } else {
+    tx = await get(askMi).issueTip(
+      get(functionsContract),
+      questioner,
+      exchangeIndex
+    )
+  }
+
+  web3Store.pendingTx(tx.hash)
   askMiStore.plusOneTips(questioner, exchangeIndex.toNumber())
 
-  // get(askMi).once(
-  //   'TipIssued',
-  //   async (_tipper: string, _questioner: string, _exchangeIndex: BigNumber) =>
-  //     await getQuestionsSubset()
-  // )
+  await tx.wait()
+
+  web3Store.pendingTx(tx.hash)
+  await getQuestionsSubset()
 }
 
 export async function updateTiers(token: string) {
   let tiers = userInputs.tiersAsArray(get(userInputs)['tiers'])
+  let { hash, wait } = await get(askMi).updateTiers(
+    get(functionsContract),
+    token,
+    tiers
+  )
 
-  await get(askMi).updateTiers(get(functionsContract), token, tiers)
-  // Do not wait for event
-  // Optimistically update state for better UX
-  // tiersUpdated.set(true)
-  // get(askMi).once('TiersUpdated', (_askMiAddress: string) => {
-  //   location.reload()
-  // })
+  web3Store.pendingTx(hash)
+
+  await wait()
+  location.reload()
+
+  web3Store.pendingTx(hash)
 }
 
 export async function updateTip(token: string) {
   let tip = BigNumber.from(get(userInputs)['tip'])
-  await get(askMi).updateTip(get(functionsContract), tip, token)
-  // Do not wait for event
-  // Optimistically update state for better UX
-  // tipUpdated.set(true)
-  // get(askMi).once('TipUpdated', (_askMiAddress: string) => {
-  //   location.reload()
-  // })
+  let { hash, wait } = await get(askMi).updateTip(
+    get(functionsContract),
+    tip,
+    token
+  )
+
+  web3Store.pendingTx(hash)
+
+  await wait()
+  location.reload()
+
+  web3Store.pendingTx(hash)
+}
+
+export async function updateRemovalFee() {
+  let removalFee = BigNumber.from(get(userInputs)['removalFee'])
+  let { hash, wait } = await get(askMi).updateRemovalFee(
+    get(functionsContract),
+    removalFee
+  )
+
+  web3Store.pendingTx(hash)
+
+  await wait()
+  location.reload()
+
+  web3Store.pendingTx(hash)
 }

@@ -8,15 +8,12 @@
 
   onMount(async () => {
     let {
-      VITE_ROPSTEN_CHAIN_ID,
       VITE_ROPSTEN_ASKMI_FACTORY,
       VITE_ROPSTEN_ASKMI_FUNCTIONS,
       VITE_ROPSTEN_ERC20,
-      VITE_MUMBAI_CHAIN_ID,
       VITE_MUMBAI_ASKMI_FACTORY,
       VITE_MUMBAI_ASKMI_FUNCTIONS,
       VITE_MUMBAI_ERC20,
-      VITE_LOCALHOST_CHAIN_ID,
       VITE_LOCALHOST_ASKMI_FACTORY,
       VITE_LOCALHOST_ASKMI_FUNCTIONS,
       VITE_LOCALHOST_ERC20,
@@ -25,11 +22,9 @@
     const _chainId = await window.ethereum.request({ method: 'eth_chainId' })
 
     if (_chainId === '0x3') {
-      // Set up event listeners and load stores with initial data
       await setUpAskMiFactory(
         VITE_ROPSTEN_ASKMI_FACTORY,
         VITE_ROPSTEN_ASKMI_FUNCTIONS,
-        VITE_ROPSTEN_CHAIN_ID,
         VITE_ROPSTEN_ERC20
       )
     }
@@ -37,7 +32,6 @@
       await setUpAskMiFactory(
         VITE_MUMBAI_ASKMI_FACTORY,
         VITE_MUMBAI_ASKMI_FUNCTIONS,
-        VITE_MUMBAI_CHAIN_ID,
         VITE_MUMBAI_ERC20
       )
     }
@@ -45,7 +39,6 @@
       await setUpAskMiFactory(
         VITE_LOCALHOST_ASKMI_FACTORY,
         VITE_LOCALHOST_ASKMI_FUNCTIONS,
-        VITE_LOCALHOST_CHAIN_ID,
         VITE_LOCALHOST_ERC20
       )
     }
@@ -57,7 +50,6 @@
 </svelte:head>
 
 <div class="grid gap-5 sm:gap-0 sm:grid-cols-2 justify-center items-start">
-  <!-- Check if the current signer alreadt has an AskMi contract -->
   {#if !$askMiStore['address']}
     <div class="grid justify-center">
       <InstantiateAskMi />

@@ -21,51 +21,31 @@ import type { AskMiFactory } from '$lib/abi-types/askmi-factory'
 import { getQuestionsSubset } from './loadExchanges'
 import type { AskMi } from '$lib/abi-types/askmi'
 import type { ERC20 } from '$lib/abi-types/erc20'
+import { getMyAskMi } from '$lib/abi-functions/askmi-factory'
 
-function setProvider() {
-  // Get the provider from the browser
+async function setupMetamask() {
   provider.set(new ethers.providers.Web3Provider(window.ethereum))
-}
 
-async function setChainId() {
   const chainId = await window.ethereum.request({ method: 'eth_chainId' })
   web3Store.chainId(chainId)
-}
 
-async function setSigner() {
   const accounts = await get(provider).listAccounts()
   web3Store.signer(accounts[0])
+
+  await detectChainChanged()
 }
 
-async function setOwner() {
-  const _owner = await get(askMi)._owner()
-  askMiStore._owner(_owner)
-}
+async function populateAskMiStore() {
+  askMiStore._owner(await get(askMi)._owner())
+  askMiStore._supportedTokens(await get(askMi).supportedTokens())
 
-async function setTiers() {
-  let token = get(askMiStore)._supportedTokens[0]
-  let _tiers = await get(askMi).getTiers(token)
-  askMiStore._tiers({ [token]: _tiers })
-}
+  let _token = get(askMiStore)._supportedTokens[0]
+  let _tiers = await get(askMi).getTiers(_token)
+  askMiStore._tiers({ [_token]: _tiers })
 
-async function setTip() {
   const [token, tip] = await get(askMi)._tip()
   askMiStore._tip({ tip, token })
   userInputs.tip(+utils.formatUnits(tip))
-}
-
-async function setAskMiAddress() {
-  try {
-    askMiStore.address(
-      await get(askMiFactory).getMyAskMi(get(web3Store).signer)
-    )
-  } catch (error) {
-    askMiStore.address(null)
-  }
-}
-
-async function getSupportedTokens() {
-  askMiStore._supportedTokens(await get(askMi).supportedTokens())
 }
 
 async function checkApproved() {
@@ -74,7 +54,7 @@ async function checkApproved() {
     get(askMi).address
   )
 
-  let tiers = get(askMiStore)._tiers[get(askMiStore)._supportedTokens[0]]
+  let tiers = get(askMiStore)._tiers[get(askMiStore)['_supportedTokens'][0]]
 
   // Check that the amount approved is greater than
   // the most expensive tier
@@ -93,11 +73,9 @@ export async function approve() {
   )
 }
 
-async function getSymbol() {
+async function populateErc20() {
+  checkApproved()
   erc20Store.symbol(await get(erc20).symbol())
-}
-
-async function getDecimals() {
   erc20Store.decimals(await get(erc20).decimals())
 }
 
@@ -105,49 +83,35 @@ async function getDecimals() {
 export async function setUpAskMi(
   functions: ImportMetaEnv[''],
   address: string,
-  chainId: ImportMetaEnv[''],
   _erc20: ImportMetaEnv[''],
   questioner?: string | null
 ) {
   // Check that the environment variables are loaded
-  if (
-    typeof chainId == 'string' &&
-    typeof functions == 'string' &&
-    typeof _erc20 == 'string'
-  ) {
+  if (typeof functions == 'string' && typeof _erc20 == 'string') {
     loading.set(true)
-    // Get the web3 provider (MetaMask) and the contract object
-    setProvider()
-    // Set the signer on page load
-    await setSigner()
-    // Detect account changes
-    detectAccountsChanged(checkApproved)
-    // Set the Chain ID
-    await setChainId()
-    // Detect chain id changes
-    await detectChainChanged()
+
+    await setupMetamask()
 
     askMi.set(
       new Contract(address, askMiAbi, get(provider).getSigner()) as AskMi
     )
 
-    await getSupportedTokens()
-    await setOwner()
-    await setTiers()
-    await setTip()
-
-    functionsContract.set(functions)
-
     erc20.set(
       new Contract(_erc20, erc20ABI, get(provider).getSigner()) as ERC20
     )
+
+    // Detect account changes
+    await populateAskMiStore()
+
+    detectAccountsChanged(checkApproved)
+
+    functionsContract.set(functions)
 
     await checkApproved()
 
     await getQuestionsSubset(questioner)
 
-    await getSymbol()
-    await getDecimals()
+    await populateErc20()
 
     loading.set(false)
   } else {
@@ -159,25 +123,17 @@ export async function setUpAskMi(
 export async function setUpAskMiFactory(
   address: ImportMetaEnv[''],
   functions: ImportMetaEnv[''],
-  chainId: ImportMetaEnv[''],
   _erc20: ImportMetaEnv['']
 ) {
   // Check that the environment variables are loaded
   if (
     typeof address == 'string' &&
     typeof functions == 'string' &&
-    typeof chainId == 'string' &&
     typeof _erc20 == 'string'
   ) {
     loading.set(true)
-    // Get the web3 provider (MetaMask) and the contract object
-    setProvider()
-    // Set the signer on page load
-    await setSigner()
-    // Set the Chain ID
-    await setChainId()
-    // Detect chain id changes
-    await detectChainChanged()
+
+    await setupMetamask()
 
     // Instantiate an AskMiFactory contract object
     askMiFactory.set(
@@ -188,20 +144,17 @@ export async function setUpAskMiFactory(
       ) as AskMiFactory
     )
 
-    // Detect account changes
-    detectAccountsChanged(setAskMiAddress)
-
     erc20.set(
       new Contract(_erc20, erc20ABI, get(provider).getSigner()) as ERC20
     )
 
-    await getSymbol()
-    await getDecimals()
+    // Detect account changes
+    detectAccountsChanged(getMyAskMi)
 
     functionsContract.set(functions)
 
     // Check if the current signer has created an AskMi contract
-    await setAskMiAddress()
+    await getMyAskMi()
 
     // Get every AskMiInstantiated event emitted by the factory contract
     let events = await get(askMiFactory).queryFilter({
@@ -220,15 +173,6 @@ export async function setUpAskMiFactory(
     ) {
       await Promise.all(array.map(callback))
     }
-
-    // async function asyncForEach(
-    //   array: any[],
-    //   callback: (value: any, index?: number, array?: any[]) => any
-    // ): Promise<void> {
-    //   for (let index = 0; index < array.length; index++) {
-    //     await callback(array[index], index, array)
-    //   }
-    // }
 
     await asyncForEach(askMis, async (address) => {
       let askMi = new Contract(
@@ -267,13 +211,3 @@ export async function setUpAskMiFactory(
     console.log('Enviroment variables not loaded.')
   }
 }
-
-// Get the ETH balance for any account in human-readable form
-// export async function getRoundedEthBalance(
-//   provider: ethers.providers.Web3Provider,
-//   address: string
-// ) {
-//   // return the balance formated to ETH
-//   let ETH = ethers.utils.formatEther(await provider?.getBalance(address))
-//   return Math.floor(Number(ETH) * 100) / 100
-// }

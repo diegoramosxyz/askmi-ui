@@ -1,4 +1,4 @@
-import type { BigNumber, Contract } from 'ethers'
+import type { BigNumber, Contract, ContractTransaction } from 'ethers'
 
 export interface AskMiFactory extends Contract {
   getMyAskMi(owner: string): Promise<string>
@@ -9,5 +9,5 @@ export interface AskMiFactory extends Contract {
     tiers: BigNumber[],
     tip: BigNumber,
     removalFee: BigNumber
-  ): Promise<string>
+  ): Promise<ContractTransaction>
 }

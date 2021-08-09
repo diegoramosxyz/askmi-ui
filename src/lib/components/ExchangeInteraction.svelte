@@ -3,8 +3,8 @@
   import type { BigNumber } from '@ethersproject/bignumber'
   import Button from './Button.svelte'
   import Trash from '$lib/svg/Trash.svelte'
-  import { removeQuestion, tipAsnwer } from '$lib/abi-functions/askmi'
   import { askMiStore, web3Store } from '$lib/web3/store'
+  import { issueTip, remove } from '$lib/abi-functions/askmi'
   let { isOwnerCheck, isQuestionerCheck } = askMiStore
 
   export let digest: string
@@ -18,14 +18,14 @@
 
 <section class="flex gap-2 justify-end">
   {#if digest === '' && (isQuestioner || isOwner)}
-    <Button color="red" click={() => removeQuestion(questioner, exchangeIndex)}
+    <Button color="red" click={() => remove(questioner, exchangeIndex)}
       ><Trash /> Remove</Button
     >
   {/if}
   {#if digest !== '' && !isOwner}
     <Button
       color="lime"
-      click={async () => await tipAsnwer(questioner, exchangeIndex)}
+      click={async () => await issueTip(questioner, exchangeIndex)}
       ><DollarSign />Tips: {tips.toNumber()}</Button
     >
   {/if}

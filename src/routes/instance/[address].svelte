@@ -10,13 +10,10 @@
   // TODO: Create function to check valid Ethereum addresses
   onMount(async () => {
     let {
-      VITE_ROPSTEN_CHAIN_ID,
       VITE_ROPSTEN_ERC20,
       VITE_ROPSTEN_ASKMI_FUNCTIONS,
-      VITE_MUMBAI_CHAIN_ID,
       VITE_MUMBAI_ERC20,
       VITE_MUMBAI_ASKMI_FUNCTIONS,
-      VITE_LOCALHOST_CHAIN_ID,
       VITE_LOCALHOST_ERC20,
       VITE_LOCALHOST_ASKMI_FUNCTIONS,
     } = import.meta.env
@@ -28,7 +25,6 @@
       await setUpAskMi(
         VITE_ROPSTEN_ASKMI_FUNCTIONS,
         $page.params.address,
-        VITE_ROPSTEN_CHAIN_ID,
         VITE_ROPSTEN_ERC20,
         $page.query.get('questioner')
       )
@@ -37,7 +33,6 @@
       await setUpAskMi(
         VITE_MUMBAI_ASKMI_FUNCTIONS,
         $page.params.address,
-        VITE_MUMBAI_CHAIN_ID,
         VITE_MUMBAI_ERC20,
         $page.query.get('questioner')
       )
@@ -46,7 +41,6 @@
       await setUpAskMi(
         VITE_LOCALHOST_ASKMI_FUNCTIONS,
         $page.params.address,
-        VITE_LOCALHOST_CHAIN_ID,
         VITE_LOCALHOST_ERC20,
         $page.query.get('questioner')
       )
