@@ -3,8 +3,9 @@
   import type { BigNumber } from '@ethersproject/bignumber'
   import Button from './Button.svelte'
   import Trash from '$lib/svg/Trash.svelte'
-  import { askMiStore, web3Store } from '$lib/web3/store'
   import { issueTip, remove } from '$lib/abi-functions/askmi'
+  import { askMiStore } from '$lib/stores/askMi'
+  import { web3Store } from '$lib/stores/web3'
   let { isOwnerCheck, isQuestionerCheck } = askMiStore
 
   export let digest: string

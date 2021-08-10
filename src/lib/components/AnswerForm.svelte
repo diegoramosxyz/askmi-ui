@@ -1,6 +1,5 @@
 <script lang="ts">
   import PaperAirplane from '$lib/svg/PaperAirplane.svelte'
-  import type { BigNumber } from '@ethersproject/bignumber'
   import Button from './Button.svelte'
   import marked from 'marked'
   import DOMPurify from 'dompurify'
@@ -8,7 +7,10 @@
   import ChebronDown from '$lib/svg/Chebron-Down.svelte'
   import Pending from './Pending.svelte'
   import { respond } from '$lib/abi-functions/askmi'
-  import { askMiStore, userInputs, web3Store } from '$lib/web3/store'
+  import { web3Store } from '$lib/stores/web3'
+  import { askMiStore } from '$lib/stores/askMi'
+  import { userInputs } from '$lib/stores/userInputs'
+  import type { BigNumber } from '@ethersproject/bignumber'
   let { isOwnerCheck } = askMiStore
 
   export let digest: string

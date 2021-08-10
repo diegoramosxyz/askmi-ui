@@ -1,5 +1,5 @@
 <script>
-  import { leaderboard } from '$lib/web3/store'
+  import { leaderboard } from '$lib/stores/leaderboard'
   import Blockie from './Blockie.svelte'
 </script>
 
@@ -20,6 +20,7 @@
             <td class="px-3 py-1.5"
               ><a
                 class="no-underline hover:underline"
+                rel="external"
                 href={`/instance/${contract}`}><Blockie address={owner} /></a
               ></td
             >

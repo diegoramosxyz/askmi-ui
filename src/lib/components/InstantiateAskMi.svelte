@@ -5,10 +5,11 @@
   import Button from '$lib/components/Button.svelte'
   import Terminal from '$lib/svg/Terminal.svelte'
   import { instantiateAskMi } from '$lib/abi-functions/askmi-factory'
-  import { userInputs } from '$lib/web3/store'
   import { BigNumber } from '@ethersproject/bignumber'
   import { utils } from 'ethers'
   import TokenSelect from './TokenSelect.svelte'
+  import Pending from './Pending.svelte'
+  import { userInputs } from '$lib/stores/userInputs'
 
   $: tiers = userInputs.tiersAsArray($userInputs['tiers'])
   $: tip = utils.parseUnits($userInputs['tip'].toString(), 18)
@@ -33,15 +34,17 @@
   </TipCard>
   <RemovalFee />
   <p>Developer fee: <span class="font-mono">0.5%</span> of rewards.</p>
-  <Button
-    click={() =>
-      instantiateAskMi(
-        $userInputs['tiersToken'],
-        $userInputs['tipToken'],
-        tiers,
-        tip,
-        BigNumber.from('100')
-      )}
-    color={'lime'}><Terminal />Deploy AskMi contract</Button
-  >
+  <Pending>
+    <Button
+      click={() =>
+        instantiateAskMi(
+          $userInputs['tiersToken'],
+          $userInputs['tipToken'],
+          tiers,
+          tip,
+          removalFee
+        )}
+      color={'lime'}><Terminal />Deploy AskMi contract</Button
+    >
+  </Pending>
 </div>

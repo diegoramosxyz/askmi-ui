@@ -2,9 +2,8 @@
 /* Detect the MetaMask Ethereum provider */
 /*****************************************/
 
+import { web3Store } from '$lib/stores/web3'
 import detectEthereumProvider from '@metamask/detect-provider'
-import { get } from 'svelte/store'
-import { web3Store } from './store'
 
 export async function detectProvider() {
   // this returns the provider, or null if it wasn't detected

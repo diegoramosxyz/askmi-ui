@@ -10,7 +10,8 @@
     resolveIpfs,
   } from '$lib/utils/cid'
   import { page } from '$app/stores'
-  import { askMiStore, erc20Store } from '$lib/web3/store'
+  import { askMiStore } from '$lib/stores/askMi'
+  import { erc20Store } from '$lib/stores/erc20'
 </script>
 
 <section class="mb-3 max-w-prose mx-auto">
@@ -20,7 +21,7 @@
       <a rel="external" href={$page.path}>Clear filter</a>
     {/if}
   </header>
-  {#if $askMiStore['_questioners'] && $askMiStore['_questioners'].length !== 0}
+  {#if Object.keys($askMiStore['_exchanges']).length > 0 && $askMiStore['_questioners'].length > 0}
     {#each $askMiStore['_questioners'] as questioner}
       <section class="grid justify-start mb-3">
         <a

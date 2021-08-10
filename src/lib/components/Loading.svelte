@@ -1,5 +1,5 @@
 <script>
-  import { loading } from '$lib/web3/store'
+  import { loading } from '$lib/stores/other'
 </script>
 
 <!-- Use a grid avoid layout shift during transition -->

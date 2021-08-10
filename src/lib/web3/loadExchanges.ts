@@ -1,4 +1,5 @@
-import { askMi, askMiStore } from './store'
+import { askMiStore } from '$lib/stores/askMi'
+import { askMi } from '$lib/stores/other'
 import { get } from 'svelte/store'
 
 // Ethers docs

@@ -1,12 +1,9 @@
+import { askMiStore } from '$lib/stores/askMi'
+import { askMi, functionsContract } from '$lib/stores/other'
+import { userInputs } from '$lib/stores/userInputs'
+import { web3Store } from '$lib/stores/web3'
 import { getBytes32FromMultiash } from '$lib/utils/cid'
 import { getQuestionsSubset } from '$lib/web3/loadExchanges'
-import {
-  functionsContract,
-  askMi,
-  userInputs,
-  web3Store,
-  askMiStore,
-} from '$lib/web3/store'
 import { BigNumber, constants, ContractTransaction } from 'ethers'
 import { get } from 'svelte/store'
 
@@ -58,7 +55,7 @@ export async function ask(token: string, index: number) {
   await tx.wait()
   await getQuestionsSubset()
 
-  web3Store.pendingTx(tx.hash)
+  web3Store.pendingTx(null)
 }
 
 export async function respond(questioner: string, qIndex: BigNumber) {
@@ -90,7 +87,7 @@ export async function respond(questioner: string, qIndex: BigNumber) {
   await wait()
   await getQuestionsSubset()
 
-  web3Store.pendingTx(hash)
+  web3Store.pendingTx(null)
 }
 
 export async function remove(questioner: string, exchangeIndex: BigNumber) {
@@ -105,7 +102,7 @@ export async function remove(questioner: string, exchangeIndex: BigNumber) {
 
   await wait()
 
-  web3Store.pendingTx(hash)
+  web3Store.pendingTx(null)
 }
 
 export async function issueTip(questioner: string, exchangeIndex: BigNumber) {
@@ -133,7 +130,7 @@ export async function issueTip(questioner: string, exchangeIndex: BigNumber) {
 
   await tx.wait()
 
-  web3Store.pendingTx(tx.hash)
+  web3Store.pendingTx(null)
   await getQuestionsSubset()
 }
 
@@ -150,7 +147,7 @@ export async function updateTiers(token: string) {
   await wait()
   location.reload()
 
-  web3Store.pendingTx(hash)
+  web3Store.pendingTx(null)
 }
 
 export async function updateTip(token: string) {
@@ -166,7 +163,7 @@ export async function updateTip(token: string) {
   await wait()
   location.reload()
 
-  web3Store.pendingTx(hash)
+  web3Store.pendingTx(null)
 }
 
 export async function updateRemovalFee() {
@@ -181,5 +178,5 @@ export async function updateRemovalFee() {
   await wait()
   location.reload()
 
-  web3Store.pendingTx(hash)
+  web3Store.pendingTx(null)
 }

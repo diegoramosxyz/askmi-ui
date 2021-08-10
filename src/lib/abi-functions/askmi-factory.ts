@@ -1,4 +1,6 @@
-import { askMiFactory, askMiStore, web3Store } from '$lib/web3/store'
+import { askMiStore } from '$lib/stores/askMi'
+import { askMiFactory } from '$lib/stores/other'
+import { web3Store } from '$lib/stores/web3'
 import type { BigNumber } from 'ethers'
 import { get } from 'svelte/store'
 
@@ -10,14 +12,18 @@ export async function instantiateAskMi(
   removalFee: BigNumber
 ) {
   // Deploy an AskMi instance
-  let { wait } = await get(askMiFactory).instantiateAskMi(
+  let { hash, wait } = await get(askMiFactory).instantiateAskMi(
     tiersToken,
     tipToken,
     tiers,
     tip,
     removalFee
   )
+  web3Store.pendingTx(hash)
+
   await wait()
+
+  web3Store.pendingTx(null)
 
   // Listen to the AskMiInstantiated event
   get(askMiFactory).once('AskMiInstantiated', (askMiAddress: string) =>

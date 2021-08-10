@@ -4,7 +4,7 @@
   import Link from '$lib/svg/Link.svelte'
   import InstantiateAskMi from '$lib/components/InstantiateAskMi.svelte'
   import Leaderboard from '$lib/components/Leaderboard.svelte'
-  import { askMiStore } from '$lib/web3/store'
+  import { askMiStore } from '$lib/stores/askMi'
 
   onMount(async () => {
     let {

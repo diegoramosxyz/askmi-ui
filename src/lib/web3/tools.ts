@@ -1,27 +1,27 @@
-import { ethers, Contract, BigNumber, utils } from 'ethers'
-import {
-  askMiFactory,
-  askMiStore,
-  erc20,
-  erc20Store,
-  functionsContract,
-  leaderboard,
-  loading,
-  provider,
-  userInputs,
-  web3Store,
-} from './store'
+import { ethers, Contract, BigNumber, utils, constants } from 'ethers'
 import { get } from 'svelte/store'
 import { abi as erc20ABI } from '$lib/abi/MyToken.json'
 import { abi as askMiAbi } from '$lib/abi/AskMi.json'
 import { abi as askMiFactoryAbi } from '$lib/abi/AskMiFactory.json'
-import { askMi } from './store'
 import { detectAccountsChanged, detectChainChanged } from './MetaMask'
 import type { AskMiFactory } from '$lib/abi-types/askmi-factory'
 import { getQuestionsSubset } from './loadExchanges'
 import type { AskMi } from '$lib/abi-types/askmi'
 import type { ERC20 } from '$lib/abi-types/erc20'
 import { getMyAskMi } from '$lib/abi-functions/askmi-factory'
+import {
+  askMi,
+  askMiFactory,
+  erc20,
+  functionsContract,
+  loading,
+  provider,
+} from '$lib/stores/other'
+import { web3Store } from '$lib/stores/web3'
+import { askMiStore } from '$lib/stores/askMi'
+import { userInputs } from '$lib/stores/userInputs'
+import { erc20Store } from '$lib/stores/erc20'
+import { leaderboard } from '$lib/stores/leaderboard'
 
 async function setupMetamask() {
   provider.set(new ethers.providers.Web3Provider(window.ethereum))
@@ -48,7 +48,7 @@ async function populateAskMiStore() {
   userInputs.tip(+utils.formatUnits(tip))
 }
 
-async function checkApproved() {
+export async function checkApproved() {
   const approvedAmount = await get(erc20).allowance(
     get(web3Store).signer,
     get(askMi).address
@@ -73,7 +73,7 @@ export async function approve() {
   )
 }
 
-async function populateErc20() {
+export async function populateErc20() {
   checkApproved()
   erc20Store.symbol(await get(erc20).symbol())
   erc20Store.decimals(await get(erc20).decimals())
@@ -83,11 +83,10 @@ async function populateErc20() {
 export async function setUpAskMi(
   functions: ImportMetaEnv[''],
   address: string,
-  _erc20: ImportMetaEnv[''],
   questioner?: string | null
 ) {
   // Check that the environment variables are loaded
-  if (typeof functions == 'string' && typeof _erc20 == 'string') {
+  if (typeof functions == 'string') {
     loading.set(true)
 
     await setupMetamask()
@@ -96,22 +95,25 @@ export async function setUpAskMi(
       new Contract(address, askMiAbi, get(provider).getSigner()) as AskMi
     )
 
-    erc20.set(
-      new Contract(_erc20, erc20ABI, get(provider).getSigner()) as ERC20
-    )
-
     // Detect account changes
     await populateAskMiStore()
 
-    detectAccountsChanged(checkApproved)
+    if (get(askMiStore)['_supportedTokens'][0] !== constants.AddressZero) {
+      erc20.set(
+        new Contract(
+          get(askMiStore)['_supportedTokens'][0],
+          erc20ABI,
+          get(provider).getSigner()
+        ) as ERC20
+      )
+      await populateErc20()
+      detectAccountsChanged(checkApproved)
+      await checkApproved()
+    }
 
     functionsContract.set(functions)
 
-    await checkApproved()
-
     await getQuestionsSubset(questioner)
-
-    await populateErc20()
 
     loading.set(false)
   } else {

@@ -5,7 +5,8 @@
   import Adjustments from '$lib/svg/Adjustments.svelte'
   import QuestionMark from '$lib/svg/QuestionMark.svelte'
   import Search from './Search.svelte'
-  import { askMiStore, web3Store } from '$lib/web3/store'
+  import { web3Store } from '$lib/stores/web3'
+  import { askMiStore } from '$lib/stores/askMi'
 
   let { isOwnerCheck } = askMiStore
 

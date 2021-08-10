@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { askMiStore, web3Store } from '$lib/web3/store'
+  import { askMiStore } from '$lib/stores/askMi'
+  import { web3Store } from '$lib/stores/web3'
 
   function content(arr: any[]) {
     if (!!arr) {

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { userInputs } from '$lib/web3/store'
+  import { userInputs } from '$lib/stores/userInputs'
 
-  let val = 0.01
+  let val = 1
   $: _ = userInputs.removalFee(Math.floor(val * 100))
 </script>
 
@@ -24,7 +24,6 @@
         min="0.01"
         max="100"
         class="flex-none text-xl font-bold text-right w-28 bg-transparent focus:outline-none rounded ring-1 ring-trueGray-700 transition focus:ring-trueGray-400"
-        placeholder="0"
       />
       <span class="text-sm font-semibold">%</span>
     </article>

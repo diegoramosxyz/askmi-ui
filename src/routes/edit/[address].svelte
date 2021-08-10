@@ -2,12 +2,6 @@
   import { page } from '$app/stores'
   import { onMount } from 'svelte'
   import { setUpAskMi } from '$lib/web3/tools'
-  import {
-    askMiStore,
-    tiersUpdated,
-    tipUpdated,
-    userInputs,
-  } from '$lib/web3/store'
   import TierCards from '$lib/components/TierCards.svelte'
   import TipCard from '$lib/components/TipCard.svelte'
   import Link from '$lib/svg/Link.svelte'
@@ -17,6 +11,9 @@
   import { updateTiers, updateTip } from '$lib/abi-functions/askmi'
   import SupportedTokensSelect from '$lib/components/SupportedTokensSelect.svelte'
   import { utils } from 'ethers'
+  import { userInputs } from '$lib/stores/userInputs'
+  import { askMiStore } from '$lib/stores/askMi'
+  import { tiersUpdated, tipUpdated } from '$lib/stores/other'
 
   // TODO: Create function to check valid Ethereum addresses
   onMount(async () => {
@@ -39,24 +36,20 @@
       await setUpAskMi(
         VITE_ROPSTEN_ASKMI_FUNCTIONS,
         $page.params.address,
-        VITE_ROPSTEN_CHAIN_ID,
-        VITE_ROPSTEN_ERC20
+        $page.query.get('questioner')
       )
     }
     if (_chainId === '0x13881') {
       await setUpAskMi(
         VITE_MUMBAI_ASKMI_FUNCTIONS,
         $page.params.address,
-        VITE_MUMBAI_CHAIN_ID,
-        VITE_MUMBAI_ERC20
+        $page.query.get('questioner')
       )
     }
     if (_chainId === '0x7a69') {
       await setUpAskMi(
         VITE_LOCALHOST_ASKMI_FUNCTIONS,
         $page.params.address,
-        VITE_LOCALHOST_CHAIN_ID,
-        VITE_LOCALHOST_ERC20,
         $page.query.get('questioner')
       )
     }

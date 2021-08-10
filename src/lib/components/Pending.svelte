@@ -1,6 +1,7 @@
 <script>
+  import { web3Store } from '$lib/stores/web3'
+
   import ExternalLink from '$lib/svg/ExternalLink.svelte'
-  import { web3Store } from '$lib/web3/store'
 </script>
 
 {#if !!$web3Store['pendingTx']}

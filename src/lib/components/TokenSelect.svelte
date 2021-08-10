@@ -1,6 +1,6 @@
 <script lang="ts">
+  import { userInputs } from '$lib/stores/userInputs'
   import ChebronDown from '$lib/svg/Chebron-Down.svelte'
-  import { userInputs } from '$lib/web3/store'
   export let tipOrTiers: 'tipToken' | 'tiersToken'
 
   let defaultTokens: { [key: string]: string } = {

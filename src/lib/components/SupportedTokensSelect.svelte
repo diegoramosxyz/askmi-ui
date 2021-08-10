@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { askMiStore } from '$lib/stores/askMi'
+
+  import { userInputs } from '$lib/stores/userInputs'
+
   import ChebronDown from '$lib/svg/Chebron-Down.svelte'
-  import { askMiStore, userInputs } from '$lib/web3/store'
   import { onMount } from 'svelte'
   import Blockie from './Blockie.svelte'
   export let withInput: boolean

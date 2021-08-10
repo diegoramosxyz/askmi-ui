@@ -1,13 +1,11 @@
 <script>
   import Banner from '$lib/components/Banner.svelte'
   import Navbar from '$lib/components/Navbar.svelte'
-  import {
-    askMiStore,
-    erc20Store,
-    functionsContract,
-    userInputs,
-    web3Store,
-  } from '$lib/web3/store'
+  import { askMiStore } from '$lib/stores/askMi'
+  import { erc20Store } from '$lib/stores/erc20'
+  import { functionsContract } from '$lib/stores/other'
+  import { userInputs } from '$lib/stores/userInputs'
+  import { web3Store } from '$lib/stores/web3'
   import '../app.postcss'
 </script>
 

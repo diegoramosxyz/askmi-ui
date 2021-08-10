@@ -1,0 +1,109 @@
+import type { Exchange, Fees, Tip } from '$lib/abi-types/askmi'
+import { BigNumber, constants } from 'ethers'
+import { writable } from 'svelte/store'
+
+const bigZero = BigNumber.from(0)
+
+type AskMiStore = {
+  address: string | null
+  _owner: string
+  _disabled: boolean
+  _tip: Tip
+  _fees: Fees
+  _questioners: string[]
+  _exchanges: {
+    [key: string]: Exchange[]
+  }
+  _supportedTokens: string[]
+  _tiers: {
+    [key: string]: BigNumber[]
+  }
+}
+
+type Web3Store = {
+  // provider: ethers.providers.Web3Provider
+  signer: string
+  chainId: string | null
+  pendingTx: string | null
+}
+
+function createAskMiStore() {
+  const { subscribe, update } = writable<AskMiStore>({
+    address: null,
+    _owner: '',
+    _disabled: false,
+    _tip: {
+      token: constants.AddressZero,
+      tip: bigZero,
+    },
+    _fees: {
+      removal: bigZero,
+      developer: bigZero,
+    },
+    _questioners: [],
+    _exchanges: {},
+    _supportedTokens: [],
+    _tiers: {},
+  })
+
+  return {
+    subscribe,
+    address: (address: AskMiStore['address']) =>
+      update((data) => ({ ...data, address })),
+    _owner: (_owner: AskMiStore['_owner']) =>
+      update((data) => ({ ...data, _owner })),
+    _disabled: (_disabled: AskMiStore['_disabled']) =>
+      update((data) => ({ ...data, _disabled })),
+    _tip: (_tip: AskMiStore['_tip']) => update((data) => ({ ...data, _tip })),
+    _fees: (_fees: AskMiStore['_fees']) =>
+      update((data) => ({ ...data, _fees })),
+    _questioners: (_questioners: AskMiStore['_questioners']) =>
+      update((data) => ({ ...data, _questioners })),
+    _exchanges: (_exchanges: AskMiStore['_exchanges']) =>
+      update((data) => ({ ...data, _exchanges })),
+    _supportedTokens: (_supportedTokens: AskMiStore['_supportedTokens']) =>
+      update((data) => ({ ...data, _supportedTokens })),
+    _tiers: (_tiers: AskMiStore['_tiers']) =>
+      update((data) => ({ ...data, _tiers })),
+    sliceQuestioners: (allQuestioners: string[]) =>
+      update((data) => ({
+        ...data,
+        _questioners: allQuestioners.slice(1).slice(-5),
+      })),
+    updateOneExchange: (questioner: string, exchanges: Exchange[]) =>
+      update((data) => ({
+        ...data,
+        _exchanges: {
+          ...data._exchanges,
+          [questioner]: exchanges,
+        },
+      })),
+    plusOneTips: (questioner: string, index: number) =>
+      update((data) => ({
+        ...data,
+        _exchanges: {
+          ...data._exchanges,
+          [questioner]: data._exchanges[questioner].splice(index, 1, {
+            ...data._exchanges[questioner][index],
+            tips: BigNumber.from(
+              data._exchanges[questioner][index].tips.toNumber() + 1
+            ),
+          }),
+        },
+      })),
+    removeOneExchange: (questioner: string, index: number) =>
+      update((data) => ({
+        ...data,
+        _exchanges: {
+          ...data._exchanges,
+          [questioner]: data._exchanges[questioner].splice(index, 1),
+        },
+      })),
+    isOwnerCheck: (signer: Web3Store['signer'], _owner: AskMiStore['_owner']) =>
+      !!signer && !!_owner && signer.toLowerCase() === _owner.toLowerCase(),
+    isQuestionerCheck: (questioner: string, signer: Web3Store['signer']) =>
+      questioner.toLowerCase() === signer.toLowerCase(),
+  }
+}
+
+export const askMiStore = createAskMiStore()

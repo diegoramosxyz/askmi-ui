@@ -6,14 +6,12 @@
   import Pending from './Pending.svelte'
   import InfoBubble from './InfoBubble.svelte'
   import { ask } from '$lib/abi-functions/askmi'
-  import {
-    askMiStore,
-    erc20Store,
-    userInputs,
-    web3Store,
-  } from '$lib/web3/store'
   import { constants, utils } from 'ethers'
   import SupportedTokensSelect from './SupportedTokensSelect.svelte'
+  import { askMiStore } from '$lib/stores/askMi'
+  import { web3Store } from '$lib/stores/web3'
+  import { userInputs } from '$lib/stores/userInputs'
+  import { erc20Store } from '$lib/stores/erc20'
 
   let { isOwnerCheck } = askMiStore
 
