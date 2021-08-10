@@ -1,10 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { setUpAskMiFactory } from '$lib/web3/tools'
   import Link from '$lib/svg/Link.svelte'
   import InstantiateAskMi from '$lib/components/InstantiateAskMi.svelte'
   import Leaderboard from '$lib/components/Leaderboard.svelte'
   import { askMiStore } from '$lib/stores/askMi'
+  import { setUpAskMiFactory } from '$lib/web3/initializers'
 
   onMount(async () => {
     let {
@@ -56,6 +56,7 @@
     </div>
   {:else}
     <a
+      rel="external"
       class="flex items-center gap-2 col-start-1 row-start-1 hover:underline"
       href={`/instance/${$askMiStore['address']}`}
       ><Link />

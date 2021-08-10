@@ -1,8 +1,7 @@
 <script lang="ts">
   import { askMiStore } from '$lib/stores/askMi'
-
+  import { erc20Store, populateErc20Store } from '$lib/stores/erc20'
   import { userInputs } from '$lib/stores/userInputs'
-
   import ChebronDown from '$lib/svg/Chebron-Down.svelte'
   import { onMount } from 'svelte'
   import Blockie from './Blockie.svelte'
@@ -16,7 +15,7 @@
 
   let knownTokens: { [key: string]: string } = {
     '0x0000000000000000000000000000000000000000': 'Ethereum',
-    '0x5FbDB2315678afecb367f032d93F642f64180aa3': 'Dai',
+    // '0x5FbDB2315678afecb367f032d93F642f64180aa3': 'Dai',
   }
 
   $: supportedTokens = Array.from(
@@ -49,7 +48,9 @@
         {knownTokens[$userInputs[tipOrTiers]]}
       </p>
     {:else}
-      <Blockie address={$userInputs[tipOrTiers]} />
+      <p class="select-none pl-2 mr-auto">
+        {$erc20Store['name']}
+      </p>
     {/if}
 
     <button
@@ -64,7 +65,7 @@
       >
         {#if withInput}
           <li
-            on:click={() => {
+            on:click={async () => {
               userInputs[tipOrTiers]('')
               menu = !menu
             }}
@@ -75,8 +76,9 @@
           {#each supportedTokens as token}
             <li
               class="select-none transition cursor-pointer px-2 py-0.5 hover:bg-trueGray-800"
-              on:click={() => {
+              on:click={async () => {
                 userInputs[tipOrTiers](token)
+                await populateErc20Store(token)
                 menu = !menu
               }}
             >
@@ -87,8 +89,9 @@
           {#each supportedTokens as token}
             <li
               class="select-none transition cursor-pointer px-2 py-0.5 hover:bg-trueGray-800"
-              on:click={() => {
+              on:click={async () => {
                 userInputs[tipOrTiers](token)
+                await populateErc20Store(token)
                 menu = !menu
               }}
             >

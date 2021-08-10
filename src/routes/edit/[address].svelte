@@ -1,7 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores'
   import { onMount } from 'svelte'
-  import { setUpAskMi } from '$lib/web3/tools'
   import TierCards from '$lib/components/TierCards.svelte'
   import TipCard from '$lib/components/TipCard.svelte'
   import Link from '$lib/svg/Link.svelte'
@@ -14,18 +13,13 @@
   import { userInputs } from '$lib/stores/userInputs'
   import { askMiStore } from '$lib/stores/askMi'
   import { tiersUpdated, tipUpdated } from '$lib/stores/other'
+  import { setUpAskMi } from '$lib/web3/initializers'
 
   // TODO: Create function to check valid Ethereum addresses
   onMount(async () => {
     let {
-      VITE_ROPSTEN_CHAIN_ID,
-      VITE_ROPSTEN_ERC20,
       VITE_ROPSTEN_ASKMI_FUNCTIONS,
-      VITE_MUMBAI_CHAIN_ID,
-      VITE_MUMBAI_ERC20,
       VITE_MUMBAI_ASKMI_FUNCTIONS,
-      VITE_LOCALHOST_CHAIN_ID,
-      VITE_LOCALHOST_ERC20,
       VITE_LOCALHOST_ASKMI_FUNCTIONS,
     } = import.meta.env
 

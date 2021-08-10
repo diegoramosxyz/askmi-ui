@@ -1,82 +1,26 @@
-import { ethers, Contract, BigNumber, utils, constants } from 'ethers'
+import { Contract, ethers, utils } from 'ethers'
 import { get } from 'svelte/store'
-import { abi as erc20ABI } from '$lib/abi/MyToken.json'
 import { abi as askMiAbi } from '$lib/abi/AskMi.json'
 import { abi as askMiFactoryAbi } from '$lib/abi/AskMiFactory.json'
-import { detectAccountsChanged, detectChainChanged } from './MetaMask'
+import { detectAccountsChanged } from './MetaMask'
 import type { AskMiFactory } from '$lib/abi-types/askmi-factory'
-import { getQuestionsSubset } from './loadExchanges'
 import type { AskMi } from '$lib/abi-types/askmi'
-import type { ERC20 } from '$lib/abi-types/erc20'
 import { getMyAskMi } from '$lib/abi-functions/askmi-factory'
 import {
-  askMi,
   askMiFactory,
-  erc20,
   functionsContract,
   loading,
   provider,
 } from '$lib/stores/other'
-import { web3Store } from '$lib/stores/web3'
-import { askMiStore } from '$lib/stores/askMi'
-import { userInputs } from '$lib/stores/userInputs'
-import { erc20Store } from '$lib/stores/erc20'
+import { populateWeb3Store } from '$lib/stores/web3'
+import { askMiStore, populateAskMiStore } from '$lib/stores/askMi'
+import { populateErc20Store } from '$lib/stores/erc20'
 import { leaderboard } from '$lib/stores/leaderboard'
+import { setAllowance, setBalanceOf } from '$lib/abi-functions/erc20'
 
-async function setupMetamask() {
-  provider.set(new ethers.providers.Web3Provider(window.ethereum))
-
-  const chainId = await window.ethereum.request({ method: 'eth_chainId' })
-  web3Store.chainId(chainId)
-
-  const accounts = await get(provider).listAccounts()
-  web3Store.signer(accounts[0])
-
-  await detectChainChanged()
-}
-
-async function populateAskMiStore() {
-  askMiStore._owner(await get(askMi)._owner())
-  askMiStore._supportedTokens(await get(askMi).supportedTokens())
-
-  let _token = get(askMiStore)._supportedTokens[0]
-  let _tiers = await get(askMi).getTiers(_token)
-  askMiStore._tiers({ [_token]: _tiers })
-
-  const [token, tip] = await get(askMi)._tip()
-  askMiStore._tip({ tip, token })
-  userInputs.tip(+utils.formatUnits(tip))
-}
-
-export async function checkApproved() {
-  const approvedAmount = await get(erc20).allowance(
-    get(web3Store).signer,
-    get(askMi).address
-  )
-
-  let tiers = get(askMiStore)._tiers[get(askMiStore)['_supportedTokens'][0]]
-
-  // Check that the amount approved is greater than
-  // the most expensive tier
-  erc20Store.approved(approvedAmount.gt(tiers[tiers.length - 1]))
-}
-
-export async function approve() {
-  const totalSupply = await get(erc20).totalSupply()
-  await get(erc20).approve(get(askMi).address, totalSupply)
-  // Approval(address owner, address spender, uint256 value)
-  get(erc20).once(
-    'Approval',
-    async (owner: string, spender: string, value: BigNumber) => {
-      erc20Store.approved(true)
-    }
-  )
-}
-
-export async function populateErc20() {
-  checkApproved()
-  erc20Store.symbol(await get(erc20).symbol())
-  erc20Store.decimals(await get(erc20).decimals())
+async function updateERC20() {
+  await setBalanceOf()
+  await setAllowance()
 }
 
 // Set up event listeners and load store with initial data
@@ -89,31 +33,21 @@ export async function setUpAskMi(
   if (typeof functions == 'string') {
     loading.set(true)
 
-    await setupMetamask()
+    provider.set(new ethers.providers.Web3Provider(window.ethereum))
 
-    askMi.set(
-      new Contract(address, askMiAbi, get(provider).getSigner()) as AskMi
-    )
+    await populateWeb3Store()
 
-    // Detect account changes
-    await populateAskMiStore()
+    await populateAskMiStore(address)
 
-    if (get(askMiStore)['_supportedTokens'][0] !== constants.AddressZero) {
-      erc20.set(
-        new Contract(
-          get(askMiStore)['_supportedTokens'][0],
-          erc20ABI,
-          get(provider).getSigner()
-        ) as ERC20
-      )
-      await populateErc20()
-      detectAccountsChanged(checkApproved)
-      await checkApproved()
-    }
+    let firstToken = get(askMiStore)['_supportedTokens'][0]
+
+    await populateErc20Store(firstToken)
+
+    detectAccountsChanged(updateERC20)
 
     functionsContract.set(functions)
 
-    await getQuestionsSubset(questioner)
+    // await getQuestionsSubset(questioner)
 
     loading.set(false)
   } else {
@@ -135,7 +69,9 @@ export async function setUpAskMiFactory(
   ) {
     loading.set(true)
 
-    await setupMetamask()
+    provider.set(new ethers.providers.Web3Provider(window.ethereum))
+
+    await populateWeb3Store()
 
     // Instantiate an AskMiFactory contract object
     askMiFactory.set(
@@ -146,17 +82,13 @@ export async function setUpAskMiFactory(
       ) as AskMiFactory
     )
 
-    erc20.set(
-      new Contract(_erc20, erc20ABI, get(provider).getSigner()) as ERC20
-    )
+    // Check if the current signer has created an AskMi contract
+    await getMyAskMi()
 
     // Detect account changes
     detectAccountsChanged(getMyAskMi)
 
     functionsContract.set(functions)
-
-    // Check if the current signer has created an AskMi contract
-    await getMyAskMi()
 
     // Get every AskMiInstantiated event emitted by the factory contract
     let events = await get(askMiFactory).queryFilter({

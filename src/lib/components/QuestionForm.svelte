@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { approve } from '$lib/web3/tools'
   import Button from '$lib/components/Button.svelte'
   import Plus from '$lib/svg/Plus.svelte'
   import Blockie from './Blockie.svelte'
   import Pending from './Pending.svelte'
   import InfoBubble from './InfoBubble.svelte'
-  import { ask } from '$lib/abi-functions/askmi'
+  import { approve, ask } from '$lib/abi-functions/askmi'
   import { constants, utils } from 'ethers'
   import SupportedTokensSelect from './SupportedTokensSelect.svelte'
   import { askMiStore } from '$lib/stores/askMi'
@@ -21,6 +20,7 @@
   $: tiers = $askMiStore['_tiers'][$askMiStore._supportedTokens[0]].map(
     (tier) => utils.formatUnits(tier, 18)
   )
+  $: approved = $erc20Store.allowance?.gt(0)
 </script>
 
 <!-- If the account is NOT the owner -->
@@ -67,14 +67,14 @@
     </div>
     <Pending>
       {#if $userInputs['tiersToken'] !== constants.AddressZero}
-        {#if $erc20Store['approved'] === true}
+        {#if approved === true}
           <Button
             click={async () =>
               await ask($askMiStore._supportedTokens[0], index)}
             color="lightBlue"><Plus /> Ask</Button
           >
         {/if}
-        {#if $erc20Store['approved'] === false}
+        {#if approved === false}
           <Button color="lime" click={() => approve()}
             >Approve spending {$erc20Store['symbol']}</Button
           >

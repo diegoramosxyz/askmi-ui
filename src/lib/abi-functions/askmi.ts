@@ -1,5 +1,6 @@
 import { askMiStore } from '$lib/stores/askMi'
-import { askMi, functionsContract } from '$lib/stores/other'
+import { erc20Store } from '$lib/stores/erc20'
+import { askMi, erc20, functionsContract } from '$lib/stores/other'
 import { userInputs } from '$lib/stores/userInputs'
 import { web3Store } from '$lib/stores/web3'
 import { getBytes32FromMultiash } from '$lib/utils/cid'
@@ -132,6 +133,18 @@ export async function issueTip(questioner: string, exchangeIndex: BigNumber) {
 
   web3Store.pendingTx(null)
   await getQuestionsSubset()
+}
+
+export async function approve() {
+  const totalSupply = await get(erc20).totalSupply()
+  await get(erc20).approve(get(web3Store)['signer'], totalSupply)
+
+  get(erc20).once(
+    'Approval',
+    async (owner: string, spender: string, value: BigNumber) => {
+      erc20Store.setAllowance(await get(erc20).allowance(owner, spender))
+    }
+  )
 }
 
 export async function updateTiers(token: string) {

@@ -97,7 +97,7 @@ export interface AskMi extends Contract {
   _disabled(): Promise<boolean>
   _fees(): Promise<Fees>
   _owner(): Promise<string>
-  _tip(): Promise<[string, BigNumber]>
+  _tip(): Promise<[token: string, tip: BigNumber]>
   getTiers(token: string): Promise<BigNumber[]>
   questioners(): Promise<string[]>
   questions(_questioner: string): Promise<Exchange[]>

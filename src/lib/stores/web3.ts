@@ -1,23 +1,22 @@
-import { writable } from 'svelte/store'
+import { get, writable } from 'svelte/store'
+import { provider } from './other'
 
 export type Web3Store = {
-  // provider: ethers.providers.Web3Provider
   signer: string
   chainId: string | null
   pendingTx: string | null
 }
 
 function createWeb3Store() {
-  const { subscribe, update } = writable<Web3Store>({
+  const { subscribe, update, set } = writable<Web3Store>({
     signer: '',
-    chainId: '',
-    pendingTx: '',
+    chainId: null,
+    pendingTx: null,
   })
 
   return {
     subscribe,
-    // provider: (provider: Web3Store['provider']) =>
-    //   update((inputs) => ({ ...inputs, provider })),
+    set,
     signer: (signer: Web3Store['signer']) =>
       update((inputs) => ({ ...inputs, signer })),
     chainId: (chainId: Web3Store['chainId']) =>
@@ -28,3 +27,13 @@ function createWeb3Store() {
 }
 
 export const web3Store = createWeb3Store()
+
+export async function populateWeb3Store() {
+  let data: Web3Store = {
+    signer: (await get(provider).listAccounts())[0],
+    chainId: await window.ethereum.request({ method: 'eth_chainId' }),
+    pendingTx: null,
+  }
+
+  web3Store.set(data)
+}

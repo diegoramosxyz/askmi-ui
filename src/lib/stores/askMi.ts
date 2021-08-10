@@ -1,10 +1,12 @@
-import type { Exchange, Fees, Tip } from '$lib/abi-types/askmi'
-import { BigNumber, constants } from 'ethers'
-import { writable } from 'svelte/store'
+import type { AskMi, Exchange, Fees, Tip } from '$lib/abi-types/askmi'
+import { BigNumber, constants, Contract } from 'ethers'
+import { get, writable } from 'svelte/store'
+import { abi as askMiAbi } from '$lib/abi/AskMi.json'
+import { askMi, provider } from './other'
 
 const bigZero = BigNumber.from(0)
 
-type AskMiStore = {
+export type AskMiStore = {
   address: string | null
   _owner: string
   _disabled: boolean
@@ -28,7 +30,7 @@ type Web3Store = {
 }
 
 function createAskMiStore() {
-  const { subscribe, update } = writable<AskMiStore>({
+  const { subscribe, update, set } = writable<AskMiStore>({
     address: null,
     _owner: '',
     _disabled: false,
@@ -48,6 +50,7 @@ function createAskMiStore() {
 
   return {
     subscribe,
+    set,
     address: (address: AskMiStore['address']) =>
       update((data) => ({ ...data, address })),
     _owner: (_owner: AskMiStore['_owner']) =>
@@ -107,3 +110,45 @@ function createAskMiStore() {
 }
 
 export const askMiStore = createAskMiStore()
+
+export async function populateAskMiStore(contractAddress: string) {
+  askMi.set(
+    new Contract(contractAddress, askMiAbi, get(provider).getSigner()) as AskMi
+  )
+
+  let tip = await get(askMi)._tip()
+
+  let questioners = await get(askMi).questioners()
+  // Remove the first questioner which is used for lookups
+  let exchanges: AskMiStore['_exchanges'] = {}
+  questioners.forEach(async (questioner) => {
+    exchanges = {
+      ...exchanges,
+      [questioner]: await get(askMi).questions(questioner),
+    }
+  })
+
+  let supportedTokens = await get(askMi).supportedTokens()
+  let tiers: AskMiStore['_tiers'] = {}
+  supportedTokens.forEach(async (token) => {
+    tiers = {
+      ...tiers,
+      [token]: await get(askMi).getTiers(token),
+    }
+  })
+
+  askMiStore.set({
+    address: get(askMi).address,
+    _owner: await get(askMi)._owner(),
+    _disabled: await get(askMi)._disabled(),
+    _tip: {
+      token: tip[0],
+      tip: tip[1],
+    },
+    _fees: await get(askMi)._fees(),
+    _questioners: questioners,
+    _exchanges: exchanges,
+    _supportedTokens: supportedTokens,
+    _tiers: tiers,
+  })
+}
