@@ -99,7 +99,7 @@
       {/if}
       <TierCards>
         <div slot="selector">
-          <SupportedTokensSelect withInput={true} tipOrTiers={'tiersToken'} />
+          <SupportedTokensSelect tipOrTiers={'tiersToken'} />
         </div>
       </TierCards>
       <Button click={() => updateTiers($userInputs['tiersToken'])} color="lime"
@@ -118,7 +118,7 @@
       {/if}
       <TipCard>
         <div slot="selector">
-          <SupportedTokensSelect withInput={true} tipOrTiers={'tipToken'} />
+          <SupportedTokensSelect tipOrTiers={'tipToken'} />
         </div>
       </TipCard>
       <Button click={() => updateTip($userInputs['tiersToken'])} color="lime"

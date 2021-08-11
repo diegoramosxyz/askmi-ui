@@ -18,3 +18,4 @@ export const functionsContract: Writable<string> = writable()
 
 // Other
 export const provider: Writable<ethers.providers.Web3Provider> = writable()
+export const tiersTokenNames: Writable<{ [key: string]: string }> = writable({})

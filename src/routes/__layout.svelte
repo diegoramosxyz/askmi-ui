@@ -14,10 +14,6 @@
   <Navbar />
   <slot />
 </main>
-<p>askMiStore</p>
-<pre>
-  {JSON.stringify($askMiStore, null, 2)}
-</pre>
 <p>web3Store</p>
 <pre>
   {JSON.stringify($web3Store, null, 2)}
@@ -32,4 +28,8 @@
 <p>erc20Store</p>
 <pre>
   {JSON.stringify($erc20Store, null, 2)}
+</pre>
+<p>askMiStore</p>
+<pre>
+  {JSON.stringify($askMiStore, null, 2)}
 </pre>

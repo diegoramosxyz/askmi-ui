@@ -1,7 +1,6 @@
 <script lang="ts">
   import { erc20Store } from '$lib/stores/erc20'
   import { userInputs } from '$lib/stores/userInputs'
-  import TokenSelect from './TokenSelect.svelte'
 </script>
 
 <section class="grid place-items-center">

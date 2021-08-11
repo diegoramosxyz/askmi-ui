@@ -86,7 +86,7 @@ function createAskMiStore() {
         ...data,
         _exchanges: {
           ...data._exchanges,
-          [questioner]: data._exchanges[questioner].splice(index, 1, {
+          [questioner]: [...data._exchanges[questioner]].splice(index, 1, {
             ...data._exchanges[questioner][index],
             tips: BigNumber.from(
               data._exchanges[questioner][index].tips.toNumber() + 1
@@ -118,23 +118,18 @@ export async function populateAskMiStore(contractAddress: string) {
 
   let tip = await get(askMi)._tip()
 
-  let questioners = await get(askMi).questioners()
+  let questioners = [...(await get(askMi).questioners())]
+  questioners.splice(0, 1)
   // Remove the first questioner which is used for lookups
   let exchanges: AskMiStore['_exchanges'] = {}
   questioners.forEach(async (questioner) => {
-    exchanges = {
-      ...exchanges,
-      [questioner]: await get(askMi).questions(questioner),
-    }
+    exchanges[questioner] = await get(askMi).questions(questioner)
   })
 
   let supportedTokens = await get(askMi).supportedTokens()
   let tiers: AskMiStore['_tiers'] = {}
   supportedTokens.forEach(async (token) => {
-    tiers = {
-      ...tiers,
-      [token]: await get(askMi).getTiers(token),
-    }
+    tiers[token] = await get(askMi).getTiers(token)
   })
 
   askMiStore.set({

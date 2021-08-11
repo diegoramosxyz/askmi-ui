@@ -4,21 +4,22 @@
   import Blockie from './Blockie.svelte'
   import Pending from './Pending.svelte'
   import InfoBubble from './InfoBubble.svelte'
-  import { approve, ask } from '$lib/abi-functions/askmi'
+  import { ask } from '$lib/abi-functions/askmi'
   import { constants, utils } from 'ethers'
-  import SupportedTokensSelect from './SupportedTokensSelect.svelte'
   import { askMiStore } from '$lib/stores/askMi'
   import { web3Store } from '$lib/stores/web3'
   import { userInputs } from '$lib/stores/userInputs'
   import { erc20Store } from '$lib/stores/erc20'
+  import { approve } from '$lib/abi-functions/erc20'
+  import TiersTokensSelect from './TiersTokensSelect.svelte'
 
   let { isOwnerCheck } = askMiStore
 
   let index: number = 0
 
   $: isOwner = isOwnerCheck($web3Store['signer'], $askMiStore['_owner'])
-  $: tiers = $askMiStore['_tiers'][$askMiStore._supportedTokens[0]].map(
-    (tier) => utils.formatUnits(tier, 18)
+  $: tiers = $askMiStore['_tiers'][$userInputs['tiersToken']].map((tier) =>
+    utils.formatUnits(tier, 18)
   )
   $: approved = $erc20Store.allowance?.gt(0)
 </script>
@@ -41,7 +42,7 @@
     />
     <div class="flex justify-between">
       <h1 class="font-bold text-lg mb-2">Tiers <InfoBubble /></h1>
-      <SupportedTokensSelect withInput={false} tipOrTiers={'tiersToken'} />
+      <TiersTokensSelect />
     </div>
     <div class="flex justify-around mb-4">
       {#each tiers as tier, i}
@@ -69,8 +70,7 @@
       {#if $userInputs['tiersToken'] !== constants.AddressZero}
         {#if approved === true}
           <Button
-            click={async () =>
-              await ask($askMiStore._supportedTokens[0], index)}
+            click={async () => await ask($userInputs['tiersToken'], index)}
             color="lightBlue"><Plus /> Ask</Button
           >
         {/if}
@@ -81,7 +81,7 @@
         {/if}
       {:else}
         <Button
-          click={async () => await ask($askMiStore._supportedTokens[0], index)}
+          click={async () => await ask($userInputs['tiersToken'], index)}
           color="lightBlue"><Plus /> Ask</Button
         >
       {/if}
