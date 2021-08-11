@@ -23,10 +23,16 @@ export async function approve() {
   get(erc20).once(
     'Approval',
     async (owner: string, spender: string, value: BigNumber) => {
-      console.log(owner, spender, value.toString())
       erc20Store.setAllowance(value)
     }
   )
+}
+
+async function asyncForEach<T>(
+  array: T[],
+  callback: (item: T, index: number, allItems: T[]) => void
+) {
+  await Promise.all(array.map(callback))
 }
 
 export async function getTokenNames() {
@@ -34,7 +40,7 @@ export async function getTokenNames() {
 
   let tokenNames: { [key: string]: string } = {}
 
-  supportedTokens.forEach(async (token) => {
+  await asyncForEach(supportedTokens, async (token) => {
     if (token === constants.AddressZero) {
       tokenNames[token] = 'Ethereum'
     } else {
@@ -57,7 +63,7 @@ export async function getTokenNamesWithTipToken() {
   let tokenNames: { [key: string]: string } = {}
   let tokens = Array.from(new Set([...supportedTokens, token]))
 
-  tokens.forEach(async (token) => {
+  await asyncForEach(tokens, async (token) => {
     if (token === constants.AddressZero) {
       tokenNames[token] = 'Ethereum'
     } else {

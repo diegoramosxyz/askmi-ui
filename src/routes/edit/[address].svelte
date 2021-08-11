@@ -7,13 +7,19 @@
   import Button from '$lib/components/Button.svelte'
   import Cog from '$lib/svg/Cog.svelte'
   import Loading from '$lib/components/Loading.svelte'
-  import { updateTiers, updateTip } from '$lib/abi-functions/askmi'
+  import {
+    updateRemovalFee,
+    updateTiers,
+    updateTip,
+  } from '$lib/abi-functions/askmi'
   import SupportedTokensSelect from '$lib/components/SupportedTokensSelect.svelte'
   import { utils } from 'ethers'
   import { userInputs } from '$lib/stores/userInputs'
   import { askMiStore } from '$lib/stores/askMi'
-  import { tiersUpdated, tipUpdated } from '$lib/stores/other'
+  import { tiersTokenNames, tiersUpdated, tipUpdated } from '$lib/stores/other'
   import { setUpAskMi } from '$lib/web3/initializers'
+  import { getTokenNamesWithTipToken } from '$lib/abi-functions/erc20'
+  import RemovalFee from '$lib/components/RemovalFee.svelte'
 
   // TODO: Create function to check valid Ethereum addresses
   onMount(async () => {
@@ -46,6 +52,8 @@
         $page.params.address,
         $page.query.get('questioner')
       )
+
+      tiersTokenNames.set(await getTokenNamesWithTipToken())
     }
 
     userInputs.tiers(
@@ -123,6 +131,14 @@
       </TipCard>
       <Button click={() => updateTip($userInputs['tiersToken'])} color="lime"
         ><Cog />Update Tip</Button
+      >
+    </div>
+    <div
+      class="grid gap-4 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
+    >
+      <RemovalFee />
+      <Button click={() => updateRemovalFee()} color="lime"
+        ><Cog />Update Removal Fee</Button
       >
     </div>
   </div>

@@ -11,7 +11,7 @@
   } from '$lib/utils/cid'
   import { page } from '$app/stores'
   import { askMiStore } from '$lib/stores/askMi'
-  import { erc20Store } from '$lib/stores/erc20'
+  import { tiersTokenNames } from '$lib/stores/other'
 </script>
 
 <section class="mb-3 max-w-prose mx-auto">
@@ -44,7 +44,7 @@
                   {#if token === constants.AddressZero}
                     ETH
                   {:else}
-                    {$erc20Store['symbol']}
+                    {$tiersTokenNames[token]}
                   {/if}
                 </span>
               </p>

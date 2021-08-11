@@ -5,6 +5,8 @@
   import QuestionForm from '$lib/components/QuestionForm.svelte'
   import Loading from '$lib/components/Loading.svelte'
   import { setUpAskMi } from '$lib/web3/initializers'
+  import { tiersTokenNames } from '$lib/stores/other'
+  import { getTokenNames } from '$lib/abi-functions/erc20'
   // import QuestionersExport from '$lib/components/QuestionersExport.svelte'
 
   // TODO: Create function to check valid Ethereum addresses
@@ -39,6 +41,8 @@
         $page.query.get('questioner')
       )
     }
+
+    tiersTokenNames.set(await getTokenNames())
   })
 </script>
 

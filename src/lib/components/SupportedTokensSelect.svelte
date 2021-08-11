@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { getTokenNamesWithTipToken } from '$lib/abi-functions/erc20'
   import { askMiStore } from '$lib/stores/askMi'
   import { populateErc20Store } from '$lib/stores/erc20'
   import { tiersTokenNames } from '$lib/stores/other'
@@ -9,8 +8,6 @@
   export let tipOrTiers: 'tipToken' | 'tiersToken'
 
   onMount(async () => {
-    tiersTokenNames.set(await getTokenNamesWithTipToken())
-    console.log(await getTokenNamesWithTipToken())
     userInputs.tiersToken($askMiStore['_supportedTokens'][0])
     userInputs.tipToken($askMiStore['_tip']['token'])
   })

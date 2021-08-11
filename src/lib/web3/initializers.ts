@@ -14,7 +14,7 @@ import {
 } from '$lib/stores/other'
 import { populateWeb3Store } from '$lib/stores/web3'
 import { askMiStore, populateAskMiStore } from '$lib/stores/askMi'
-import { erc20Store, populateErc20Store } from '$lib/stores/erc20'
+import { populateErc20Store } from '$lib/stores/erc20'
 import { leaderboard } from '$lib/stores/leaderboard'
 import { setAllowance, setBalanceOf } from '$lib/abi-functions/erc20'
 
