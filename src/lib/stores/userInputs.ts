@@ -1,5 +1,6 @@
 import { BigNumber, constants, utils } from 'ethers'
-import { writable } from 'svelte/store'
+import { get, writable } from 'svelte/store'
+import { askMiStore } from './askMi'
 
 const bigZero = BigNumber.from(0)
 
@@ -55,3 +56,14 @@ function createUserInputs() {
 }
 
 export const userInputs = createUserInputs()
+
+export async function populateUserInputs() {
+  userInputs.set({
+    tiersToken: get(askMiStore)['_supportedTokens'][0],
+    tiers: { slow: 0, medium: 0, fast: 0 },
+    tipToken: get(askMiStore)['_tip']['token'],
+    tip: 0,
+    textArea: '',
+    removalFee: 0,
+  })
+}

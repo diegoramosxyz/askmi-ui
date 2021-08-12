@@ -17,6 +17,7 @@ import { askMiStore, populateAskMiStore } from '$lib/stores/askMi'
 import { populateErc20Store } from '$lib/stores/erc20'
 import { leaderboard } from '$lib/stores/leaderboard'
 import { setAllowance, setBalanceOf } from '$lib/abi-functions/erc20'
+import { populateUserInputs } from '$lib/stores/userInputs'
 
 async function updateERC20() {
   await setBalanceOf()
@@ -42,6 +43,8 @@ export async function setUpAskMi(
     let firstToken = get(askMiStore)['_supportedTokens'][0]
 
     await populateErc20Store(firstToken)
+
+    await populateUserInputs()
 
     detectAccountsChanged(updateERC20)
 

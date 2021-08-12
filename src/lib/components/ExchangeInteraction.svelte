@@ -14,7 +14,7 @@
   export let tips: BigNumber
 
   $: isOwner = isOwnerCheck($web3Store['signer'], $askMiStore['_owner'])
-  $: isQuestioner = isQuestionerCheck('test', $web3Store['signer'])
+  $: isQuestioner = isQuestionerCheck(questioner, $web3Store['signer'])
 </script>
 
 <section class="flex gap-2 justify-end">

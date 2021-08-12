@@ -99,7 +99,7 @@ function createAskMiStore() {
         ...data,
         _exchanges: {
           ...data._exchanges,
-          [questioner]: data._exchanges[questioner].splice(index, 1),
+          [questioner]: [...data._exchanges[questioner]].splice(index, 1),
         },
       })),
     isOwnerCheck: (signer: Web3Store['signer'], _owner: AskMiStore['_owner']) =>
