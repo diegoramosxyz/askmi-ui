@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getTokenNames } from '$lib/abi-functions/erc20'
+
   import { askMiStore } from '$lib/stores/askMi'
   import { populateErc20Store } from '$lib/stores/erc20'
   import { tiersTokenNames } from '$lib/stores/other'
@@ -9,8 +11,9 @@
   onMount(async () => {
     userInputs.tiersToken($askMiStore['_supportedTokens'][0])
     userInputs.tipToken($askMiStore['_tip']['token'])
-  })
 
+    tiersTokenNames.set(await getTokenNames())
+  })
   let menu: boolean = false
 </script>
 

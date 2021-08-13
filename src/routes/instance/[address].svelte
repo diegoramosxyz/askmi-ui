@@ -41,8 +41,6 @@
         $page.query.get('questioner')
       )
     }
-
-    tiersTokenNames.set(await getTokenNames())
   })
 </script>
 
