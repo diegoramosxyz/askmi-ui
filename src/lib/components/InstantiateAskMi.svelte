@@ -34,17 +34,15 @@
   </TipCard>
   <RemovalFee />
   <p>Developer fee: <span class="font-mono">0.5%</span> of rewards.</p>
-  <Pending>
-    <Button
-      click={() =>
-        instantiateAskMi(
-          $userInputs['tiersToken'],
-          $userInputs['tipToken'],
-          tiers,
-          tip,
-          removalFee
-        )}
-      color={'lime'}><Terminal />Deploy AskMi contract</Button
-    >
-  </Pending>
+  <Button
+    click={() =>
+      instantiateAskMi(
+        $userInputs['tiersToken'],
+        $userInputs['tipToken'],
+        tiers,
+        tip,
+        removalFee
+      )}
+    color={'lime'}><Terminal />Deploy AskMi contract</Button
+  >
 </div>

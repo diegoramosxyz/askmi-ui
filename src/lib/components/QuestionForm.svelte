@@ -66,25 +66,23 @@
         </article>
       {/each}
     </div>
-    <Pending>
-      {#if $userInputs['tiersToken'] !== constants.AddressZero}
-        {#if approved === true}
-          <Button
-            click={async () => await ask($userInputs['tiersToken'], index)}
-            color="lightBlue"><Plus /> Ask</Button
-          >
-        {/if}
-        {#if approved === false}
-          <Button color="lime" click={() => approve()}
-            >Approve spending {$erc20Store['symbol']}</Button
-          >
-        {/if}
-      {:else}
+    {#if $userInputs['tiersToken'] !== constants.AddressZero}
+      {#if approved === true}
         <Button
           click={async () => await ask($userInputs['tiersToken'], index)}
           color="lightBlue"><Plus /> Ask</Button
         >
       {/if}
-    </Pending>
+      {#if approved === false}
+        <Button color="lime" click={() => approve()}
+          >Approve spending {$erc20Store['symbol']}</Button
+        >
+      {/if}
+    {:else}
+      <Button
+        click={async () => await ask($userInputs['tiersToken'], index)}
+        color="lightBlue"><Plus /> Ask</Button
+      >
+    {/if}
   </div>
 {/if}
