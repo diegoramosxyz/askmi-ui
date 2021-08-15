@@ -22,20 +22,21 @@
     {/if}
   </header>
   {#if Object.keys($askMiStore['_exchanges']).length > 0 && $askMiStore['_questioners'].length > 0}
-    {#each $askMiStore['_questioners'] as questioner}
+    {#each $askMiStore['_questioners'] as questioner (questioner)}
       <section class="grid justify-start mb-3">
         <a
-          href={`${$page.path}?questioner=${questioner}`}
+          href="{$page.path}?questioner={questioner}"
           class="no-underline hover:ring-1 ring-trueGray-700 rounded transition p-1.5 flex gap-2"
         >
           <Blockie address={questioner} />
         </a>
       </section>
       <div class="grid gap-5 mb-6">
-        {#each [...$askMiStore['_exchanges'][questioner]].reverse() as { answer, question, index, balance, tips, token }}
+        {#each [...$askMiStore['_exchanges'][questioner]].reverse() as { answer, question, index, balance, tips, token } (index.toString())}
           <article
             class="px-4 py-3 rounded max-w-prose ring-1 ring-trueGray-800"
           >
+            {index.toString()}
             {#if balance > ethers.BigNumber.from(0)}
               <p class="mb-2 flex gap-2 items-center">
                 <span

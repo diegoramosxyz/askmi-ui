@@ -21,7 +21,7 @@
               ><a
                 class="no-underline hover:underline"
                 rel="external"
-                href={`/instance/${contract}`}><Blockie address={owner} /></a
+                href="/instance/{contract}"><Blockie address={owner} /></a
               ></td
             >
           </tr>

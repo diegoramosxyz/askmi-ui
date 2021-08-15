@@ -19,14 +19,14 @@
 
 <section class="flex gap-2 justify-end">
   {#if digest === '' && (isQuestioner || isOwner)}
-    <Button color="red" click={() => remove(questioner, exchangeIndex)}
+    <Button color="red" on:click={() => remove(questioner, exchangeIndex)}
       ><Trash /> Remove</Button
     >
   {/if}
   {#if digest !== '' && !isOwner}
     <Button
       color="lime"
-      click={async () => await issueTip(questioner, exchangeIndex)}
+      on:click={async () => await issueTip(questioner, exchangeIndex)}
       ><DollarSign />Tips: {tips.toNumber()}</Button
     >
   {/if}

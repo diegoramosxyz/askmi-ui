@@ -16,7 +16,7 @@
   import { utils } from 'ethers'
   import { userInputs } from '$lib/stores/userInputs'
   import { askMiStore } from '$lib/stores/askMi'
-  import { tiersTokenNames, tiersUpdated, tipUpdated } from '$lib/stores/other'
+  import { tiersTokenNames } from '$lib/stores/other'
   import { setUpAskMi } from '$lib/web3/initializers'
   import { getTokenNamesWithTipToken } from '$lib/abi-functions/erc20'
   import RemovalFee from '$lib/components/RemovalFee.svelte'
@@ -74,9 +74,6 @@
         18
       )
     )
-
-    tiersUpdated.set(false)
-    tipUpdated.set(false)
   })
 </script>
 
@@ -87,7 +84,7 @@
 <Loading>
   <a
     class="flex items-center gap-2 col-start-1 row-start-1 hover:underline"
-    href={`/instance/${$page.params.address}`}
+    href="/instance/{$page.params.address}"
     ><Link />
     <p>Go to your AskMi instance</p>
   </a>
@@ -98,38 +95,25 @@
     <div
       class="grid gap-4 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
     >
-      {#if $tiersUpdated === true}
-        <p
-          class="px-2 py-0.5 rounded font-bold bg-trueGray-300 text-trueGray-900"
-        >
-          Tiers will update soon!
-        </p>
-      {/if}
       <TierCards>
         <div slot="selector">
           <SupportedTokensSelect tipOrTiers={'tiersToken'} />
         </div>
       </TierCards>
-      <Button click={() => updateTiers($userInputs['tiersToken'])} color="lime"
-        ><Cog />Update Tiers</Button
+      <Button
+        on:click={() => updateTiers($userInputs['tiersToken'])}
+        color="lime"><Cog />Update Tiers</Button
       >
     </div>
     <div
       class="grid gap-4 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
     >
-      {#if $tipUpdated === true}
-        <p
-          class="px-2 py-0.5 rounded font-bold bg-trueGray-300 text-trueGray-900"
-        >
-          The tip cost will update soon!
-        </p>
-      {/if}
       <TipCard>
         <div slot="selector">
           <SupportedTokensSelect tipOrTiers={'tipToken'} />
         </div>
       </TipCard>
-      <Button click={() => updateTip($userInputs['tiersToken'])} color="lime"
+      <Button on:click={() => updateTip($userInputs['tiersToken'])} color="lime"
         ><Cog />Update Tip</Button
       >
     </div>
@@ -137,7 +121,7 @@
       class="grid gap-4 place-items-center px-5 py-3 rounded ring-1 ring-trueGray-800"
     >
       <RemovalFee />
-      <Button click={() => updateRemovalFee()} color="lime"
+      <Button on:click={() => updateRemovalFee()} color="lime"
         ><Cog />Update Removal Fee</Button
       >
     </div>

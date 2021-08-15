@@ -95,13 +95,12 @@ function createAskMiStore() {
         },
       })),
     removeOneExchange: (questioner: string, index: number) =>
-      update((data) => ({
-        ...data,
-        _exchanges: {
-          ...data._exchanges,
-          [questioner]: [...data._exchanges[questioner]].splice(index, 1),
-        },
-      })),
+      update((data) => {
+        let exchanges = [...data._exchanges[questioner]]
+        exchanges.splice(index, 1)
+        data._exchanges[questioner] = exchanges
+        return data
+      }),
     isOwnerCheck: (signer: Web3Store['signer'], _owner: AskMiStore['_owner']) =>
       !!signer && !!_owner && signer.toLowerCase() === _owner.toLowerCase(),
     isQuestionerCheck: (questioner: string, signer: Web3Store['signer']) =>

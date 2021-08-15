@@ -7,8 +7,6 @@ import { Writable, writable } from 'svelte/store'
 // UI
 export const loading: Writable<boolean> = writable()
 export const search: Writable<string> = writable('')
-export const tipUpdated: Writable<boolean> = writable()
-export const tiersUpdated: Writable<boolean> = writable()
 
 // Contracts
 export const askMi: Writable<AskMi> = writable()

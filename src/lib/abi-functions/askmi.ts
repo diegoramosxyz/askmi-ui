@@ -7,9 +7,9 @@ import { getQuestionsSubset } from '$lib/web3/loadExchanges'
 import { BigNumber, constants, ContractTransaction } from 'ethers'
 import { get } from 'svelte/store'
 
-export async function fetchTextToIPFS() {
+export async function fetchTextToIPFS(text: string) {
   const formData = new FormData()
-  formData.append('question', get(userInputs).textArea)
+  formData.append('question', text)
 
   const res = await fetch('https://ipfs.infura.io:5001/api/v0/add', {
     method: 'POST',
@@ -19,8 +19,8 @@ export async function fetchTextToIPFS() {
   return Hash
 }
 
-export async function ask(token: string, index: number) {
-  const cid = await fetchTextToIPFS()
+export async function ask(text: string, token: string, index: number) {
+  const cid = await fetchTextToIPFS(text)
   // Conver CID into a multihash object
   let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
   // Call the ask function
@@ -58,8 +58,12 @@ export async function ask(token: string, index: number) {
   web3Store.pendingTx(null)
 }
 
-export async function respond(questioner: string, qIndex: BigNumber) {
-  const cid = await fetchTextToIPFS()
+export async function respond(
+  text: string,
+  questioner: string,
+  qIndex: BigNumber
+) {
+  const cid = await fetchTextToIPFS(text)
   // Conver CID into a multihash object
   let { digest, hashFunction, size } = getBytes32FromMultiash(cid)
   // Call the ask function

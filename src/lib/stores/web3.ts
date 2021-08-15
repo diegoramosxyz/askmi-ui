@@ -34,6 +34,5 @@ export async function populateWeb3Store() {
     chainId: await window.ethereum.request({ method: 'eth_chainId' }),
     pendingTx: null,
   }
-
   web3Store.set(data)
 }

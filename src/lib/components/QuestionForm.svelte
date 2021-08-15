@@ -16,6 +16,7 @@
   let { isOwnerCheck } = askMiStore
 
   let index: number = 0
+  let value = ''
 
   $: isOwner = isOwnerCheck($web3Store['signer'], $askMiStore['_owner'])
   $: tiers = $askMiStore['_tiers'][$userInputs['tiersToken']].map((tier) =>
@@ -34,7 +35,7 @@
     </p>
     <textarea
       disabled={!!$web3Store['pendingTx']}
-      bind:value={$userInputs['textArea']}
+      bind:value
       cols="40"
       rows="4"
       class="disabled:opacity-50 disabled:cursor-not-allowed mb-3 px-3 py-2 bg-transparent ring-1 transition focus:outline-none ring-trueGray-700 focus:ring-trueGray-500 rounded resize-y"
@@ -69,18 +70,20 @@
     {#if $userInputs['tiersToken'] !== constants.AddressZero}
       {#if approved === true}
         <Button
-          click={async () => await ask($userInputs['tiersToken'], index)}
+          on:click={async () =>
+            await ask(value, $userInputs['tiersToken'], index)}
           color="lightBlue"><Plus /> Ask</Button
         >
       {/if}
       {#if approved === false}
-        <Button color="lime" click={() => approve()}
+        <Button color="lime" on:click={() => approve()}
           >Approve spending {$erc20Store['symbol']}</Button
         >
       {/if}
     {:else}
       <Button
-        click={async () => await ask($userInputs['tiersToken'], index)}
+        on:click={async () =>
+          await ask(value, $userInputs['tiersToken'], index)}
         color="lightBlue"><Plus /> Ask</Button
       >
     {/if}

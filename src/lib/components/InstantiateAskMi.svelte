@@ -35,7 +35,7 @@
   <RemovalFee />
   <p>Developer fee: <span class="font-mono">0.5%</span> of rewards.</p>
   <Button
-    click={() =>
+    on:click={() =>
       instantiateAskMi(
         $userInputs['tiersToken'],
         $userInputs['tipToken'],

@@ -10,7 +10,7 @@
   >
     <a
       class="text-center flex items-center gap-2"
-      href={`https://ropsten.etherscan.io/tx/${$web3Store['pendingTx']}`}
+      href="https://ropsten.etherscan.io/tx/{$web3Store['pendingTx']}"
       target="_blank"
       rel="noreferrer noopener">Pending Transaction <ExternalLink /></a
     >

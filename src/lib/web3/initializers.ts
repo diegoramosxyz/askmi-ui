@@ -18,6 +18,7 @@ import { populateErc20Store } from '$lib/stores/erc20'
 import { leaderboard } from '$lib/stores/leaderboard'
 import { setAllowance, setBalanceOf } from '$lib/abi-functions/erc20'
 import { populateUserInputs } from '$lib/stores/userInputs'
+import Web3Modal from 'web3modal'
 
 async function updateERC20() {
   await setBalanceOf()
@@ -34,7 +35,9 @@ export async function setUpAskMi(
   if (typeof functions == 'string') {
     loading.set(true)
 
-    provider.set(new ethers.providers.Web3Provider(window.ethereum))
+    const web3Modal = new Web3Modal()
+    const connection = await web3Modal.connect()
+    provider.set(new ethers.providers.Web3Provider(connection))
 
     await populateWeb3Store()
 
@@ -72,7 +75,9 @@ export async function setUpAskMiFactory(
   ) {
     loading.set(true)
 
-    provider.set(new ethers.providers.Web3Provider(window.ethereum))
+    const web3Modal = new Web3Modal()
+    const connection = await web3Modal.connect()
+    provider.set(new ethers.providers.Web3Provider(connection))
 
     await populateWeb3Store()
 
@@ -94,10 +99,14 @@ export async function setUpAskMiFactory(
     functionsContract.set(functions)
 
     // Get every AskMiInstantiated event emitted by the factory contract
-    let events = await get(askMiFactory).queryFilter({
-      address,
-      topics: [utils.id('AskMiInstantiated(address)')],
-    })
+    let events = await get(askMiFactory).queryFilter(
+      {
+        address,
+        topics: [utils.id('AskMiInstantiated(address)')],
+      },
+      get(provider).blockNumber - 1000,
+      get(provider).blockNumber
+    )
 
     // Get the address for every AskMi instance
     let askMis = events.map((event) => event.args && event.args['askMi'])

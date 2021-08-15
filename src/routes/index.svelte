@@ -58,7 +58,7 @@
     <a
       rel="external"
       class="flex items-center gap-2 col-start-1 row-start-1 hover:underline"
-      href={`/instance/${$askMiStore['address']}`}
+      href="/instance/{$askMiStore['address']}"
       ><Link />
       <p>Go to your AskMi instance</p>
     </a>

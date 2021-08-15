@@ -57,7 +57,7 @@
             {#each results.owners as { owner, contract }}
               <a
                 class="block p-1 no-underline hover:underline"
-                href={`/instance/${contract}`}><Blockie address={owner} /></a
+                href="/instance/{contract}"><Blockie address={owner} /></a
               >
             {/each}
           </section>
@@ -68,7 +68,7 @@
             {#each results.contracts as { contract }}
               <a
                 class="block p-1 no-underline hover:underline"
-                href={`/instance/${contract}`}><Blockie address={contract} /></a
+                href="/instance/{contract}"><Blockie address={contract} /></a
               >
             {/each}
           </section>

@@ -16,6 +16,7 @@
   export let digest: string
   export let questioner: string
   export let exchangeIndex: BigNumber
+  let value = ''
 
   $: isOwner = isOwnerCheck($web3Store['signer'], $askMiStore['_owner'])
 </script>
@@ -27,21 +28,22 @@
     >
     <form
       class="mb-5 grid justify-center"
-      on:submit|preventDefault={async () => respond(questioner, exchangeIndex)}
+      on:submit|preventDefault={async () =>
+        respond(value, questioner, exchangeIndex)}
     >
       <textarea
-        bind:value={$userInputs['textArea']}
+        bind:value
         cols="40"
         rows="5"
         class="mb-3 px-3 py-2 bg-transparent ring-1 transition focus:outline-none ring-trueGray-700 focus:ring-trueGray-500 rounded resize-y"
         placeholder="Answer here..."
       />
-      {#if $userInputs['textArea']}
+      {#if value !== ''}
         <h2 class="flex gap-1 items-center font-semibold mb-1">
           <Markdown /> Preview
         </h2>
         <div class="mb-3">
-          {@html DOMPurify.sanitize(marked($userInputs['textArea']))}
+          {@html DOMPurify.sanitize(marked(value))}
         </div>
       {/if}
       <div class="flex gap-4">
