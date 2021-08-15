@@ -2,23 +2,19 @@
   import Button from '$lib/components/Button.svelte'
   import Plus from '$lib/svg/Plus.svelte'
   import Blockie from './Blockie.svelte'
-  import Pending from './Pending.svelte'
   import InfoBubble from './InfoBubble.svelte'
   import { ask } from '$lib/abi-functions/askmi'
   import { constants, utils } from 'ethers'
-  import { askMiStore } from '$lib/stores/askMi'
+  import { askMiStore, derivedValues } from '$lib/stores/askMi'
   import { web3Store } from '$lib/stores/web3'
   import { userInputs } from '$lib/stores/userInputs'
   import { erc20Store } from '$lib/stores/erc20'
   import { approve } from '$lib/abi-functions/erc20'
   import TiersTokensSelect from './TiersTokensSelect.svelte'
 
-  let { isOwnerCheck } = askMiStore
-
   let index: number = 0
   let value = ''
 
-  $: isOwner = isOwnerCheck($web3Store['signer'], $askMiStore['_owner'])
   $: tiers = $askMiStore['_tiers'][$userInputs['tiersToken']].map((tier) =>
     utils.formatUnits(tier, 18)
   )
@@ -26,7 +22,7 @@
 </script>
 
 <!-- If the account is NOT the owner -->
-{#if !isOwner}
+{#if !$derivedValues.isOwner}
   <div class="mb-5 grid justify-center">
     <p class="mb-2 p-1.5 flex gap-2 items-center">
       Ask

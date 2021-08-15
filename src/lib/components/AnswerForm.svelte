@@ -5,23 +5,17 @@
   import DOMPurify from 'dompurify'
   import Markdown from '$lib/svg/Markdown.svelte'
   import ChebronDown from '$lib/svg/Chebron-Down.svelte'
-  import Pending from './Pending.svelte'
   import { respond } from '$lib/abi-functions/askmi'
-  import { web3Store } from '$lib/stores/web3'
-  import { askMiStore } from '$lib/stores/askMi'
-  import { userInputs } from '$lib/stores/userInputs'
+  import { derivedValues } from '$lib/stores/askMi'
   import type { BigNumber } from '@ethersproject/bignumber'
-  let { isOwnerCheck } = askMiStore
 
   export let digest: string
   export let questioner: string
   export let exchangeIndex: BigNumber
   let value = ''
-
-  $: isOwner = isOwnerCheck($web3Store['signer'], $askMiStore['_owner'])
 </script>
 
-{#if digest === '' && isOwner}
+{#if digest === '' && $derivedValues.isOwner}
   <details>
     <summary class="mb-2 flex gap-1 items-center"
       >Answer <ChebronDown /></summary

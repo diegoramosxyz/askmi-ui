@@ -1,8 +1,9 @@
 import type { AskMi, Exchange, Fees, Tip } from '$lib/abi-types/askmi'
 import { BigNumber, constants, Contract } from 'ethers'
-import { get, writable } from 'svelte/store'
+import { derived, get, Readable, writable } from 'svelte/store'
 import { abi as askMiAbi } from '$lib/abi/AskMi.json'
 import { askMi, provider } from './other'
+import { web3Store } from './web3'
 
 const bigZero = BigNumber.from(0)
 
@@ -20,13 +21,6 @@ export type AskMiStore = {
   _tiers: {
     [key: string]: BigNumber[]
   }
-}
-
-type Web3Store = {
-  // provider: ethers.providers.Web3Provider
-  signer: string
-  chainId: string | null
-  pendingTx: string | null
 }
 
 function createAskMiStore() {
@@ -101,14 +95,21 @@ function createAskMiStore() {
         data._exchanges[questioner] = exchanges
         return data
       }),
-    isOwnerCheck: (signer: Web3Store['signer'], _owner: AskMiStore['_owner']) =>
-      !!signer && !!_owner && signer.toLowerCase() === _owner.toLowerCase(),
-    isQuestionerCheck: (questioner: string, signer: Web3Store['signer']) =>
-      questioner.toLowerCase() === signer.toLowerCase(),
+    isQuestionerCheck: (questioner: string) => {
+      let signer = get(web3Store)['signer']
+      return questioner.toLowerCase() === signer.toLowerCase()
+    },
   }
 }
 
 export const askMiStore = createAskMiStore()
+
+export const derivedValues: Readable<{ isOwner: boolean }> = derived(
+  [askMiStore, web3Store],
+  ([$askMiStore, $web3Store]) => ({
+    isOwner: $askMiStore._owner.toLowerCase() === $web3Store.signer,
+  })
+)
 
 export async function populateAskMiStore(contractAddress: string) {
   askMi.set(

@@ -1,8 +1,6 @@
 <script lang="ts">
   import { askMiStore } from '$lib/stores/askMi'
-
   import { userInputs } from '$lib/stores/userInputs'
-
   let val = $askMiStore['_fees']['removal'].toNumber() / 100
   $: _ = userInputs.removalFee(Math.floor(val * 100))
 </script>

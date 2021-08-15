@@ -6,11 +6,7 @@
   import QuestionMark from '$lib/svg/QuestionMark.svelte'
   import Search from './Search.svelte'
   import { web3Store } from '$lib/stores/web3'
-  import { askMiStore } from '$lib/stores/askMi'
-
-  let { isOwnerCheck } = askMiStore
-
-  $: isOwner = isOwnerCheck($web3Store['signer'], $askMiStore['_owner'])
+  import { derivedValues } from '$lib/stores/askMi'
 </script>
 
 <nav class="mb-3 flex justify-between items-center py-3">
@@ -21,7 +17,7 @@
     </a>
   </section>
   <section class="flex flex-row-reverse sm:flex-row gap-2 sm:gap-4">
-    {#if isOwner && !$page.path.startsWith('/edit/')}
+    {#if $derivedValues.isOwner && !$page.path.startsWith('/edit/')}
       <a
         class="no-underline flex items-center gap-2 px-3 py-1.5 ring-1 ring-trueGray-700 rounded"
         href="/edit/${$page.params.address}"

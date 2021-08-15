@@ -8,7 +8,6 @@
   import { BigNumber } from '@ethersproject/bignumber'
   import { utils } from 'ethers'
   import TokenSelect from './TokenSelect.svelte'
-  import Pending from './Pending.svelte'
   import { userInputs } from '$lib/stores/userInputs'
 
   $: tiers = userInputs.tiersAsArray($userInputs['tiers'])
