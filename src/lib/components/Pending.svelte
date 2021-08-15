@@ -1,11 +1,12 @@
 <script>
   import { web3Store } from '$lib/stores/web3'
-
+  import { fade } from 'svelte/transition'
   import ExternalLink from '$lib/svg/ExternalLink.svelte'
 </script>
 
 {#if !!$web3Store['pendingTx']}
   <div
+    transition:fade
     class="absolute z-10 top-5 right-5 px-3 py-2 rounded ring-1 ring-trueGray-100 bg-trueGray-900"
   >
     <a

@@ -36,7 +36,6 @@
           <article
             class="px-4 py-3 rounded max-w-prose ring-1 ring-trueGray-800"
           >
-            {index.toString()}
             {#if balance > ethers.BigNumber.from(0)}
               <p class="mb-2 flex gap-2 items-center">
                 <span
